@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>SHISHIR COIN SHOP</title>
 
-  <!-- External libraries -->
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -747,7 +746,7 @@
         </div>
       </div>
     </div>
-  </div> <!-- END ADMIN PANEL -->
+  </div> 
 
   <div id="coin-edit-modal" class="modal-mask z-[5000]">
      <div class="bottom-sheet">
@@ -904,6 +903,7 @@
       if(!ts) return '';
       try { return new Date(ts).toLocaleString('en-BD',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:true}); } catch(e){ return ''; }
     }
+
     function getOrderStatus(order){
       const legacy = String(order?.status || '').toLowerCase();
       const current = String(order?.order_status || '').toLowerCase();
@@ -1023,6 +1023,7 @@
       return false;
     }
     function toggleLeaderboardUserList(){ leaderboardUserListOpen = !leaderboardUserListOpen; renderUserTrackingSystem(); }
+    
     function renderUserTrackingSystem(){
       const allUsers = collectKnownUsers();
       if($('track-total-users')) $('track-total-users').textContent = allUsers.length;
@@ -1038,6 +1039,7 @@
         return `<div class="tracked-user-card"><div><div class="tracked-user-name">${escapeHtml(u.label)}</div><div class="tracked-user-meta">ID: ${escapeHtml(u.chatId)}</div><div class="tracked-user-status">${statusPill}</div></div><div class="tracked-user-controls"><button class="btn-small ${u.banned?'green':'red'}" type="button" onclick="updateTrackedUserBan('${u.userKey}', ${!u.banned})">${u.banned?'Unban':'Ban'}</button></div></div>`;
       }).join('') || `<div class="empty-state">No users found</div>`;
     }
+    
     function updateTrackedUserBan(key, shouldBan){
       if(!requireFirebase()) return;
       adminConfirm(shouldBan?'Ban this user?':'Unban this user?', 'Are you sure?', shouldBan?'🚫':'✅', async () => {
@@ -1288,7 +1290,7 @@
         proof_image_url:proofImageDataUrl, proof_file_name:proofFileName, proof_uploaded:true, status:'pending', order_status:'pending', payment_status:'pending', timestamp:firebase.database.ServerValue.TIMESTAMP, created_at:firebase.database.ServerValue.TIMESTAMP
       };
       orderRef.set(orderData).then(() => {
-        sendTelegramMessage(TELEGRAM_ADMIN_CHAT_ID, buildNewOrderMessage(orderData)); sendUserTelegramMessage(orderData, buildUserOrderSubmittedMessage(orderData));
+        sendTelegramMessage(TELEGRAM_ADMIN_CHAT_ID, buildNewOrderMessage(orderData)); 
         hideConfirm(); closeOrderModal(); showToast('✓ Order Submitted!','success'); userSwitchTab('history-scr');
       }).catch(err => { showToast('Submit failed','error'); }).finally(() => { submitting = false; btn.textContent = '✓ Submit'; btn.disabled = false; });
     }
@@ -1358,7 +1360,7 @@
         proof_image_url:vpnProofImageDataUrl, proof_file_name:vpnProofFileName, proof_uploaded:true, status:'pending', order_status:'pending', payment_status:'pending', timestamp:firebase.database.ServerValue.TIMESTAMP, created_at:firebase.database.ServerValue.TIMESTAMP
       };
       orderRef.set(orderData).then(() => {
-        sendTelegramMessage(TELEGRAM_ADMIN_CHAT_ID, buildNewOrderMessage(orderData)); sendUserTelegramMessage(orderData, buildUserOrderSubmittedMessage(orderData));
+        sendTelegramMessage(TELEGRAM_ADMIN_CHAT_ID, buildNewOrderMessage(orderData)); 
         $('vpn-checkout-modal').classList.remove('active'); showToast('✓ VPN Order Submitted!','success'); userSwitchTab('history-scr');
       }).catch(err => { showToast('Submit failed','error'); }).finally(() => { submitting = false; btn.textContent = 'CONFIRM VPN ORDER →'; btn.disabled = false; });
     }
@@ -1477,7 +1479,6 @@
       const patch = { order_status:status, status:status==='approved'?'completed':status, updated_at:firebase.database.ServerValue.TIMESTAMP };
       if(status === 'approved'){ patch.payment_status = 'pending'; patch.approved_at = firebase.database.ServerValue.TIMESTAMP; }
       db.ref('orders/' + id).update(patch).then(() => {
-        sendUserTelegramMessage(order, buildOrderStatusMessage(order, status));
         renderAdminOrders(); showToast('Order updated','success'); if(status==='approved') adminSwitchTab('payment');
       });
     }
@@ -1500,7 +1501,6 @@
        };
        db.ref('orders/'+orderId).update(patch).then(() => {
           db.ref(`vpnConfig/${brandKey}/stock/${stockKey}`).remove();
-          sendUserTelegramMessage(order, buildOrderStatusMessage(order, 'approved'));
           $('admin-stock-modal').classList.remove('active');
           renderAdminOrders(); showToast('VPN Delivered!','success'); adminSwitchTab('payment');
        });
@@ -1523,7 +1523,7 @@
       const id = paymentTargetOrderId, refVal = $('payment-ref-input').value.trim(), o = globalOrders[id];
       if(!refVal) return showToast('Enter Reference ID','error');
       const patch = { order_status:'approved', payment_status:'paid', paid_at:firebase.database.ServerValue.TIMESTAMP, payment_reference_id:refVal };
-      db.ref('orders/'+id).update(patch).then(()=>{ sendUserTelegramMessage(o, buildPaymentPaidMessage(o)); closePaymentModal(); renderAdminOrders(); showToast('Marked as Paid','success'); });
+      db.ref('orders/'+id).update(patch).then(()=>{ closePaymentModal(); renderAdminOrders(); showToast('Marked as Paid','success'); });
     }
 
     async function handlePaymentProofFileChange(e){
@@ -1697,6 +1697,11 @@
       $('admin-confirm-ok').addEventListener('click', () => { if(typeof adminConfirmCallback === 'function') adminConfirmCallback(); $('admin-confirm').classList.remove('active'); });
       $('proof-close-btn').addEventListener('click', closeProofModal);
       $('payment-cancel-btn').addEventListener('click', closePaymentModal);
+
+      // Binding file input trigger buttons
+      if($('proof-select-btn')) $('proof-select-btn').addEventListener('click', () => $('proof-file').click());
+      if($('vpn-proof-select-btn')) $('vpn-proof-select-btn').addEventListener('click', () => $('vpn-proof-file').click());
+      if($('broadcast-image-select-btn')) $('broadcast-image-select-btn').addEventListener('click', () => $('broadcast-image-file').click());
       
       // File Inputs
       $('proof-file').addEventListener('change', handleProofFileChange);
