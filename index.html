@@ -106,13 +106,6 @@
     .hist-order-id{font-size:10px;font-weight:700;color:var(--subtext);}
     .hist-payout{font-size:14px;font-weight:900;color:var(--sky-dark);}
 
-    .lb-card{background:var(--panel2);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow-sm);animation:riseUp .35s ease both;}
-    .lb-rank{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;}
-    .rank-1{background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#111;box-shadow:0 2px 8px rgba(251,191,36,.4);}
-    .rank-2{background:linear-gradient(135deg,#94a3b8,#cbd5e1);color:#111;}
-    .rank-3{background:linear-gradient(135deg,#b45309,#d97706);color:#fff;}
-    .rank-n{background:var(--sky-light);color:var(--sky-dark);border:1px solid rgba(56,189,248,.3);}
-
     .nav-dock{position:fixed;bottom:16px;left:14px;right:14px;max-width:560px;margin:auto;height:68px;background:var(--panel2);border:1px solid var(--border-hi);border-radius:22px;display:flex;justify-content:space-around;align-items:center;z-index:1000;box-shadow:var(--shadow-lg);}
     .nav-tab{border:none;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 12px;border-radius:16px;transition:all .2s ease;color:var(--subtext);}
     .nav-icon{font-size:21px;transition:transform .2s ease;}
@@ -232,7 +225,6 @@
     #access-denied{position:fixed;inset:0;background:var(--bg);z-index:10000;display:none;align-items:center;justify-content:center;padding:24px;}.denied-box{background:rgba(39,39,42,.95);border:1px solid rgba(248,113,113,.3);border-radius:32px;padding:36px 30px;text-align:center;width:100%;max-width:340px;box-shadow:0 0 60px rgba(248,113,113,.15),0 30px 60px rgba(0,0,0,.8);animation:riseUp .5s ease both;}.denied-icon{font-size:56px;margin-bottom:14px;filter:drop-shadow(0 0 20px rgba(248,113,113,.6));}.denied-title{font-size:22px;font-weight:900;color:var(--danger);margin-bottom:10px;}.denied-text{font-size:13px;color:var(--subtext);line-height:1.65;margin-bottom:22px;}
     .toast{position:fixed;bottom:108px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--gray-light);border:1px solid var(--border);border-radius:12px;padding:11px 20px;font-size:12px;font-weight:700;color:var(--text);z-index:9000;opacity:0;transition:all .3s ease;white-space:nowrap;pointer-events:none;box-shadow:var(--shadow-lg);max-width:92vw;overflow:hidden;text-overflow:ellipsis;}.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}.toast.admin{top:20px;bottom:auto;transform:translateX(-50%) translateY(-20px);}.toast.admin.show{transform:translateX(-50%) translateY(0);}.empty-state{text-align:center;padding:40px 20px;color:var(--subtext);font-size:13px;font-weight:600;}.empty-icon{font-size:36px;margin-bottom:10px;opacity:.4;}::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border-hi);border-radius:2px;}
 
-
     .settings-shell{animation:riseUp .35s ease both;}
     .settings-page.hidden{display:none!important;}
     .settings-main-head{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:18px;margin-bottom:14px;box-shadow:var(--shadow-sm);}
@@ -250,10 +242,6 @@
     .user-track-stat small{font-size:8px;font-weight:900;letter-spacing:1.2px;color:var(--subtext);display:block;margin-bottom:4px;text-transform:uppercase;}
     .user-track-stat b{font-size:22px;font-weight:900;color:var(--sky-dark);line-height:1;}
     .user-track-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px;}
-    .manual-leaderboard-box{background:rgba(56,189,248,.055);border:1px dashed rgba(56,189,248,.28);border-radius:16px;padding:14px;margin:0 0 14px;}
-    .manual-leaderboard-note{font-size:10px;font-weight:700;color:var(--subtext);line-height:1.45;margin:-2px 0 10px;}
-    .leader-row-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
-    .leader-edit-btn{background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.35);color:var(--sky-dark);padding:7px 10px;border-radius:9px;font-size:9px;font-weight:900;}
     .tracked-user-list,.notice-user-select-list{display:grid;gap:8px;margin-top:10px;}
     .user-tracking-search{margin-bottom:10px;}
     .tracked-user-card,.notice-user-check{background:rgba(0,0,0,.18);border:1px solid var(--border);border-radius:14px;padding:11px 12px;}
@@ -332,11 +320,6 @@
       <div id="history-list"></div>
     </div>
 
-    <div id="rank-scr" style="display:none;padding-top:6px;">
-      <div class="sec-title">TOP 10 SELLERS</div>
-      <div id="rank-list"></div>
-    </div>
-
     <div id="tutorial-scr" style="display:none;padding-top:6px;">
       <div class="sec-title">TUTORIAL VIDEOS</div>
       <div id="tutorial-list"></div>
@@ -345,7 +328,6 @@
     <nav class="nav-dock" id="user-nav">
       <button class="nav-tab active" id="tab-home" type="button" data-screen="home-scr"><span class="nav-icon">🏠</span><span class="nav-label">Market</span></button>
       <button class="nav-tab" id="tab-hist" type="button" data-screen="history-scr"><span class="nav-icon">🕒</span><span class="nav-label">History</span></button>
-      <button class="nav-tab" id="tab-rank" type="button" data-screen="rank-scr"><span class="nav-icon">🏆</span><span class="nav-label">Ranks</span></button>
       <button class="nav-tab" id="tab-tutorial" type="button" data-screen="tutorial-scr"><span class="nav-icon">▶️</span><span class="nav-label">Tutorial</span></button>
     </nav>
   </div>
@@ -410,6 +392,7 @@
       <button class="tab-item" id="admin-tab-settings" type="button" data-admin-tab="settings">⚙ SETTINGS</button>
     </div>
     <div id="order-section"><div id="payment-tools" class="payment-tools hidden"><input type="search" id="payment-search" class="form-input" placeholder="Search username, coin ID, target ID"><select id="payment-filter" class="form-input"><option value="pending">Pending Payment</option><option value="paid">Paid Payment</option><option value="all">All Payments</option></select></div><div id="order-list"></div></div>
+    
     <div id="settings-section" class="settings-section">
       <div class="settings-shell">
         <div id="settings-main-page" class="settings-page">
@@ -418,9 +401,9 @@
             <div class="settings-main-sub">Choose one module to manage. Each section opens on its own clean page so the admin panel stays simple and mobile friendly.</div>
           </div>
           <div class="settings-menu-grid">
-            <button class="settings-module-card" type="button" data-settings-module="leaderboard-management">
-              <div class="settings-module-icon" style="background:rgba(251,191,36,.1);color:var(--warning);">🏆</div>
-              <div><div class="settings-module-title">Leaderboard Management</div><div class="settings-module-desc">View, delete, or reset seller ranking data.</div><div class="settings-module-path">/settings/leaderboard-management</div></div>
+            <button class="settings-module-card" type="button" data-settings-module="user-management">
+              <div class="settings-module-icon" style="background:rgba(251,191,36,.1);color:var(--warning);">👥</div>
+              <div><div class="settings-module-title">User Management</div><div class="settings-module-desc">View tracked users, manage bans, and notifications.</div><div class="settings-module-path">/settings/user-management</div></div>
               <div class="settings-module-arrow">›</div>
             </button>
             <button class="settings-module-card" type="button" data-settings-module="coin-management">
@@ -451,10 +434,10 @@
           </div>
         </div>
 
-        <div id="settings-leaderboard-management" class="settings-page settings-module-page hidden" data-settings-page="leaderboard-management">
-          <div class="settings-page-head"><div class="settings-breadcrumb"><span>Settings</span><span>›</span><span>Leaderboard Management</span></div><div class="settings-page-title-row"><div class="settings-page-title">Leaderboard Management</div><button class="settings-back-inline" type="button" data-settings-back>← Back to Settings</button></div></div>
+        <div id="settings-user-management" class="settings-page settings-module-page hidden" data-settings-page="user-management">
+          <div class="settings-page-head"><div class="settings-breadcrumb"><span>Settings</span><span>›</span><span>User Management</span></div><div class="settings-page-title-row"><div class="settings-page-title">User Management</div><button class="settings-back-inline" type="button" data-settings-back>← Back to Settings</button></div></div>
           <div class="settings-group">
-            <div class="settings-group-title"><div class="stitle-bar" style="background:var(--gold);"></div>🏆 LEADERBOARD MANAGEMENT</div>
+            <div class="settings-group-title"><div class="stitle-bar" style="background:var(--sky-dark);"></div>👥 USER TRACKING</div>
             <div class="user-tracking-grid">
               <div class="user-track-stat"><small>Total Users</small><b id="track-total-users">0</b></div>
               <div class="user-track-stat"><small>Active Now</small><b id="track-active-users">0</b></div>
@@ -465,19 +448,6 @@
             </div>
             <input type="search" id="user-tracking-search" class="form-input user-tracking-search hidden" placeholder="Search by name, username or user ID">
             <div id="user-tracking-list" class="tracked-user-list hidden"></div>
-            <div class="settings-group-title" style="margin-top:18px;"><div class="stitle-bar" style="background:var(--sky-dark);"></div>🏅 SELLER RANKINGS</div>
-            <div class="manual-leaderboard-box">
-              <input type="hidden" id="manual-leaderboard-key">
-              <div class="manual-leaderboard-note">Admin চাইলে real user name অথবা demo/fake display name দিয়ে manually leaderboard entry add/update করতে পারবে। Amount বেশি হলে ranking automatically উপরে দেখাবে।</div>
-              <input type="text" id="manual-leaderboard-name" class="form-input" placeholder="User Name / Demo Name">
-              <input type="number" id="manual-leaderboard-amount" class="form-input" placeholder="Amount / Score" min="0" step="any">
-              <div class="form-row2">
-                <button class="btn-action btn-cyan" type="button" id="save-manual-leaderboard-btn">+ Add / Update Entry</button>
-                <button class="btn-action btn-danger" type="button" id="clear-manual-leaderboard-form-btn">Clear</button>
-              </div>
-            </div>
-            <div id="leaderboard-list"></div>
-            <button class="btn-action btn-danger" type="button" id="clear-leaderboard-btn" style="margin-top:12px;">🗑 Reset All Rankings</button>
           </div>
         </div>
 
@@ -535,6 +505,7 @@
         </div>
       </div>
     </div>
+  </div>
 
   <div id="admin-confirm" class="confirm-mask">
     <div class="confirm-box"><div class="confirm-icon" id="admin-confirm-icon">⚠️</div><div class="confirm-title" id="admin-confirm-title">Confirm Action</div><p id="admin-confirm-desc" style="font-size:13px;color:var(--subtext);text-align:center;margin-bottom:20px;line-height:1.5;"></p><div class="confirm-btns"><button class="btn-back" type="button" id="admin-confirm-cancel">Cancel</button><button class="btn-go" type="button" id="admin-confirm-ok">Confirm</button></div></div>
@@ -560,7 +531,6 @@
 
   <script>
     /**********************************************************************
-     /**********************************************************************
  * CHANGEABLE CONFIG AREA
  * Replace these values before publishing your Telegram Mini App.
  **********************************************************************/
@@ -606,14 +576,11 @@ const DEFAULT_DISCLAIMER_NOTICE = `Please check your coin amount, sender ID, pay
 
     const ADMIN_IDS = [8505710811];
 
-    // Telegram Notification Config - DIRECT HTML MODE (NOT SAFE FOR PUBLIC HOSTING)
-    // IMPORTANT: Live bot token HTML/frontend এ রাখলে View Source থেকে সবাই দেখে ফেলতে পারবে.
-    // আমি security reason-এ real token বসাইনি. BotFather থেকে NEW token নিয়ে নিচের placeholder replace করবেন.
     const TELEGRAM_BOT_TOKEN = "8875964438:AAF2lT2euFccjbRUbMeQWkFLZDCjUmfuQSI";
     const TELEGRAM_ADMIN_CHAT_ID = "8505710811";
     const TELEGRAM_NOTIFY_ENABLED = true;
     const NOTIFICATION_BACKEND_MODE = false;
-    const MAX_PROOF_DATA_URL_LENGTH = 950000; // Realtime DB-safe guard for compressed proof image.
+    const MAX_PROOF_DATA_URL_LENGTH = 950000; 
 
     const firebaseConfig = {
   apiKey: "AIzaSyCZqrp0hx-tkAJjUqyZ7Beas50HE5lzq6c",
@@ -645,10 +612,9 @@ const DEFAULT_DISCLAIMER_NOTICE = `Please check your coin amount, sender ID, pay
     let selAdminRate = 0, selAdminRateMinCoins = 0, selMinSubmitLimit = DEFAULT_MIN_SUBMIT_LIMIT, selInputType = 'username';
     let channelLinkValue = '', helpLinkValue = '', disclaimerNoticeValue = DEFAULT_DISCLAIMER_NOTICE, submitting = false;
     let proofFileName = '', proofImageDataUrl = '', proofProcessing = false;
-    let marketCache = {}, tutorialCache = {}, userRegistryCache = {}, leaderboardCache = {}, globalOrders = {}, currentAdminTab = 'pending', adminStarted = false, adminConfirmCallback = null, paymentTargetOrderId = '', proofModalSrc = '', paymentProofTargetOrderId = '', paymentProofProcessing = false, broadcastNoticeImageDataUrl = '', broadcastNoticeImageFileName = '', broadcastNoticeImageProcessing = false, leaderboardUserListOpen = false, userTrackingSearchTerm = '';
+    let marketCache = {}, tutorialCache = {}, userRegistryCache = {}, globalOrders = {}, currentAdminTab = 'pending', adminStarted = false, adminConfirmCallback = null, paymentTargetOrderId = '', proofModalSrc = '', paymentProofTargetOrderId = '', paymentProofProcessing = false, broadcastNoticeImageDataUrl = '', broadcastNoticeImageFileName = '', broadcastNoticeImageProcessing = false, userListOpen = false, userTrackingSearchTerm = '';
     const ACTIVE_USER_WINDOW_MS = 10 * 60 * 1000;
 
-    // Safety guard: app যেন কোনো runtime error হলেও loading screen-এ আটকে না থাকে.
     window.addEventListener('error', (event) => {
       console.error('Runtime error:', event.error || event.message);
       setTimeout(finishLoading, 0);
@@ -729,6 +695,7 @@ const DEFAULT_DISCLAIMER_NOTICE = `Please check your coin amount, sender ID, pay
       if(!raw) return '';
       return normalizeLink(raw);
     }
+    
     function renderBroadcastNoticePreview(){
       const textEl = $('broadcast-notice-text');
       const videoEl = $('broadcast-video-link');
@@ -736,19 +703,10 @@ const DEFAULT_DISCLAIMER_NOTICE = `Please check your coin amount, sender ID, pay
       if(!preview) return;
       const noticeText = String(textEl ? textEl.value : '').trim();
       const videoLink = normalizeBroadcastVideoLink(videoEl ? videoEl.value : '');
-      const imageNote = broadcastNoticeImageDataUrl ? `
-
-📸 ছবি/স্ক্রিনশট যুক্ত করা হয়েছে` : '';
+      const imageNote = broadcastNoticeImageDataUrl ? `\n\n📸 ছবি/স্ক্রিনশট যুক্ত করা হয়েছে` : '';
       const mode = getBroadcastTargetMode();
-      const targetNote = mode === 'selected' ? `
-🎯 Target: Selected Users (${getSelectedBroadcastUserKeys().size})` : `
-🎯 Target: All Eligible Users`;
-      preview.textContent = noticeText ? `📢 SHISHIR COIN SHOP Notice${targetNote}
-
-${noticeText}${videoLink ? `
-
-🎬 ভিডিও লিংক:
-${videoLink}` : ''}${imageNote}` : 'Notice text লিখলে preview এখানে দেখাবে।';
+      const targetNote = mode === 'selected' ? `\n🎯 Target: Selected Users (${getSelectedBroadcastUserKeys().size})` : `\n🎯 Target: All Eligible Users`;
+      preview.textContent = noticeText ? `📢 SHISHIR COIN SHOP Notice${targetNote}\n\n${noticeText}${videoLink ? `\n\n🎬 ভিডিও লিংক:\n${videoLink}` : ''}${imageNote}` : 'Notice text লিখলে preview এখানে দেখাবে।';
     }
     function resetBroadcastNoticeImage(){
       broadcastNoticeImageDataUrl = '';
@@ -833,8 +791,8 @@ ${videoLink}` : ''}${imageNote}` : 'Notice text লিখলে preview এখ�
       }
       return false;
     }
-    function toggleLeaderboardUserList(){
-      leaderboardUserListOpen = !leaderboardUserListOpen;
+    function toggleUserList(){
+      userListOpen = !userListOpen;
       renderUserTrackingSystem();
     }
     function renderUserTrackingSystem(){
@@ -846,10 +804,10 @@ ${videoLink}` : ''}${imageNote}` : 'Notice text লিখলে preview এখ�
       const allUsers = collectKnownUsers();
       totalEl.textContent = allUsers.length;
       activeEl.textContent = allUsers.filter(u => u.active).length;
-      if($('toggle-user-list-btn')) $('toggle-user-list-btn').textContent = leaderboardUserListOpen ? '👥 Hide User List' : '👥 User List';
-      listEl.classList.toggle('hidden', !leaderboardUserListOpen);
-      if(searchEl) searchEl.classList.toggle('hidden', !leaderboardUserListOpen);
-      if(!leaderboardUserListOpen) return;
+      if($('toggle-user-list-btn')) $('toggle-user-list-btn').textContent = userListOpen ? '👥 Hide User List' : '👥 User List';
+      listEl.classList.toggle('hidden', !userListOpen);
+      if(searchEl) searchEl.classList.toggle('hidden', !userListOpen);
+      if(!userListOpen) return;
       const q = String(userTrackingSearchTerm || (searchEl ? searchEl.value : '') || '').trim().toLowerCase();
       const users = q ? allUsers.filter(u => {
         const hay = [u.label, u.username, u.display_name, u.displayName, u.user, u.name, u.chatId, u.userKey].map(v => String(v || '').toLowerCase()).join(' ');
@@ -869,14 +827,13 @@ ${videoLink}` : ''}${imageNote}` : 'Notice text লিখলে preview এখ�
           <div class="tracked-user-controls">
             <button class="btn-small ${u.banned ? 'green' : 'red'}" type="button" data-user-ban="${safeKey}" data-ban-state="${u.banned ? '0' : '1'}">${u.banned ? 'Unban' : 'Ban'}</button>
             <button class="btn-small ${u.notificationEnabled ? 'gray' : 'blue'}" type="button" data-user-notify="${safeKey}" data-notify-state="${u.notificationEnabled ? '0' : '1'}">${u.notificationEnabled ? 'Notify Off' : 'Notify On'}</button>
-            <button class="btn-small blue" type="button" data-manual-leaderboard="${safeKey}">Set Score</button>
           </div>
         </div>`;
       }).join('') || `<div class="empty-state"><div class="empty-icon">👥</div>${q ? 'No user matched your search' : 'No tracked users yet'}</div>`;
       document.querySelectorAll('[data-user-ban]').forEach(btn => btn.addEventListener('click', () => updateTrackedUserBan(btn.dataset.userBan, btn.dataset.banState === '1')));
       document.querySelectorAll('[data-user-notify]').forEach(btn => btn.addEventListener('click', () => updateTrackedUserNotification(btn.dataset.userNotify, btn.dataset.notifyState === '1')));
-      document.querySelectorAll('[data-manual-leaderboard]').forEach(btn => btn.addEventListener('click', () => setManualLeaderboardUser(btn.dataset.manualLeaderboard)));
     }
+    
     function ensureUserRecordExists(key){
       const users = collectKnownUsers();
       const u = users.find(x => x.userKey === key) || {userKey:key};
@@ -1049,7 +1006,6 @@ ${videoLink}` : ''}${imageNote}` : 'Notice text লিখলে preview এখ�
         disable_web_page_preview: 'true'
       };
 
-      // Browser CORS এর কারণে response read করা যায় না; hidden form request reliably send করে.
       try{
         telegramPostByHiddenForm(payload);
         return true;
@@ -1126,35 +1082,10 @@ ${videoLink}` : ''}${imageNote}` : 'Notice text লিখলে preview এখ�
       return '—';
     }
     function buildNewOrderMessage(order){
-      return `🆕 <b>NEW ORDER RECEIVED</b>
-
-👤 <b>User:</b> ${tgEscape(orderUserLabel(order))}
-🆔 <b>User ID:</b> ${tgEscape(order.userId || order.user_id || '—')}
-🪙 <b>Coin:</b> ${tgEscape(order.coin || '—')}
-📦 <b>Amount:</b> ${Number(order.amt || 0).toLocaleString()}
-💰 <b>Payout:</b> ${Number(order.payable || 0).toFixed(2)}৳
-💳 <b>Method:</b> ${tgEscape(order.method || '—')}
-📱 <b>Payment:</b> ${tgEscape(getOrderPaymentNumber(order))}
-📨 <b>Sender:</b> ${tgEscape(order.sender || '—')}
-🎯 <b>Target ID:</b> ${tgEscape(order.targetId || order.target_id || '—')}
-📸 <b>Proof:</b> ${order.proof_uploaded ? 'Uploaded' : 'Not uploaded'}
-
-🆔 <b>Order ID:</b> #${tgEscape(orderShortId(order))}
-⏳ <b>Status:</b> Pending / অপেক্ষমান`;
+      return `🆕 <b>NEW ORDER RECEIVED</b>\n\n👤 <b>User:</b> ${tgEscape(orderUserLabel(order))}\n🆔 <b>User ID:</b> ${tgEscape(order.userId || order.user_id || '—')}\n🪙 <b>Coin:</b> ${tgEscape(order.coin || '—')}\n📦 <b>Amount:</b> ${Number(order.amt || 0).toLocaleString()}\n💰 <b>Payout:</b> ${Number(order.payable || 0).toFixed(2)}৳\n💳 <b>Method:</b> ${tgEscape(order.method || '—')}\n📱 <b>Payment:</b> ${tgEscape(getOrderPaymentNumber(order))}\n📨 <b>Sender:</b> ${tgEscape(order.sender || '—')}\n🎯 <b>Target ID:</b> ${tgEscape(order.targetId || order.target_id || '—')}\n📸 <b>Proof:</b> ${order.proof_uploaded ? 'Uploaded' : 'Not uploaded'}\n\n🆔 <b>Order ID:</b> #${tgEscape(orderShortId(order))}\n⏳ <b>Status:</b> Pending / অপেক্ষমান`;
     }
     function buildUserOrderSubmittedMessage(order){
-      return `📩 <b>অর্ডার গ্রহণ করা হয়েছে</b>
-
-আপনার কয়েন সেল অর্ডারটি সফলভাবে গ্রহণ করা হয়েছে। আমাদের টিম অর্ডারটি যাচাই করছে। যাচাই শেষে পরবর্তী আপডেট দেওয়া হবে।
-
-🆔 <b>অর্ডার আইডি:</b> #${tgEscape(orderShortId(order))}
-🪙 <b>কয়েন:</b> ${tgEscape(order.coin || '—')}
-📦 <b>পরিমাণ:</b> ${Number(order.amt || 0).toLocaleString()}
-💰 <b>পেমেন্ট:</b> ${Number(order.payable || 0).toFixed(2)}৳
-💳 <b>মাধ্যম:</b> ${tgEscape(order.method || '—')}
-📱 <b>পেমেন্ট নম্বর:</b> ${tgEscape(getOrderPaymentNumber(order))}
-
-<b>SHISHIR COIN SHOP-এর সাথে নিরাপদ লেনদেনের জন্য ধন্যবাদ।</b>`;
+      return `📩 <b>অর্ডার গ্রহণ করা হয়েছে</b>\n\nআপনার কয়েন সেল অর্ডারটি সফলভাবে গ্রহণ করা হয়েছে। আমাদের টিম অর্ডারটি যাচাই করছে। যাচাই শেষে পরবর্তী আপডেট দেওয়া হবে।\n\n🆔 <b>অর্ডার আইডি:</b> #${tgEscape(orderShortId(order))}\n🪙 <b>কয়েন:</b> ${tgEscape(order.coin || '—')}\n📦 <b>পরিমাণ:</b> ${Number(order.amt || 0).toLocaleString()}\n💰 <b>পেমেন্ট:</b> ${Number(order.payable || 0).toFixed(2)}৳\n💳 <b>মাধ্যম:</b> ${tgEscape(order.method || '—')}\n📱 <b>পেমেন্ট নম্বর:</b> ${tgEscape(getOrderPaymentNumber(order))}\n\n<b>SHISHIR COIN SHOP-এর সাথে নিরাপদ লেনদেনের জন্য ধন্যবাদ।</b>`;
     }
     function getOrderUserChatId(order){
       const candidates = [
@@ -1193,58 +1124,17 @@ ${videoLink}` : ''}${imageNote}` : 'Notice text লিখলে preview এখ�
       const rejected = status === 'rejected';
 
       if(approved){
-        return `✅ <b>অর্ডার অনুমোদিত হয়েছে</b>
-
-আপনার কয়েন সেল অর্ডারটি যাচাই করে অনুমোদন করা হয়েছে। পেমেন্ট প্রক্রিয়া চলমান আছে। পেমেন্ট সম্পন্ন হলে আপডেট দেওয়া হবে।
-
-🆔 <b>অর্ডার আইডি:</b> #${tgEscape(orderShortId(order))}
-🪙 <b>কয়েন:</b> ${tgEscape(order.coin || '—')}
-📦 <b>পরিমাণ:</b> ${Number(order.amt || 0).toLocaleString()}
-💰 <b>পেমেন্ট:</b> ${Number(order.payable || 0).toFixed(2)}৳
-💳 <b>মাধ্যম:</b> ${tgEscape(order.method || '—')}
-📱 <b>পেমেন্ট নম্বর:</b> ${tgEscape(getOrderPaymentNumber(order))}
-
-<b>SHISHIR COIN SHOP-এর সাথে নিরাপদ লেনদেনের জন্য ধন্যবাদ।</b>`;
+        return `✅ <b>অর্ডার অনুমোদিত হয়েছে</b>\n\nআপনার কয়েন সেল অর্ডারটি যাচাই করে অনুমোদন করা হয়েছে। পেমেন্ট প্রক্রিয়া চলমান আছে। পেমেন্ট সম্পন্ন হলে আপডেট দেওয়া হবে।\n\n🆔 <b>অর্ডার আইডি:</b> #${tgEscape(orderShortId(order))}\n🪙 <b>কয়েন:</b> ${tgEscape(order.coin || '—')}\n📦 <b>পরিমাণ:</b> ${Number(order.amt || 0).toLocaleString()}\n💰 <b>পেমেন্ট:</b> ${Number(order.payable || 0).toFixed(2)}৳\n💳 <b>মাধ্যম:</b> ${tgEscape(order.method || '—')}\n📱 <b>পেমেন্ট নম্বর:</b> ${tgEscape(getOrderPaymentNumber(order))}\n\n<b>SHISHIR COIN SHOP-এর সাথে নিরাপদ লেনদেনের জন্য ধন্যবাদ।</b>`;
       }
-
       if(rejected){
-        return `❌ <b>অর্ডার বাতিল করা হয়েছে</b>
-
-আপনার কয়েন সেল অর্ডারটি যাচাই করা হয়েছে, কিন্তু এই মুহূর্তে অনুমোদন করা সম্ভব হয়নি। বিস্তারিত জানতে সাপোর্টে যোগাযোগ করুন।
-
-🆔 <b>অর্ডার আইডি:</b> #${tgEscape(orderShortId(order))}
-🪙 <b>কয়েন:</b> ${tgEscape(order.coin || '—')}
-📦 <b>পরিমাণ:</b> ${Number(order.amt || 0).toLocaleString()}
-💳 <b>মাধ্যম:</b> ${tgEscape(order.method || '—')}
-
-<b>SHISHIR COIN SHOP-এর সাথে থাকার জন্য ধন্যবাদ।</b>`;
+        return `❌ <b>অর্ডার বাতিল করা হয়েছে</b>\n\nআপনার কয়েন সেল অর্ডারটি যাচাই করা হয়েছে, কিন্তু এই মুহূর্তে অনুমোদন করা সম্ভব হয়নি। বিস্তারিত জানতে সাপোর্টে যোগাযোগ করুন।\n\n🆔 <b>অর্ডার আইডি:</b> #${tgEscape(orderShortId(order))}\n🪙 <b>কয়েন:</b> ${tgEscape(order.coin || '—')}\n📦 <b>পরিমাণ:</b> ${Number(order.amt || 0).toLocaleString()}\n💳 <b>মাধ্যম:</b> ${tgEscape(order.method || '—')}\n\n<b>SHISHIR COIN SHOP-এর সাথে থাকার জন্য ধন্যবাদ।</b>`;
       }
-
-      return `ℹ️ <b>অর্ডার আপডেট হয়েছে</b>
-
-আপনার কয়েন সেল অর্ডারের স্ট্যাটাস আপডেট করা হয়েছে।
-
-🆔 <b>অর্ডার আইডি:</b> #${tgEscape(orderShortId(order))}
-🪙 <b>কয়েন:</b> ${tgEscape(order.coin || '—')}
-📦 <b>পরিমাণ:</b> ${Number(order.amt || 0).toLocaleString()}
-
-<b>SHISHIR COIN SHOP-এর সাথে নিরাপদ লেনদেনের জন্য ধন্যবাদ।</b>`;
+      return `ℹ️ <b>অর্ডার আপডেট হয়েছে</b>\n\nআপনার কয়েন সেল অর্ডারের স্ট্যাটাস আপডেট করা হয়েছে।\n\n🆔 <b>অর্ডার আইডি:</b> #${tgEscape(orderShortId(order))}\n🪙 <b>কয়েন:</b> ${tgEscape(order.coin || '—')}\n📦 <b>পরিমাণ:</b> ${Number(order.amt || 0).toLocaleString()}\n\n<b>SHISHIR COIN SHOP-এর সাথে নিরাপদ লেনদেনের জন্য ধন্যবাদ।</b>`;
     }
     function buildPaymentPaidMessage(order){
-      return `💸 <b>পেমেন্ট সম্পন্ন হয়েছে</b>
-
-আপনার কয়েন সেল অর্ডারের পেমেন্ট সফলভাবে সম্পন্ন করা হয়েছে। অনুগ্রহ করে আপনার পেমেন্ট অ্যাকাউন্ট চেক করুন।
-
-🆔 <b>অর্ডার আইডি:</b> #${tgEscape(orderShortId(order))}
-🪙 <b>কয়েন:</b> ${tgEscape(order.coin || '—')}
-📦 <b>পরিমাণ:</b> ${Number(order.amt || 0).toLocaleString()}
-💰 <b>পেমেন্ট:</b> ${Number(order.payable || 0).toFixed(2)}৳
-💳 <b>মাধ্যম:</b> ${tgEscape(order.method || '—')}
-📱 <b>পেমেন্ট নম্বর:</b> ${tgEscape(getOrderPaymentNumber(order))}
-🔖 <b>রেফারেন্স:</b> ${tgEscape(order.payment_reference_id || '—')}
-
-<b>SHISHIR COIN SHOP-এর সাথে নিরাপদ লেনদেনের জন্য ধন্যবাদ।</b>`;
+      return `💸 <b>পেমেন্ট সম্পন্ন হয়েছে</b>\n\nআপনার কয়েন সেল অর্ডারের পেমেন্ট সফলভাবে সম্পন্ন করা হয়েছে। অনুগ্রহ করে আপনার পেমেন্ট অ্যাকাউন্ট চেক করুন।\n\n🆔 <b>অর্ডার আইডি:</b> #${tgEscape(orderShortId(order))}\n🪙 <b>কয়েন:</b> ${tgEscape(order.coin || '—')}\n📦 <b>পরিমাণ:</b> ${Number(order.amt || 0).toLocaleString()}\n💰 <b>পেমেন্ট:</b> ${Number(order.payable || 0).toFixed(2)}৳\n💳 <b>মাধ্যম:</b> ${tgEscape(order.method || '—')}\n📱 <b>পেমেন্ট নম্বর:</b> ${tgEscape(getOrderPaymentNumber(order))}\n🔖 <b>রেফারেন্স:</b> ${tgEscape(order.payment_reference_id || '—')}\n\n<b>SHISHIR COIN SHOP-এর সাথে নিরাপদ লেনদেনের জন্য ধন্যবাদ।</b>`;
     }
+    
     function finishLoading(){
       if(appLoaded) return;
       appLoaded = true;
@@ -1278,7 +1168,6 @@ ${videoLink}` : ''}${imageNote}` : 'Notice text লিখলে preview এখ�
     function renderNoFirebaseState(){
       $('market-list').innerHTML = '<div class="empty-state"><div class="empty-icon">⚙️</div>Firebase config set করা হয়নি। নিচের line list দেখে config বসান।</div>';
       $('history-list').innerHTML = '<div class="empty-state"><div class="empty-icon">🕒</div>No history yet</div>';
-      $('rank-list').innerHTML = '<div class="empty-state"><div class="empty-icon">🏆</div>Leaderboard empty</div>';
       $('tutorial-list').innerHTML = '<div class="empty-state"><div class="empty-icon">🎬</div>No tutorial videos available right now.</div>';
       $('m-select').innerHTML = '<option value="">No payment method</option>';
       renderDisclaimerNotice();
@@ -1358,7 +1247,6 @@ ${videoLink}` : ''}${imageNote}` : 'Notice text লিখলে preview এখ�
       });
       db.ref('paymentMethods').on('value', snap => renderUserPayments(snap.val() || {}));
       db.ref('orders').orderByChild('userKey').equalTo(userRefKey).on('value', snap => renderUserHistory(snap.val() || {}));
-      db.ref('leaderboard').on('value', snap => { leaderboardCache = snap.val() || {}; renderLeaderboard(leaderboardCache); });
       db.ref('tutorialVideos').on('value', snap => renderTutorialVideos(snap.val() || {}));
       setTimeout(finishLoading, 3500);
     }
@@ -1401,25 +1289,7 @@ ${videoLink}` : ''}${imageNote}` : 'Notice text লিখলে preview এখ�
         return `<div class="hist-card" style="animation-delay:${i*.04}s;"><div class="hist-top"><div><div class="hist-coin-label">${escapeHtml(o.coin || '—')}</div><div class="hist-time">${formatDate(getCreatedAt(o))}</div></div><span class="hist-status-badge hs-${info.cls}">${escapeHtml(info.label).toUpperCase()}</span></div><div class="hist-body"><div class="hist-info-row"><div class="hist-info-cell"><div class="hic-label">AMOUNT</div><div class="hic-value">${Number(o.amt || 0)} ${escapeHtml(o.coin || '')}</div></div><div class="hist-info-cell"><div class="hic-label">METHOD</div><div class="hic-value">${escapeHtml(o.method || '—')}</div></div><div class="hist-info-cell"><div class="hic-label">PAYMENT</div><div class="hic-value">${escapeHtml(o.number || '—')}</div></div><div class="hist-info-cell"><div class="hic-label">SENDER</div><div class="hic-value">${escapeHtml(o.sender || '—')}</div></div>${extraPaymentCells}</div></div><div class="hist-footer"><span class="hist-order-id">💰 Total Paid Out</span><span class="hist-payout">${money(o.payable)}</span></div></div>`;
       }).join('');
     }
-    function sortLeaderboardEntries(entries){
-      return entries.filter(Boolean).sort((a,b) => {
-        const amountDiff = Number(b.totalAmount || 0) - Number(a.totalAmount || 0);
-        if(amountDiff !== 0) return amountDiff;
-        return String(a.displayName || a.user || '').localeCompare(String(b.displayName || b.user || ''));
-      });
-    }
-    function renderLeaderboard(data){
-      const arr = sortLeaderboardEntries(Object.values(data || {})).slice(0,10);
-      if(!arr.length){
-        $('rank-list').innerHTML = '<div class="empty-state"><div class="empty-icon">🏆</div>Leaderboard empty</div>';
-        return;
-      }
-      $('rank-list').innerHTML = arr.map((u,i) => {
-        const rClass = i===0 ? 'rank-1' : i===1 ? 'rank-2' : i===2 ? 'rank-3' : 'rank-n';
-        const name = String(u.displayName || u.user || 'Unknown').replace(/^@/, '');
-        return `<div class="lb-card" style="animation-delay:${i*.03}s;"><div style="display:flex;align-items:center;gap:11px;"><div class="lb-rank ${rClass}">${i+1}</div><div><div style="font-weight:800;font-size:14px;">${escapeHtml(name)}</div><div style="font-size:10px;color:var(--subtext);">Total Amount</div></div></div><b style="color:var(--sky-dark);font-size:15px;">${money(u.totalAmount)}</b></div>`;
-      }).join('');
-    }
+    
     function renderTutorialVideos(data){
       tutorialCache = data || {};
       const arr = Object.values(data || {}).filter(v => v && v.status !== false && (v.video_id || parseYouTubeVideoId(v.youtube_url || v.youtubeUrl || v.url || ''))).sort((a,b) => Number(b.created_at || b.createdAt || b.updated_at || 0) - Number(a.created_at || a.createdAt || a.updated_at || 0));
@@ -1685,8 +1555,9 @@ ${videoLink}` : ''}${imageNote}` : 'Notice text লিখলে preview এখ�
         submitting = false; btn.textContent = '✓ Submit'; btn.disabled = false;
       });
     }
+    
     function userSwitchTab(screenId){
-      ['home-scr','history-scr','rank-scr','tutorial-scr'].forEach(s => $(s).style.display = s === screenId ? 'block' : 'none');
+      ['home-scr','history-scr','tutorial-scr'].forEach(s => $(s).style.display = s === screenId ? 'block' : 'none');
       document.querySelectorAll('#user-nav .nav-tab').forEach(tab => tab.classList.toggle('active', tab.dataset.screen === screenId));
       try{ tg.HapticFeedback.impactOccurred('light'); }catch(e){}
     }
@@ -1751,14 +1622,13 @@ ${videoLink}` : ''}${imageNote}` : 'Notice text লিখলে preview এখ�
         renderBroadcastUserSelectList();
       });
       db.ref('users').on('value', snap => { userRegistryCache = snap.val() || {}; renderUserTrackingSystem(); renderBroadcastUserSelectList(); });
-      db.ref('leaderboard').on('value', snap => { leaderboardCache = snap.val() || {}; renderAdminLeaderboard(leaderboardCache); });
       db.ref('marketConfig').on('value', snap => renderAdminCoins(snap.val() || {}));
       db.ref('paymentMethods').on('value', snap => renderAdminPayments(snap.val() || {}));
       db.ref('tutorialVideos').on('value', snap => { tutorialCache = snap.val() || {}; renderAdminTutorials(tutorialCache); });
       loadAdminBranding();
     }
     const SETTINGS_MODULE_LABELS = {
-      'leaderboard-management':'Leaderboard Management',
+      'user-management':'User Management',
       'coin-management':'Coin Management',
       'branding-links':'Branding & Links',
       'disclaimer-notice':'Disclaimer Notice',
@@ -1810,6 +1680,7 @@ ${videoLink}` : ''}${imageNote}` : 'Notice text লিখলে preview এখ�
       const h = String(location.hash || '').toLowerCase();
       return h === '#admin' || h === '#settings' || h === '#/settings' || h.startsWith('#settings/') || h.startsWith('#/settings/');
     }
+    
     function adminSwitchTab(tab, options = {}){
       currentAdminTab = tab;
       document.querySelectorAll('[data-admin-tab]').forEach(t => t.classList.toggle('active', t.dataset.adminTab === tab));
@@ -1975,14 +1846,7 @@ ${videoLink}` : ''}${imageNote}` : 'Notice text লিখলে preview এখ�
     function buildBroadcastNoticeMessage(text, videoLink){
       const safeText = tgEscape(text);
       const safeVideo = tgEscape(videoLink || '');
-      return `📢 <b>SHISHIR COIN SHOP Notice</b>
-
-${safeText}${safeVideo ? `
-
-🎬 <b>ভিডিও লিংক:</b>
-${safeVideo}` : ''}
-
-<b>SHISHIR COIN SHOP-এর সাথে নিরাপদ লেনদেনের জন্য ধন্যবাদ।</b>`;
+      return `📢 <b>SHISHIR COIN SHOP Notice</b>\n\n${safeText}${safeVideo ? `\n\n🎬 <b>ভিডিও লিংক:</b>\n${safeVideo}` : ''}\n\n<b>SHISHIR COIN SHOP-এর সাথে নিরাপদ লেনদেনের জন্য ধন্যবাদ।</b>`;
     }
     function delay(ms){ return new Promise(resolve => setTimeout(resolve, ms)); }
     function sendBroadcastNotice(){
@@ -2038,6 +1902,7 @@ ${safeVideo}` : ''}
         }
       });
     }
+    
     function updateOrderStatus(id,orderStatus){
       if(!requireFirebase()) return;
       const order = globalOrders[id];
@@ -2059,7 +1924,7 @@ ${safeVideo}` : ''}
       renderAdminOrders();
       db.ref('orders/' + id).update(patch).then(() => {
         sendUserTelegramMessage(order, buildOrderStatusMessage(order, orderStatus));
-        if(orderStatus === 'approved' && order){ updateLeaderboardFromOrder(order); showToast('✓ Order Approved. Payment pending now.','success'); adminSwitchTab('payment'); }
+        if(orderStatus === 'approved'){ showToast('✓ Order Approved. Payment pending now.','success'); adminSwitchTab('payment'); }
         else if(orderStatus === 'rejected') showToast('Order Rejected','warning');
       }).catch(err => { console.error(err); showToast('Update failed','error'); });
       try{ tg.HapticFeedback.notificationOccurred('success'); }catch(e){}
@@ -2099,85 +1964,6 @@ ${safeVideo}` : ''}
     function updateOrder(id,status){
       updateOrderStatus(id, status === 'completed' ? 'approved' : status);
     }
-    function resetManualLeaderboardForm(){
-      if($('manual-leaderboard-key')) $('manual-leaderboard-key').value = '';
-      if($('manual-leaderboard-name')) $('manual-leaderboard-name').value = '';
-      if($('manual-leaderboard-amount')) $('manual-leaderboard-amount').value = '';
-      if($('save-manual-leaderboard-btn')) $('save-manual-leaderboard-btn').textContent = '+ Add / Update Entry';
-    }
-    function manualLeaderboardKeyFromName(name){
-      return 'manual_' + safeDbKey(String(name || '').trim().toLowerCase());
-    }
-    function fillManualLeaderboardForm(entry){
-      if(!entry) return;
-      const key = entry.key || entry.userKey || '';
-      const name = String(entry.displayName || entry.user || entry.label || key || '').replace(/^@/, '');
-      const amount = Number(entry.totalAmount || 0);
-      if($('manual-leaderboard-key')) $('manual-leaderboard-key').value = key;
-      if($('manual-leaderboard-name')) $('manual-leaderboard-name').value = name;
-      if($('manual-leaderboard-amount')) $('manual-leaderboard-amount').value = Number.isFinite(amount) && amount > 0 ? String(amount) : '';
-      if($('save-manual-leaderboard-btn')) $('save-manual-leaderboard-btn').textContent = 'Update Entry';
-      try{ $('manual-leaderboard-name').scrollIntoView({behavior:'smooth', block:'center'}); }catch(e){}
-      setTimeout(() => { try{ $('manual-leaderboard-amount').focus(); }catch(e){} }, 250);
-    }
-    function setManualLeaderboardUser(key){
-      const user = collectKnownUsers().find(u => u.userKey === key) || {userKey:key, label:key};
-      const current = leaderboardCache[key] ? {key, ...leaderboardCache[key]} : {key, userKey:key, displayName:user.label, user:user.label, totalAmount:0};
-      fillManualLeaderboardForm(current);
-      showToast('Name এবং amount দিয়ে leaderboard entry save করুন','success');
-    }
-    function saveManualLeaderboardEntry(){
-      if(!requireFirebase()) return;
-      const name = String(($('manual-leaderboard-name') || {}).value || '').trim();
-      const amountRaw = String(($('manual-leaderboard-amount') || {}).value || '').replace(/,/g,'').trim();
-      const amount = parseFloat(amountRaw);
-      if(!name){ showToast('User Name / Demo Name দিন','error'); return; }
-      if(!Number.isFinite(amount) || amount < 0){ showToast('Valid amount / score দিন','error'); return; }
-      let key = String(($('manual-leaderboard-key') || {}).value || '').trim();
-      if(!key) key = manualLeaderboardKeyFromName(name);
-      const existing = leaderboardCache[key] || {};
-      const patch = {
-        ...existing,
-        userKey:key,
-        user:name,
-        displayName:name,
-        totalAmount:parseFloat(amount.toFixed(2)),
-        manual_entry:true,
-        manual_updated_at:firebase.database.ServerValue.TIMESTAMP,
-        updated_at:firebase.database.ServerValue.TIMESTAMP
-      };
-      delete patch.manual_rank;
-      delete patch.manualRank;
-      delete patch.rank_position;
-      delete patch.rankPosition;
-      db.ref('leaderboard/' + key).set(patch).then(() => {
-        resetManualLeaderboardForm();
-        showToast('Leaderboard entry saved','success');
-      }).catch(err => { console.error('Manual leaderboard save failed:', err); showToast('Leaderboard save failed','error'); });
-    }
-    function editLeaderboardEntry(key){
-      if(!key) return;
-      const entry = leaderboardCache[key];
-      if(!entry){ showToast('Leaderboard entry not found','error'); return; }
-      fillManualLeaderboardForm({key, ...entry});
-    }
-    function updateLeaderboardFromOrder(order){
-      if(!order || !order.id) return;
-      const key = order.userKey || safeDbKey(order.userId ? `tg_${order.userId}` : (order.username || order.user || 'unknown'));
-      const displayName = order.username && order.username !== 'no_username' ? '@' + order.username : (order.user || key);
-      const amount = Number(order.payable || 0);
-      if(!Number.isFinite(amount) || amount <= 0) return;
-      db.ref('orders/' + order.id + '/leaderboard_updated').transaction(current => current ? current : true, (err, committed) => {
-        if(err){ console.error('Leaderboard flag failed:', err); return; }
-        if(!committed) return;
-        const lbRef = db.ref('leaderboard/' + key);
-        lbRef.transaction(current => {
-          const d = current || {};
-          const totalAmount = parseFloat((Number(d.totalAmount || 0) + amount).toFixed(2));
-          return { ...d, userKey:key, user:displayName, displayName, totalAmount };
-        }, txErr => { if(txErr) console.error('Leaderboard update failed:', txErr); });
-      });
-    }
     function deleteOrder(id){
       adminConfirm('Delete Order permanently?','This order will be removed forever. This cannot be undone.','🗑️',() => {
         if(globalOrders[id]) delete globalOrders[id];
@@ -2185,22 +1971,7 @@ ${safeVideo}` : ''}
         db.ref('orders/' + id).remove().then(() => showToast('Order deleted','warning'));
       });
     }
-    function renderAdminLeaderboard(data){
-      const arr = sortLeaderboardEntries(Object.entries(data || {}).map(([key,v]) => ({key,...v})));
-      $('leaderboard-list').innerHTML = arr.map((u, i) => {
-        const entryType = u.manual_entry ? 'Manual Entry' : 'Auto from orders';
-        return `<div class="user-row"><div><div class="user-name">#${i + 1} ${escapeHtml(u.displayName || u.user || u.key)}</div><div class="user-amount">${money(u.totalAmount)}</div><div class="tracked-user-meta">${entryType} · Sorted by amount</div></div><div class="leader-row-actions"><button class="leader-edit-btn" type="button" data-edit-leader="${escapeHtml(u.key)}">Edit</button><button class="del-btn" type="button" data-del-leader="${escapeHtml(u.key)}">DEL</button></div></div>`;
-      }).join('') || '<div class="empty-state"><div class="empty-icon">🏆</div>No users yet</div>';
-      document.querySelectorAll('[data-edit-leader]').forEach(btn => btn.addEventListener('click', () => editLeaderboardEntry(btn.dataset.editLeader)));
-      document.querySelectorAll('[data-del-leader]').forEach(btn => btn.addEventListener('click', () => deleteLeaderboardUser(btn.dataset.delLeader)));
-      renderUserTrackingSystem();
-    }
-    function deleteLeaderboardUser(key){
-      adminConfirm('Remove Leaderboard Entry?',`Are you sure you want to delete ${key} from leaderboard?`,'👤',() => db.ref('leaderboard/' + key).remove().then(() => showToast('Leaderboard entry deleted','warning')));
-    }
-    function clearLeaderboard(){
-      adminConfirm('Reset All Leaderboard Data?','This will wipe out all seller volume completely. This action is irreversible.','🏆',() => db.ref('leaderboard').remove().then(() => showToast('Leaderboard cleared','warning')));
-    }
+
     function renderAdminCoins(data){
       const entries = Object.entries(data || {});
       $('coin-list').innerHTML = entries.map(([key,v]) => `<div class="coin-box ${v.status === false ? 'offline' : ''}" data-coin-box="${escapeHtml(key)}"><div class="coin-box-header"><div class="coin-name-row">${v.logo ? `<img src="${escapeHtml(v.logo)}" class="coin-logo-sm" alt="">` : '<span style="font-size:18px;">💰</span>'}<span class="coin-key">${escapeHtml(key)}</span></div><label class="switch"><input type="checkbox" data-coin-field="status" data-key="${escapeHtml(key)}" ${v.status !== false ? 'checked' : ''}><span class="slider"></span></label></div><input class="form-input" type="text" value="${escapeHtml(v.logo || '')}" placeholder="Logo URL" data-coin-field="logo" data-key="${escapeHtml(key)}"><input class="form-input" type="text" value="${escapeHtml(v.transferId || '')}" placeholder="Transfer ID" data-coin-field="transferId" data-key="${escapeHtml(key)}"><select class="form-input" data-coin-field="inputType" data-key="${escapeHtml(key)}"><option value="username" ${v.inputType !== 'code' ? 'selected' : ''}>Sender Username</option><option value="code" ${v.inputType === 'code' ? 'selected' : ''}>Transfer Code</option></select><div class="form-row2"><input class="form-input" type="number" value="${Number(v.userRate || 0)}" placeholder="User Rate" data-coin-field="userRate" data-key="${escapeHtml(key)}"><input class="form-input" type="number" value="${Number(v.adminRate || 0)}" placeholder="Admin Rate" data-coin-field="adminRate" data-key="${escapeHtml(key)}"></div><div class="form-row2"><input class="form-input" type="number" value="${Number(v.adminRateMinCoins || 0)}" placeholder="Admin Rate From" data-coin-field="adminRateMinCoins" data-key="${escapeHtml(key)}"><input class="form-input" type="number" value="${Number(v.minSubmitLimit || DEFAULT_MIN_SUBMIT_LIMIT)}" placeholder="Min Submit" data-coin-field="minSubmitLimit" data-key="${escapeHtml(key)}"></div><button class="btn-action btn-danger" type="button" style="margin-top:10px;font-size:11px;padding:9px;" data-remove-coin="${escapeHtml(key)}">Remove Coin</button></div>`).join('') || '<div class="empty-state" style="padding:20px 0;"><div class="empty-icon">🪙</div>No coins configured</div>';
@@ -2315,6 +2086,7 @@ ${safeVideo}` : ''}
         showToast(err && err.code === 'PERMISSION_DENIED' ? 'Firebase rules write permission দিচ্ছে না' : 'Disclaimer save failed','error');
       });
     }
+
     function renderAdminPayments(data){
       const entries = Object.entries(data || {});
       $('payment-list').innerHTML = entries.map(([key,v]) => `<div class="pay-row"><div class="pay-name">${escapeHtml(key)}</div><div class="pay-controls"><label class="switch"><input type="checkbox" ${v.status !== false ? 'checked' : ''} data-pay-status="${escapeHtml(key)}"><span class="slider"></span></label><button class="del-btn" type="button" data-remove-pay="${escapeHtml(key)}">DEL</button></div></div>`).join('') || '<div style="color:var(--subtext);font-size:12px;text-align:center;padding:12px 0;">No methods added</div>';
@@ -2403,6 +2175,7 @@ ${safeVideo}` : ''}
     function removeTutorial(key){
       adminConfirm('Delete Tutorial Video?', 'This tutorial will be removed from the user Tutorial page.', '🎬', () => db.ref('tutorialVideos/' + key).remove().then(() => showToast('Tutorial removed','warning')).catch(err => { console.error('Tutorial remove failed:', err); showToast('Tutorial remove failed','error'); }));
     }
+    
     function adminConfirm(title,desc,icon,callback){
       $('admin-confirm-title').textContent = title; $('admin-confirm-desc').textContent = desc; $('admin-confirm-icon').textContent = icon; adminConfirmCallback = callback; $('admin-confirm').classList.add('active');
     }
@@ -2448,10 +2221,7 @@ ${safeVideo}` : ''}
       document.querySelectorAll('[data-settings-back]').forEach(btn => btn.addEventListener('click', () => openSettingsMain(true)));
       window.addEventListener('popstate', () => { if(hashOpensAdmin()) handleSettingsHashRoute(); });
       window.addEventListener('hashchange', () => { if(hashOpensAdmin()) handleSettingsHashRoute(); });
-      $('clear-leaderboard-btn').addEventListener('click', clearLeaderboard);
-      if($('save-manual-leaderboard-btn')) $('save-manual-leaderboard-btn').addEventListener('click', saveManualLeaderboardEntry);
-      if($('clear-manual-leaderboard-form-btn')) $('clear-manual-leaderboard-form-btn').addEventListener('click', resetManualLeaderboardForm);
-      $('toggle-user-list-btn').addEventListener('click', toggleLeaderboardUserList);
+      $('toggle-user-list-btn').addEventListener('click', toggleUserList);
       if($('user-tracking-search')) $('user-tracking-search').addEventListener('input', () => { userTrackingSearchTerm = $('user-tracking-search').value; renderUserTrackingSystem(); });
       $('refresh-user-tracking-btn').addEventListener('click', () => { renderUserTrackingSystem(); renderBroadcastUserSelectList(); showToast('User tracking refreshed','success'); });
       $('add-coin-btn').addEventListener('click', addCoin);
