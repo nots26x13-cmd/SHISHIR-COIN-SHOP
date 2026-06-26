@@ -1,0 +1,2506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SHISHIR COIN SHOP</title>
+
+  <!-- External libraries -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg:#18181b; --bg2:#09090b; --panel:#27272a; --panel2:#27272a;
+      --card:rgba(39,39,42,0.92); --card-solid:#27272a;
+      --border:#3f3f46; --border-hi:#52525b; --text:#f4f4f5; --subtext:#a1a1aa;
+      --sky:#0ea5e9; --sky-dark:#38bdf8; --sky-light:rgba(14,165,233,0.15); --sky-glow:rgba(14,165,233,0.25);
+      --purple:#a78bfa; --emerald:#34d399; --gold:#fbbf24; --danger:#f87171;
+      --success:#34d399; --success-bg:rgba(16,185,129,0.15); --warning:#fbbf24; --warning-bg:rgba(245,158,11,0.15);
+      --danger-bg:rgba(239,68,68,0.15); --gray-mid:#71717a; --gray-light:#3f3f46;
+      --shadow-sm:0 1px 3px rgba(0,0,0,0.3),0 1px 2px rgba(0,0,0,0.2);
+      --shadow-md:0 4px 12px rgba(0,0,0,0.4),0 2px 4px rgba(0,0,0,0.2);
+      --shadow-lg:0 8px 24px rgba(0,0,0,0.5),0 4px 8px rgba(0,0,0,0.3);
+      --radius-md:12px; --radius-lg:16px; --radius-xl:20px;
+    }
+
+    *{box-sizing:border-box;font-family:'Inter',sans-serif;-webkit-tap-highlight-color:transparent;outline:none;margin:0;padding:0;}
+    html,body{background:var(--bg);color:var(--text);overflow-x:hidden;min-height:100vh;}
+    body{padding:14px 13px 120px;}
+    button,input,select{font-family:'Inter',sans-serif;}
+    button{cursor:pointer;}
+    .hidden{display:none!important;}
+
+    #loading{position:fixed;inset:0;background:var(--bg);z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .5s ease;}
+    .loader-box{width:80px;height:80px;border-radius:22px;background:var(--panel);border:2px solid var(--border);box-shadow:var(--shadow-lg);display:flex;align-items:center;justify-content:center;animation:loadPulse 1.6s ease-in-out infinite;}
+    .loader-box img{width:54px;height:54px;border-radius:14px;object-fit:cover;}
+    .load-ring{width:96px;height:96px;border-radius:50%;border:3px solid var(--border);border-top-color:var(--sky);position:absolute;animation:spin 1s linear infinite;}
+    .load-title{margin-top:22px;font-size:12px;font-weight:800;letter-spacing:4px;text-transform:uppercase;color:var(--sky-dark);text-align:center;}
+    .load-sub{margin-top:5px;font-size:9px;font-weight:600;letter-spacing:2px;color:var(--subtext);}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes loadPulse{0%,100%{box-shadow:var(--shadow-md)}50%{box-shadow:0 0 0 8px var(--sky-glow)}}
+    @keyframes riseUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+    #user-panel,#admin-panel{position:relative;z-index:1;max-width:560px;margin:0 auto;animation:fadeIn .35s ease both;}
+    #cv{position:fixed;inset:0;width:100vw;height:100vh;z-index:0;pointer-events:none;display:none;}
+
+    .profile-card{background:#6F527B;border-radius:var(--radius-xl);padding:18px 16px;display:flex;align-items:center;gap:14px;box-shadow:0 6px 20px rgba(111,82,123,.35);margin-bottom:12px;animation:riseUp .45s ease both;}
+    .user-avatar{width:56px;height:56px;border-radius:14px;border:2px solid rgba(255,255,255,.5);object-fit:cover;flex-shrink:0;box-shadow:0 2px 10px rgba(0,0,0,.15);background:var(--sky-light);}
+    .profile-name{font-size:18px;font-weight:800;color:#fff;line-height:1.1;}
+    .profile-tag{font-size:11px;font-weight:600;color:rgba(255,255,255,.75);margin-top:2px;}
+    .approved-chip{margin-left:auto;flex-shrink:0;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);border-radius:12px;padding:10px 14px;text-align:center;backdrop-filter:blur(10px);}
+    .approved-chip small{font-size:8px;font-weight:800;letter-spacing:2px;color:rgba(255,255,255,.8);display:block;margin-bottom:2px;}
+    .approved-chip b{font-size:22px;font-weight:900;color:#fff;}
+
+    .sec-title{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--sky-dark);padding:4px 0 10px 2px;display:flex;align-items:center;gap:7px;}
+    .sec-title::before{content:'';display:block;width:3px;height:14px;border-radius:2px;background:var(--sky);flex-shrink:0;}
+    .qa-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+    .qa-btn{background:var(--panel2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px 14px;display:flex;align-items:center;gap:10px;transition:all .15s ease;text-decoration:none;box-shadow:var(--shadow-sm);color:inherit;text-align:left;}
+    .qa-btn:active{transform:scale(.97);background:var(--gray-light);}
+    .qa-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+    .qa-main-text{font-size:13px;font-weight:700;color:var(--text);}
+    .qa-sub-text{font-size:10px;font-weight:500;color:var(--subtext);margin-top:1px;}
+    .qa-admin{background:linear-gradient(135deg,rgba(14,165,233,.1),rgba(14,165,233,.05));border-color:var(--sky);box-shadow:0 2px 8px var(--sky-glow);}
+
+    .coin-card{background:var(--panel2);border:1px solid var(--border);border-radius:var(--radius-xl);padding:16px;margin-bottom:10px;position:relative;overflow:hidden;box-shadow:var(--shadow-sm);transition:all .2s ease;animation:riseUp .4s ease both;}
+    .coin-card.online{cursor:pointer;}
+    .coin-card.online:active{box-shadow:0 0 0 2px var(--sky),var(--shadow-md);transform:scale(.98);}
+    .coin-card:not(.online){opacity:.6;cursor:default;}
+    .coin-card-top{display:flex;align-items:center;gap:12px;}
+    .coin-logo-wrap{width:50px;height:50px;border-radius:14px;background:var(--sky-light);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;}
+    .coin-logo-wrap img{width:100%;height:100%;object-fit:cover;border-radius:14px;}
+    .coin-name-txt{font-size:18px;font-weight:900;color:var(--text);}
+    .coin-label-txt{font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--subtext);margin-top:2px;}
+    .status-pill{margin-left:auto;flex-shrink:0;font-size:9px;font-weight:800;letter-spacing:1px;padding:4px 10px;border-radius:20px;display:flex;align-items:center;gap:5px;}
+    .status-pill.on{background:var(--success-bg);color:var(--success);border:1px solid rgba(52,211,153,.3);}
+    .status-pill.off{background:var(--danger-bg);color:var(--danger);border:1px solid rgba(248,113,113,.3);}
+    .s-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+    .s-dot.on{background:var(--success);animation:blink 2s ease-in-out infinite;}
+    .s-dot.off{background:var(--danger);}
+    .rates-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;}
+    .rate-cell{background:var(--gray-light);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center;}
+    .rate-cell small{font-size:8px;font-weight:800;letter-spacing:1px;color:var(--subtext);display:block;margin-bottom:4px;}
+    .rate-cell b{font-size:15px;font-weight:900;color:var(--sky-dark);}
+    .coin-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+    .ctag{font-size:9px;font-weight:700;padding:4px 10px;border-radius:20px;background:var(--sky-light);color:var(--sky-dark);border:1px solid rgba(56,189,248,.3);}
+
+    .hist-card{background:var(--panel2);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:10px;box-shadow:var(--shadow-sm);overflow:hidden;animation:riseUp .35s ease both;}
+    .hist-top{padding:12px 14px 10px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:10px;}
+    .hist-coin-label{font-size:17px;font-weight:900;color:var(--text);}
+    .hist-time{font-size:10px;font-weight:600;color:var(--subtext);margin-top:2px;}
+    .hist-status-badge{font-size:9px;font-weight:800;letter-spacing:1px;padding:4px 10px;border-radius:20px;white-space:nowrap;}
+    .hs-pending{background:var(--warning-bg);color:var(--warning);border:1px solid rgba(251,191,36,.3);}
+    .hs-completed,.hs-accepted{background:var(--sky-light);color:var(--sky-dark);border:1px solid rgba(56,189,248,.3);}
+    .hs-paid{background:var(--success-bg);color:var(--success);border:1px solid rgba(52,211,153,.3);}
+    .hs-rejected{background:var(--danger-bg);color:var(--danger);border:1px solid rgba(248,113,113,.3);}
+    .hist-body{padding:10px 14px 12px;}
+    .hist-info-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;}
+    .hist-info-cell{background:var(--gray-light);border:1px solid var(--border);border-radius:8px;padding:7px 10px;}
+    .hic-label{font-size:8px;font-weight:800;letter-spacing:1px;color:var(--subtext);margin-bottom:2px;}
+    .hic-value{font-size:12px;font-weight:700;color:var(--text);word-break:break-word;}
+    .hist-footer{background:var(--gray-light);border-top:1px solid var(--border);padding:8px 14px;display:flex;justify-content:space-between;align-items:center;}
+    .hist-order-id{font-size:10px;font-weight:700;color:var(--subtext);}
+    .hist-payout{font-size:14px;font-weight:900;color:var(--sky-dark);}
+
+    .lb-card{background:var(--panel2);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow-sm);animation:riseUp .35s ease both;}
+    .lb-rank{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;}
+    .rank-1{background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#111;box-shadow:0 2px 8px rgba(251,191,36,.4);}
+    .rank-2{background:linear-gradient(135deg,#94a3b8,#cbd5e1);color:#111;}
+    .rank-3{background:linear-gradient(135deg,#b45309,#d97706);color:#fff;}
+    .rank-n{background:var(--sky-light);color:var(--sky-dark);border:1px solid rgba(56,189,248,.3);}
+
+    .nav-dock{position:fixed;bottom:16px;left:14px;right:14px;max-width:560px;margin:auto;height:68px;background:var(--panel2);border:1px solid var(--border-hi);border-radius:22px;display:flex;justify-content:space-around;align-items:center;z-index:1000;box-shadow:var(--shadow-lg);}
+    .nav-tab{border:none;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 12px;border-radius:16px;transition:all .2s ease;color:var(--subtext);}
+    .nav-icon{font-size:21px;transition:transform .2s ease;}
+    .nav-label{font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;}
+    .nav-tab.active{color:var(--sky-dark);background:var(--sky-light);}
+    .nav-tab.active .nav-icon{transform:translateY(-3px);}
+
+    .modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(8px);display:none;align-items:flex-end;z-index:2000;}
+    .modal-mask.active{display:flex;}
+    .bottom-sheet{background:var(--panel2);border-top:2px solid var(--sky);width:100%;border-radius:24px 24px 0 0;padding:22px 18px 28px;max-height:92vh;overflow-y:auto;transform:translateY(100%);transition:transform .38s cubic-bezier(.4,0,.2,1);box-shadow:0 -8px 40px rgba(0,0,0,.5);}
+    .modal-mask.active .bottom-sheet{transform:translateY(0);}
+    .sheet-handle{width:40px;height:4px;background:var(--border-hi);border-radius:2px;margin:0 auto 18px;}
+    .sheet-title{font-size:20px;font-weight:900;color:var(--text);}
+    .x-btn{background:var(--gray-light);border:1px solid var(--border);width:34px;height:34px;border-radius:50%;color:var(--text);font-size:13px;}
+    .transfer-id-box{background:var(--sky-light);border:1px solid rgba(56,189,248,.3);border-radius:var(--radius-lg);padding:14px;text-align:center;margin-bottom:14px;}
+    .transfer-id-box small{font-size:8px;font-weight:800;letter-spacing:2px;color:var(--sky-dark);display:block;margin-bottom:5px;}
+    .tid-value{font-size:20px;font-weight:900;color:var(--sky-dark);letter-spacing:1px;margin-bottom:8px;word-break:break-all;}
+    .copy-btn{background:var(--sky);color:#fff;border:none;padding:7px 18px;border-radius:9px;font-size:10px;font-weight:800;letter-spacing:1px;transition:all .15s;}
+    .copy-btn:active{transform:scale(.95);background:var(--sky-dark);}
+    .form-input{width:100%;background:var(--gray-light);border:1px solid var(--border);border-radius:var(--radius-md);padding:13px 14px;font-size:13px;font-weight:600;color:var(--text);margin-bottom:9px;transition:all .2s;}
+    .form-input:focus{border-color:var(--sky);box-shadow:0 0 0 3px var(--sky-glow);background:var(--panel2);}
+    .form-input option{background:var(--panel2);}
+    .form-input::placeholder{color:var(--gray-mid);}
+    .form-row{display:grid;grid-template-columns:1fr 1.5fr;gap:9px;}
+    .calc-box{background:var(--gray-light);border:1px solid var(--border);border-radius:var(--radius-md);padding:13px;margin-bottom:13px;}
+    .calc-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:7px;align-items:center;}
+    .calc-row:last-child{margin-bottom:0;font-size:16px;font-weight:900;}
+    .calc-divider{height:1px;background:var(--border);margin:9px 0;}
+    .btn-primary{width:100%;background:linear-gradient(135deg,var(--sky),var(--sky-dark));border:none;padding:16px;border-radius:14px;font-size:14px;font-weight:900;letter-spacing:.5px;color:#fff;transition:all .2s ease;box-shadow:0 6px 20px rgba(2,132,199,.3);}
+    .btn-primary:active{transform:scale(.97);}
+    .btn-primary:disabled{opacity:.6;cursor:not-allowed;}
+
+    .confirm-mask{position:fixed;inset:0;background:rgba(0,0,0,.82);backdrop-filter:blur(10px);display:none;justify-content:center;align-items:center;z-index:3000;padding:18px;}
+    .confirm-mask.active{display:flex;}
+    .confirm-box{background:var(--panel2);border:1px solid var(--border);border-radius:24px;padding:26px;width:100%;max-width:360px;box-shadow:var(--shadow-lg);animation:riseUp .25s ease both;}
+    .confirm-icon{font-size:40px;text-align:center;margin-bottom:10px;}
+    .confirm-title{font-size:17px;font-weight:900;text-align:center;margin-bottom:16px;}
+    .confirm-row{display:flex;justify-content:space-between;font-size:12px;margin-bottom:9px;padding-bottom:9px;border-bottom:1px solid var(--border);gap:10px;}
+    .confirm-row span:first-child{color:var(--subtext);font-weight:600;}
+    .confirm-row span:last-child{font-weight:800;color:var(--text);text-align:right;}
+    .confirm-total{display:flex;justify-content:space-between;font-size:17px;font-weight:900;border-top:2px solid var(--border);padding-top:12px;margin-top:4px;gap:10px;}
+    .confirm-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px;}
+    .btn-back{background:var(--gray-light);border:1px solid var(--border);color:var(--text);padding:13px;border-radius:12px;font-size:13px;font-weight:700;transition:all .15s;}
+    .btn-go{background:linear-gradient(135deg,var(--sky),var(--sky-dark));border:none;color:#fff;padding:13px;border-radius:12px;font-size:13px;font-weight:900;transition:all .15s;box-shadow:0 4px 14px rgba(2,132,199,.3);}
+    .btn-back:active,.btn-go:active{transform:scale(.97);}
+
+    .admin-header{display:flex;align-items:center;justify-content:space-between;background:rgba(39,39,42,.85);border:1px solid var(--border);border-radius:24px;padding:14px 18px;margin-bottom:16px;backdrop-filter:blur(20px);box-shadow:0 8px 30px rgba(0,0,0,.4);}
+    .header-brand{font-size:14px;font-weight:900;color:var(--sky-dark);letter-spacing:1px;}
+    .header-sub{font-size:10px;font-weight:700;color:var(--subtext);letter-spacing:1.5px;margin-top:2px;}
+    .back-btn{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:14px;padding:9px 16px;color:var(--subtext);font-size:13px;font-weight:800;}
+    .stats-row{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:14px;}
+    .stat-box{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:16px 20px;display:flex;align-items:center;gap:14px;backdrop-filter:blur(16px);box-shadow:0 4px 20px rgba(0,0,0,.3);}
+    .stat-icon{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+    .stat-label{font-size:10px;font-weight:800;letter-spacing:1.5px;color:var(--subtext);}
+    .stat-value{font-size:26px;font-weight:900;line-height:1;margin-top:3px;}
+    .tab-strip{display:flex;background:rgba(0,0,0,.3);border-radius:18px;padding:5px;gap:4px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none;border:1px solid var(--border);}
+    .tab-strip::-webkit-scrollbar{display:none;}
+    .tab-item{flex:1;min-width:72px;padding:10px 8px;border-radius:14px;border:none;background:none;color:var(--subtext);font-size:10px;font-weight:900;letter-spacing:.5px;transition:all .2s ease;display:flex;flex-direction:column;align-items:center;gap:3px;white-space:nowrap;}
+    .tab-item.active{background:linear-gradient(135deg,rgba(14,165,233,.25),rgba(56,189,248,.12));color:var(--sky-dark);border:1px solid rgba(56,189,248,.2);box-shadow:0 4px 14px rgba(56,189,248,.1);}
+    .tab-badge{background:rgba(255,255,255,.08);color:var(--text);font-size:9px;font-weight:800;padding:1px 7px;border-radius:8px;min-width:20px;text-align:center;}
+    .tab-item.active .tab-badge{background:rgba(56,189,248,.15);color:var(--sky-dark);}
+    .order-card{background:var(--card);border:1px solid var(--border);border-radius:22px;padding:16px;margin-bottom:12px;backdrop-filter:blur(16px);box-shadow:0 4px 20px rgba(0,0,0,.3);animation:riseUp .35s ease both;border-left:4px solid var(--sky);position:relative;}
+    .order-card.pending{border-left-color:var(--warning);}.order-card.approved,.order-card.completed{border-left-color:var(--sky-dark);}.order-card.payment{border-left-color:var(--gold);}.order-card.paid{border-left-color:var(--emerald);}.order-card.rejected{border-left-color:var(--danger);}
+    .order-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:10px;}
+    .order-user{font-size:15px;font-weight:900;}.order-id{font-size:10px;color:var(--subtext);font-weight:700;margin-top:2px;}
+    .order-badge{font-size:9px;font-weight:900;letter-spacing:1.5px;padding:4px 10px;border-radius:8px;white-space:nowrap;}
+    .badge-pending{background:rgba(251,191,36,.12);color:var(--gold);border:1px solid rgba(251,191,36,.25);}
+    .badge-approved,.badge-completed{background:rgba(56,189,248,.08);color:var(--sky-dark);border:1px solid rgba(56,189,248,.2);}
+    .badge-payment-pending{background:rgba(251,191,36,.12);color:var(--gold);border:1px solid rgba(251,191,36,.25);}
+    .badge-paid{background:rgba(52,211,153,.12);color:var(--emerald);border:1px solid rgba(52,211,153,.28);}
+    .badge-rejected{background:rgba(248,113,113,.08);color:var(--danger);border:1px solid rgba(248,113,113,.2);}
+    .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+    .info-cell{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:12px;padding:9px 11px;}
+    .info-cell small{font-size:8px;font-weight:900;letter-spacing:1.5px;color:var(--subtext);display:block;margin-bottom:3px;}
+    .info-cell b{font-size:12px;font-weight:800;color:var(--text);word-break:break-word;}
+    .info-copy-btn{margin-top:7px;background:rgba(14,165,233,.12);border:1px solid rgba(56,189,248,.35);color:var(--sky-dark);padding:6px 10px;border-radius:9px;font-size:9px;font-weight:900;letter-spacing:.6px;line-height:1;display:inline-flex;align-items:center;gap:4px;transition:all .15s ease;}
+    .info-copy-btn:active{transform:scale(.96);background:rgba(56,189,248,.22);}
+    .info-copy-btn[disabled]{opacity:.45;cursor:not-allowed;}
+    .proof-upload{background:rgba(14,165,233,.06);border:1px dashed rgba(56,189,248,.35);border-radius:var(--radius-md);padding:12px;margin-bottom:13px;}
+    .proof-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px;}
+    .proof-head span{font-size:12px;font-weight:900;color:var(--text);letter-spacing:.3px;}
+    .proof-head small{font-size:8px;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:var(--sky-dark);white-space:nowrap;}
+    .proof-select-btn{width:100%;background:rgba(56,189,248,.14);border:1px solid rgba(56,189,248,.35);color:var(--sky-dark);padding:12px;border-radius:12px;font-size:12px;font-weight:900;letter-spacing:.4px;transition:all .15s ease;}
+    .proof-select-btn:active{transform:scale(.98);background:rgba(56,189,248,.24);}
+    .proof-preview{margin-top:10px;background:rgba(0,0,0,.22);border:1px solid var(--border);border-radius:12px;padding:9px;display:grid;grid-template-columns:52px 1fr auto;gap:10px;align-items:center;}
+    .proof-preview img{width:52px;height:52px;object-fit:cover;border-radius:10px;border:1px solid var(--border-hi);background:#000;}
+    .proof-preview-meta b{font-size:11px;font-weight:900;color:var(--text);display:block;word-break:break-word;}
+    .proof-preview-meta small{font-size:9px;font-weight:700;color:var(--subtext);display:block;margin-top:2px;}
+    .proof-remove-btn{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);color:var(--danger);padding:8px 10px;border-radius:10px;font-size:10px;font-weight:900;}
+    .proof-view-btn{flex:1;background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.35);color:var(--sky-dark);padding:11px 12px;border-radius:13px;font-size:12px;font-weight:900;letter-spacing:.4px;}
+    .proof-view-btn[disabled]{opacity:.45;color:var(--subtext);border-color:var(--border);background:rgba(255,255,255,.04);}
+    .proof-viewer-box{background:var(--panel2);border:1px solid var(--border);border-radius:24px;padding:16px;width:100%;max-width:430px;max-height:92vh;overflow:auto;box-shadow:var(--shadow-lg);animation:riseUp .25s ease both;}
+    .proof-viewer-img{width:100%;max-height:70vh;object-fit:contain;border-radius:16px;background:#000;border:1px solid var(--border);display:block;}
+    .notice-box{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.28);border-radius:var(--radius-md);padding:12px 13px;margin:0 0 13px;box-shadow:var(--shadow-sm);}
+    .notice-box.confirm{margin:12px 0 14px;background:rgba(251,191,36,.075);}
+    .notice-title{display:flex;align-items:center;gap:7px;font-size:10px;font-weight:900;letter-spacing:.9px;text-transform:uppercase;color:var(--warning);margin-bottom:7px;}
+    .notice-text{font-size:11px;font-weight:700;line-height:1.55;color:var(--text);white-space:pre-wrap;word-break:break-word;}
+    .admin-textarea{min-height:110px;resize:vertical;line-height:1.55;white-space:pre-wrap;}
+    .order-actions{display:flex;gap:8px;flex-wrap:wrap;}.btn-accept{flex:2;background:linear-gradient(135deg,var(--emerald),rgba(52,211,153,.7));border:none;color:#000;padding:11px;border-radius:13px;font-size:12px;font-weight:900;letter-spacing:.5px;}.btn-reject{flex:1;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);color:var(--danger);padding:11px;border-radius:13px;font-size:12px;font-weight:900;}.btn-paid{flex:2;background:linear-gradient(135deg,var(--emerald),rgba(52,211,153,.72));border:none;color:#000;padding:11px;border-radius:13px;font-size:12px;font-weight:900;letter-spacing:.5px;}.btn-payment-proof{flex:.9;background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.35);color:var(--sky-dark);padding:11px 10px;border-radius:13px;font-size:11px;font-weight:900;letter-spacing:.3px;}.btn-payment-proof.has-proof{background:var(--success-bg);border-color:rgba(52,211,153,.35);color:var(--success);}.btn-del{background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--subtext);padding:11px 14px;border-radius:13px;font-size:11px;font-weight:800;}
+    .payment-tools{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:12px;margin-bottom:12px;display:grid;grid-template-columns:1fr 150px;gap:9px;backdrop-filter:blur(16px);box-shadow:var(--shadow-sm);}.payment-tools .form-input{margin-bottom:0;}.payment-meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}.payment-pill{font-size:9px;font-weight:800;letter-spacing:.7px;border-radius:20px;padding:5px 9px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--subtext);}.payment-pill.good{background:var(--success-bg);border-color:rgba(52,211,153,.28);color:var(--success);}.payment-pill.warn{background:var(--warning-bg);border-color:rgba(251,191,36,.28);color:var(--warning);}
+    .settings-section{display:none;}.settings-group{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:20px;margin-bottom:14px;backdrop-filter:blur(16px);animation:riseUp .35s ease both;}.settings-group-title{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:900;letter-spacing:1.5px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);}.stitle-bar{width:3px;height:16px;border-radius:2px;flex-shrink:0;}.form-row2{display:grid;grid-template-columns:1fr 1fr;gap:9px;}.btn-action{width:100%;border:none;padding:12px;border-radius:14px;font-size:13px;font-weight:900;transition:all .15s;letter-spacing:.5px;}.btn-blue{background:linear-gradient(135deg,var(--sky),rgba(14,165,233,.7));color:#fff;box-shadow:0 6px 20px var(--sky-glow);}.btn-cyan{background:linear-gradient(135deg,var(--sky-dark),rgba(56,189,248,.7));color:#000;box-shadow:0 6px 20px rgba(56,189,248,.25);}.btn-emerald{background:linear-gradient(135deg,var(--emerald),rgba(52,211,153,.7));color:#000;}.btn-danger{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);color:var(--danger);}
+    .coin-box{background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:18px;padding:14px;margin-bottom:12px;border-left:3px solid var(--emerald);animation:riseUp .3s ease both;}.coin-box.offline{border-left-color:var(--danger);}.coin-box-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}.coin-name-row{display:flex;align-items:center;gap:8px;}.coin-logo-sm{width:30px;height:30px;border-radius:9px;object-fit:cover;background:var(--sky-light);}.coin-key{font-size:16px;font-weight:900;color:var(--sky-dark);}.switch{position:relative;display:inline-block;width:40px;height:22px;flex-shrink:0;}.switch input{opacity:0;width:0;height:0;}.slider{position:absolute;inset:0;background:rgba(255,255,255,.1);border-radius:34px;transition:.35s;border:1px solid var(--border);}.slider::before{position:absolute;content:"";height:16px;width:16px;left:3px;bottom:3px;background:#e4e4e7;border-radius:50%;transition:.35s;}input:checked+.slider{background:var(--emerald);border-color:var(--emerald);box-shadow:0 0 10px rgba(52,211,153,.25);}input:checked+.slider::before{transform:translateX(18px);background:#fff;}
+    .user-row,.pay-row{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;background:rgba(0,0,0,.2);border-radius:14px;margin-bottom:8px;border:1px solid var(--border);gap:10px;}.user-name,.pay-name{font-size:14px;font-weight:800;}.user-amount{font-size:12px;font-weight:700;color:var(--sky-dark);margin-top:2px;}.del-btn{background:none;border:none;color:var(--danger);font-size:12px;font-weight:900;padding:6px 10px;border-radius:9px;}.pay-controls{display:flex;gap:10px;align-items:center;}.add-form{background:rgba(0,0,0,.2);border:1px dashed rgba(56,189,248,.2);border-radius:16px;padding:14px;margin-bottom:14px;}
+    .tutorial-card{background:var(--panel2);border:1px solid var(--border);border-radius:var(--radius-xl);padding:12px;margin-bottom:12px;box-shadow:var(--shadow-sm);animation:riseUp .35s ease both;overflow:hidden;}
+    .tutorial-frame{position:relative;width:100%;padding-top:56.25%;border-radius:14px;overflow:hidden;background:#000;border:1px solid var(--border);}
+    .tutorial-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;}
+    .tutorial-meta{padding:12px 2px 2px;}
+    .tutorial-title{font-size:15px;font-weight:900;color:var(--text);line-height:1.35;word-break:break-word;}
+    .tutorial-date{font-size:10px;font-weight:700;color:var(--subtext);margin-top:4px;letter-spacing:.4px;}
+    .tutorial-admin-card{background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:18px;padding:14px;margin-bottom:12px;border-left:3px solid var(--sky-dark);animation:riseUp .3s ease both;}
+    .tutorial-admin-card.offline{border-left-color:var(--danger);opacity:.82;}
+    .tutorial-admin-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;}
+    .tutorial-admin-title{font-size:14px;font-weight:900;color:var(--sky-dark);word-break:break-word;}
+    .tutorial-admin-sub{font-size:10px;font-weight:700;color:var(--subtext);margin-top:2px;word-break:break-all;}
+    .tutorial-admin-actions{display:grid;grid-template-columns:1fr auto;gap:9px;align-items:center;margin-top:8px;}
+
+    #access-denied{position:fixed;inset:0;background:var(--bg);z-index:10000;display:none;align-items:center;justify-content:center;padding:24px;}.denied-box{background:rgba(39,39,42,.95);border:1px solid rgba(248,113,113,.3);border-radius:32px;padding:36px 30px;text-align:center;width:100%;max-width:340px;box-shadow:0 0 60px rgba(248,113,113,.15),0 30px 60px rgba(0,0,0,.8);animation:riseUp .5s ease both;}.denied-icon{font-size:56px;margin-bottom:14px;filter:drop-shadow(0 0 20px rgba(248,113,113,.6));}.denied-title{font-size:22px;font-weight:900;color:var(--danger);margin-bottom:10px;}.denied-text{font-size:13px;color:var(--subtext);line-height:1.65;margin-bottom:22px;}
+    .toast{position:fixed;bottom:108px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--gray-light);border:1px solid var(--border);border-radius:12px;padding:11px 20px;font-size:12px;font-weight:700;color:var(--text);z-index:9000;opacity:0;transition:all .3s ease;white-space:nowrap;pointer-events:none;box-shadow:var(--shadow-lg);max-width:92vw;overflow:hidden;text-overflow:ellipsis;}.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}.toast.admin{top:20px;bottom:auto;transform:translateX(-50%) translateY(-20px);}.toast.admin.show{transform:translateX(-50%) translateY(0);}.empty-state{text-align:center;padding:40px 20px;color:var(--subtext);font-size:13px;font-weight:600;}.empty-icon{font-size:36px;margin-bottom:10px;opacity:.4;}::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border-hi);border-radius:2px;}
+
+
+    .settings-shell{animation:riseUp .35s ease both;}
+    .settings-page.hidden{display:none!important;}
+    .settings-main-head{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:18px;margin-bottom:14px;box-shadow:var(--shadow-sm);}
+    .settings-main-title{font-size:20px;font-weight:900;color:var(--text);line-height:1.15;}
+    .settings-main-sub{font-size:11px;font-weight:700;color:var(--subtext);margin-top:6px;line-height:1.5;}
+    .settings-menu-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:14px;}
+    .settings-module-card{width:100%;border:1px solid var(--border);background:linear-gradient(135deg,rgba(39,39,42,.95),rgba(24,24,27,.95));border-radius:20px;padding:15px 14px;display:grid;grid-template-columns:44px 1fr auto;align-items:center;gap:12px;text-align:left;color:var(--text);box-shadow:var(--shadow-sm);transition:all .18s ease;}
+    .settings-module-card:active{transform:scale(.98);border-color:var(--sky);box-shadow:0 0 0 2px var(--sky-glow),var(--shadow-md);}
+    .settings-module-icon{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;border:1px solid rgba(255,255,255,.05);}
+    .settings-module-title{font-size:14px;font-weight:900;color:var(--text);letter-spacing:.2px;}
+    .settings-module-desc{font-size:10px;font-weight:650;color:var(--subtext);margin-top:3px;line-height:1.35;}
+    .settings-module-path{display:none!important;}
+    .user-tracking-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px;}
+    .user-track-stat{background:rgba(255,255,255,.035);border:1px solid var(--border);border-radius:14px;padding:12px;text-align:center;}
+    .user-track-stat small{font-size:8px;font-weight:900;letter-spacing:1.2px;color:var(--subtext);display:block;margin-bottom:4px;text-transform:uppercase;}
+    .user-track-stat b{font-size:22px;font-weight:900;color:var(--sky-dark);line-height:1;}
+    .user-track-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px;}
+    .manual-leaderboard-box{background:rgba(56,189,248,.055);border:1px dashed rgba(56,189,248,.28);border-radius:16px;padding:14px;margin:0 0 14px;}
+    .manual-leaderboard-note{font-size:10px;font-weight:700;color:var(--subtext);line-height:1.45;margin:-2px 0 10px;}
+    .leader-row-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+    .leader-edit-btn{background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.35);color:var(--sky-dark);padding:7px 10px;border-radius:9px;font-size:9px;font-weight:900;}
+    .tracked-user-list,.notice-user-select-list{display:grid;gap:8px;margin-top:10px;}
+    .user-tracking-search{margin-bottom:10px;}
+    .tracked-user-card,.notice-user-check{background:rgba(0,0,0,.18);border:1px solid var(--border);border-radius:14px;padding:11px 12px;}
+    .tracked-user-card{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;}
+    .tracked-user-name{font-size:13px;font-weight:900;color:var(--text);word-break:break-word;}
+    .tracked-user-meta{font-size:9px;font-weight:700;color:var(--subtext);margin-top:3px;line-height:1.45;word-break:break-word;}
+    .tracked-user-status{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;}
+    .mini-pill{font-size:8px;font-weight:900;letter-spacing:.7px;border-radius:20px;padding:4px 7px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--subtext);text-transform:uppercase;}
+    .mini-pill.good{background:var(--success-bg);border-color:rgba(52,211,153,.28);color:var(--success);}
+    .mini-pill.warn{background:var(--warning-bg);border-color:rgba(251,191,36,.28);color:var(--warning);}
+    .mini-pill.bad{background:var(--danger-bg);border-color:rgba(248,113,113,.28);color:var(--danger);}
+    .tracked-user-controls{display:grid;grid-template-columns:1fr;gap:7px;min-width:88px;}
+    .btn-small{border:none;border-radius:10px;padding:8px 9px;font-size:9px;font-weight:900;letter-spacing:.4px;line-height:1.1;}
+    .btn-small.blue{background:rgba(56,189,248,.14);border:1px solid rgba(56,189,248,.35);color:var(--sky-dark);}
+    .btn-small.green{background:var(--success-bg);border:1px solid rgba(52,211,153,.28);color:var(--success);}
+    .btn-small.red{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);color:var(--danger);}
+    .btn-small.gray{background:rgba(255,255,255,.055);border:1px solid var(--border);color:var(--subtext);}
+    .notice-target-box{background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.22);border-radius:var(--radius-md);padding:12px;margin-bottom:12px;}
+    .notice-target-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;}
+    .notice-target-option{background:rgba(0,0,0,.18);border:1px solid var(--border);border-radius:12px;padding:10px;font-size:11px;font-weight:900;color:var(--text);display:flex;align-items:center;gap:8px;}
+    .notice-target-option input{accent-color:var(--sky);}
+    .notice-user-check{display:grid;grid-template-columns:auto 1fr;gap:9px;align-items:flex-start;cursor:pointer;}
+    .notice-user-check input{margin-top:2px;accent-color:var(--sky);}
+    .notice-user-check.disabled{opacity:.55;cursor:not-allowed;}
+    .notice-user-check.disabled input{cursor:not-allowed;}
+    @media(max-width:380px){.user-tracking-grid,.user-track-actions,.notice-target-row{grid-template-columns:1fr}.tracked-user-card{grid-template-columns:1fr}.tracked-user-controls{grid-template-columns:1fr 1fr;min-width:0}}
+    .settings-module-arrow{font-size:20px;color:var(--subtext);font-weight:900;}
+    .settings-page-head{background:var(--card);border:1px solid var(--border);border-radius:22px;padding:14px;margin-bottom:14px;box-shadow:var(--shadow-sm);}
+    .settings-breadcrumb{font-size:10px;font-weight:800;letter-spacing:.6px;color:var(--subtext);margin-bottom:10px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+    .settings-breadcrumb span:last-child{color:var(--sky-dark);}
+    .settings-page-title-row{display:flex;justify-content:space-between;align-items:center;gap:12px;}
+    .settings-page-title{font-size:18px;font-weight:900;color:var(--text);line-height:1.2;}
+    .settings-back-inline{background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.28);color:var(--sky-dark);padding:9px 12px;border-radius:12px;font-size:11px;font-weight:900;white-space:nowrap;}
+    .settings-back-inline:active{transform:scale(.97);}
+    @media(max-width:380px){.settings-module-card{grid-template-columns:38px 1fr auto;padding:13px 12px}.settings-module-icon{width:38px;height:38px;border-radius:12px}.settings-page-title-row{align-items:flex-start;flex-direction:column}.settings-back-inline{width:100%;}}
+
+    @media(max-width:380px){.profile-card{padding:14px 12px;gap:10px}.approved-chip{padding:8px 10px}.form-row,.form-row2,.info-grid,.hist-info-row,.tutorial-admin-actions{grid-template-columns:1fr}.proof-preview{grid-template-columns:44px 1fr}.proof-remove-btn{grid-column:1/-1}.nav-tab{padding:8px 7px}.qa-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <canvas id="cv"></canvas>
+
+  <div id="loading">
+    <div style="position:relative;width:96px;height:96px;display:flex;align-items:center;justify-content:center;">
+      <div class="load-ring"></div>
+      <div class="loader-box"><img id="loader-logo" src="https://blogger.googleusercontent.com/img/a/AVvXsEjGP9QLeE3svTKp0WBPd4dPU016ScT0BJkgsiXnlFqvBx1I2fRshJUs6WHsAhVzRraoiYFEd4GJ8l3uRZeatIbg4Zv_C25cMt9XLDIecl7I-TP6LcFKHIs_PJp8RPqOtgrdlmESBPnr7h6TI4Yus7SF0XnSe04_AUjAhU7K2VMeV90DJaibcjFAU5WuruFv=w669-h648" alt="Logo" onerror="this.style.display='none'"></div>
+    </div>
+    <div class="load-title" id="brand-text">SHISHIR COIN SHOP</div>
+    <div class="load-sub">DIGITAL ASSET EXCHANGE</div>
+  </div>
+
+  <div id="user-panel">
+    <div class="profile-card">
+      <img id="pfp" src="https://i.ibb.co/PZ5B9y0x/images.jpg" class="user-avatar" alt="User" onerror="this.style.background='var(--sky-light)';this.removeAttribute('src')">
+      <div>
+        <div class="profile-name" id="u-name">—</div>
+        <div class="profile-tag" id="u-tag">@—</div>
+      </div>
+      <div class="approved-chip"><small>APPROVED</small><b id="suc-count">0</b></div>
+    </div>
+
+    <div class="sec-title">QUICK ACCESS</div>
+    <div class="qa-grid" id="quick-grid" style="animation:riseUp .4s .06s ease both;">
+      <button class="qa-btn" type="button" id="help-btn"><div class="qa-icon" style="background:var(--sky-light);color:var(--sky-dark);">🎧</div><div><div class="qa-main-text">Help Line</div><div class="qa-sub-text">24/7 Support</div></div></button>
+      <button class="qa-btn" type="button" id="channel-btn"><div class="qa-icon" style="background:rgba(124,58,237,.15);color:#a78bfa;">📢</div><div><div class="qa-main-text">Channel</div><div class="qa-sub-text">News & Updates</div></div></button>
+      <button class="qa-btn qa-admin hidden" type="button" id="admin-btn" style="grid-column:1/-1;"><div class="qa-icon" style="background:var(--sky-light);color:var(--sky-dark);">🛡️</div><div><div class="qa-main-text">Admin Panel</div><div class="qa-sub-text" style="color:var(--sky-dark);">RESTRICTED ACCESS</div></div></button>
+    </div>
+
+    <div id="home-scr">
+      <div class="sec-title" style="margin-top:18px;">LIVE MARKET <div class="s-dot on" style="margin-left:4px;width:7px;height:7px;"></div></div>
+      <div id="market-list"></div>
+    </div>
+
+    <div id="history-scr" style="display:none;padding-top:6px;">
+      <div class="sec-title">ORDER HISTORY</div>
+      <div id="history-list"></div>
+    </div>
+
+    <div id="rank-scr" style="display:none;padding-top:6px;">
+      <div class="sec-title">TOP 10 SELLERS</div>
+      <div id="rank-list"></div>
+    </div>
+
+    <div id="tutorial-scr" style="display:none;padding-top:6px;">
+      <div class="sec-title">TUTORIAL VIDEOS</div>
+      <div id="tutorial-list"></div>
+    </div>
+
+    <nav class="nav-dock" id="user-nav">
+      <button class="nav-tab active" id="tab-home" type="button" data-screen="home-scr"><span class="nav-icon">🏠</span><span class="nav-label">Market</span></button>
+      <button class="nav-tab" id="tab-hist" type="button" data-screen="history-scr"><span class="nav-icon">🕒</span><span class="nav-label">History</span></button>
+      <button class="nav-tab" id="tab-rank" type="button" data-screen="rank-scr"><span class="nav-icon">🏆</span><span class="nav-label">Ranks</span></button>
+      <button class="nav-tab" id="tab-tutorial" type="button" data-screen="tutorial-scr"><span class="nav-icon">▶️</span><span class="nav-label">Tutorial</span></button>
+    </nav>
+  </div>
+
+  <div id="order-modal" class="modal-mask">
+    <div class="bottom-sheet">
+      <div class="sheet-handle"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><div class="sheet-title" id="m-title">Sell COIN</div><button class="x-btn" type="button" id="close-order-btn">✕</button></div>
+      <div class="transfer-id-box"><small>⚡ SEND COIN TO THIS TRANSFER ID</small><div class="tid-value" id="admin-id">—</div><button class="copy-btn" type="button" id="copy-id-btn">⧉ COPY ID</button></div>
+      <input type="number" id="c-qty" class="form-input" placeholder="Enter Amount (Min: 5000)" inputmode="numeric" min="0" step="any">
+      <input type="text" id="c-sender" class="form-input" placeholder="Sender Username / Transfer Code">
+      <div class="form-row" style="margin-bottom:9px;"><select id="m-select" class="form-input" style="margin-bottom:0;"></select><input type="text" id="m-num" class="form-input" style="margin-bottom:0;" placeholder="Payment Number"></div>
+      <div class="calc-box"><div class="calc-row"><span style="color:var(--subtext);">Coin Unit</span><span id="coin-unit-val" style="font-weight:800;">0.00</span></div><div class="calc-row"><span style="color:var(--subtext);">Base Amount</span><span id="base-val" style="font-weight:800;">0.00 ৳</span></div><div class="calc-row"><span style="color:var(--danger);">Send Fee</span><span id="fee-val" style="color:var(--danger);font-weight:800;">- 5.00 ৳</span></div><div class="calc-divider"></div><div class="calc-row"><span style="color:var(--subtext);">Net Payable</span><span id="c-res" style="color:var(--sky-dark);">0.00 ৳</span></div></div>
+      <div class="proof-upload" id="proof-upload-box">
+        <input type="file" id="proof-file" accept="image/*" class="hidden">
+        <div class="proof-head"><span>📸 Proof / Screenshot</span><small>Required for verification</small></div>
+        <button class="proof-select-btn" type="button" id="proof-select-btn">+ Upload Transfer Screenshot</button>
+        <div class="proof-preview hidden" id="proof-preview">
+          <img id="proof-preview-img" alt="Proof Screenshot Preview">
+          <div class="proof-preview-meta"><b id="proof-file-name">Screenshot selected</b><small id="proof-file-size">Ready to submit</small></div>
+          <button class="proof-remove-btn" type="button" id="proof-remove-btn">Remove</button>
+        </div>
+      </div>
+      <button class="btn-primary" type="button" id="confirm-order-btn">CONFIRM ORDER →</button>
+    </div>
+  </div>
+
+  <div id="confirm-modal" class="confirm-mask">
+    <div class="confirm-box">
+      <div class="confirm-icon">🔐</div>
+      <div class="confirm-title">Confirm Your Order</div>
+      <div class="confirm-row"><span>Coin / Amount</span><span id="sum-amt">—</span></div>
+      <div class="confirm-row"><span>Payment Method</span><span id="sum-method">—</span></div>
+      <div class="confirm-row"><span>Payment Number</span><span id="sum-number">—</span></div>
+      <div class="confirm-row"><span>Sender ID</span><span id="sum-sender">—</span></div>
+      <div class="notice-box confirm" id="confirm-notice-box">
+        <div class="notice-title">⚠️ Disclaimer Notice</div>
+        <div class="notice-text" id="confirm-disclaimer-text">—</div>
+      </div>
+      <div class="confirm-total"><span>Total Payout</span><span id="sum-total" style="color:var(--sky-dark);">0.00 ৳</span></div>
+      <small id="fee-note" style="color:var(--danger);display:block;text-align:center;margin-top:8px;font-size:10px;font-weight:700;">5 TK Send Money Fee Deducted</small>
+      <div class="confirm-btns"><button class="btn-back" type="button" id="confirm-back-btn">← Back</button><button class="btn-go" type="button" id="submit-btn">✓ Submit</button></div>
+    </div>
+  </div>
+
+  <div id="access-denied">
+    <div class="denied-box">
+      <div class="denied-icon">⛔</div><div class="denied-title">Access Denied</div>
+      <div class="denied-text">This panel is restricted to authorized Telegram admin accounts only.</div>
+      <button class="btn-action btn-danger" type="button" id="return-user-btn">← Return to User Panel</button>
+    </div>
+  </div>
+
+  <div id="admin-panel" class="hidden">
+    <div class="admin-header"><div><div class="header-brand" id="admin-brand-name">SHISHIR COIN SHOP</div><div class="header-sub">ADMIN CONTROL PANEL</div></div><button class="back-btn" type="button" id="admin-back-btn">← Back</button></div>
+    <div class="stats-row"><div class="stat-box"><div class="stat-icon" style="background:rgba(251,191,36,.1);color:var(--warning);">⏳</div><div><div class="stat-label">PENDING ORDERS</div><div class="stat-value" id="stat-pending" style="color:var(--warning);">0</div></div></div></div>
+    <div class="tab-strip">
+      <button class="tab-item active" id="admin-tab-pending" type="button" data-admin-tab="pending">PENDING<span class="tab-badge" id="cnt-pending">0</span></button>
+      <button class="tab-item" id="admin-tab-approved" type="button" data-admin-tab="approved">APPROVED<span class="tab-badge" id="cnt-completed">0</span></button>
+      <button class="tab-item" id="admin-tab-rejected" type="button" data-admin-tab="rejected">REJECTED<span class="tab-badge" id="cnt-rejected">0</span></button>
+      <button class="tab-item" id="admin-tab-payment" type="button" data-admin-tab="payment">PAYMENT<span class="tab-badge" id="cnt-payment">0</span></button>
+      <button class="tab-item" id="admin-tab-settings" type="button" data-admin-tab="settings">⚙ SETTINGS</button>
+    </div>
+    <div id="order-section"><div id="payment-tools" class="payment-tools hidden"><input type="search" id="payment-search" class="form-input" placeholder="Search username, coin ID, target ID"><select id="payment-filter" class="form-input"><option value="pending">Pending Payment</option><option value="paid">Paid Payment</option><option value="all">All Payments</option></select></div><div id="order-list"></div></div>
+    <div id="settings-section" class="settings-section">
+      <div class="settings-shell">
+        <div id="settings-main-page" class="settings-page">
+          <div class="settings-main-head">
+            <div class="settings-main-title">Settings Modules</div>
+            <div class="settings-main-sub">Choose one module to manage. Each section opens on its own clean page so the admin panel stays simple and mobile friendly.</div>
+          </div>
+          <div class="settings-menu-grid">
+            <button class="settings-module-card" type="button" data-settings-module="leaderboard-management">
+              <div class="settings-module-icon" style="background:rgba(251,191,36,.1);color:var(--warning);">🏆</div>
+              <div><div class="settings-module-title">Leaderboard Management</div><div class="settings-module-desc">View, delete, or reset seller ranking data.</div><div class="settings-module-path">/settings/leaderboard-management</div></div>
+              <div class="settings-module-arrow">›</div>
+            </button>
+            <button class="settings-module-card" type="button" data-settings-module="coin-management">
+              <div class="settings-module-icon" style="background:var(--sky-light);color:var(--sky-dark);">🪙</div>
+              <div><div class="settings-module-title">Coin Management</div><div class="settings-module-desc">Add coins, edit rates, set target IDs, and control status.</div><div class="settings-module-path">/settings/coin-management</div></div>
+              <div class="settings-module-arrow">›</div>
+            </button>
+            <button class="settings-module-card" type="button" data-settings-module="branding-links">
+              <div class="settings-module-icon" style="background:rgba(167,139,250,.12);color:var(--purple);">🌐</div>
+              <div><div class="settings-module-title">Branding & Links</div><div class="settings-module-desc">Manage app name, channel link, and help line link.</div><div class="settings-module-path">/settings/branding-links</div></div>
+              <div class="settings-module-arrow">›</div>
+            </button>
+            <button class="settings-module-card" type="button" data-settings-module="disclaimer-notice">
+              <div class="settings-module-icon" style="background:rgba(251,191,36,.1);color:var(--warning);">⚠️</div>
+              <div><div class="settings-module-title">Disclaimer Notice</div><div class="settings-module-desc">Edit disclaimer and send notices to users.</div><div class="settings-module-path">/settings/disclaimer-notice</div></div>
+              <div class="settings-module-arrow">›</div>
+            </button>
+            <button class="settings-module-card" type="button" data-settings-module="payment-methods">
+              <div class="settings-module-icon" style="background:var(--success-bg);color:var(--success);">💳</div>
+              <div><div class="settings-module-title">Payment Methods</div><div class="settings-module-desc">Add, remove, or activate payment methods.</div><div class="settings-module-path">/settings/payment-methods</div></div>
+              <div class="settings-module-arrow">›</div>
+            </button>
+            <button class="settings-module-card" type="button" data-settings-module="tutorial-management">
+              <div class="settings-module-icon" style="background:rgba(56,189,248,.12);color:var(--sky-dark);">🎬</div>
+              <div><div class="settings-module-title">Tutorial Management</div><div class="settings-module-desc">Add and manage tutorial videos without mixing other settings.</div><div class="settings-module-path">/settings/tutorial-management</div></div>
+              <div class="settings-module-arrow">›</div>
+            </button>
+          </div>
+        </div>
+
+        <div id="settings-leaderboard-management" class="settings-page settings-module-page hidden" data-settings-page="leaderboard-management">
+          <div class="settings-page-head"><div class="settings-breadcrumb"><span>Settings</span><span>›</span><span>Leaderboard Management</span></div><div class="settings-page-title-row"><div class="settings-page-title">Leaderboard Management</div><button class="settings-back-inline" type="button" data-settings-back>← Back to Settings</button></div></div>
+          <div class="settings-group">
+            <div class="settings-group-title"><div class="stitle-bar" style="background:var(--gold);"></div>🏆 LEADERBOARD MANAGEMENT</div>
+            <div class="user-tracking-grid">
+              <div class="user-track-stat"><small>Total Users</small><b id="track-total-users">0</b></div>
+              <div class="user-track-stat"><small>Active Now</small><b id="track-active-users">0</b></div>
+            </div>
+            <div class="user-track-actions">
+              <button class="btn-action btn-cyan" type="button" id="toggle-user-list-btn">👥 User List</button>
+              <button class="btn-action btn-blue" type="button" id="refresh-user-tracking-btn">↻ Refresh</button>
+            </div>
+            <input type="search" id="user-tracking-search" class="form-input user-tracking-search hidden" placeholder="Search by name, username or user ID">
+            <div id="user-tracking-list" class="tracked-user-list hidden"></div>
+            <div class="settings-group-title" style="margin-top:18px;"><div class="stitle-bar" style="background:var(--sky-dark);"></div>🏅 SELLER RANKINGS</div>
+            <div class="manual-leaderboard-box">
+              <input type="hidden" id="manual-leaderboard-key">
+              <div class="manual-leaderboard-note">Admin চাইলে real user name অথবা demo/fake display name দিয়ে manually leaderboard entry add/update করতে পারবে। Amount বেশি হলে ranking automatically উপরে দেখাবে।</div>
+              <input type="text" id="manual-leaderboard-name" class="form-input" placeholder="User Name / Demo Name">
+              <input type="number" id="manual-leaderboard-amount" class="form-input" placeholder="Amount / Score" min="0" step="any">
+              <div class="form-row2">
+                <button class="btn-action btn-cyan" type="button" id="save-manual-leaderboard-btn">+ Add / Update Entry</button>
+                <button class="btn-action btn-danger" type="button" id="clear-manual-leaderboard-form-btn">Clear</button>
+              </div>
+            </div>
+            <div id="leaderboard-list"></div>
+            <button class="btn-action btn-danger" type="button" id="clear-leaderboard-btn" style="margin-top:12px;">🗑 Reset All Rankings</button>
+          </div>
+        </div>
+
+        <div id="settings-coin-management" class="settings-page settings-module-page hidden" data-settings-page="coin-management">
+          <div class="settings-page-head"><div class="settings-breadcrumb"><span>Settings</span><span>›</span><span>Coin Management</span></div><div class="settings-page-title-row"><div class="settings-page-title">Coin Management</div><button class="settings-back-inline" type="button" data-settings-back>← Back to Settings</button></div></div>
+          <div class="settings-group"><div class="settings-group-title"><div class="stitle-bar" style="background:var(--sky-dark);"></div>🪙 COIN MANAGEMENT</div><div class="add-form"><input type="text" id="c-name" class="form-input" placeholder="Coin Name (e.g. BKASH)"><input type="text" id="c-logo" class="form-input" placeholder="Logo URL (Optional)"><input type="text" id="c-tid" class="form-input" placeholder="Transfer Target ID"><select id="c-input-type" class="form-input"><option value="username">Sender Username</option><option value="code">Transfer Code</option></select><div class="form-row2"><input type="number" id="c-user-rate" class="form-input" placeholder="User Rate"><input type="number" id="c-admin-rate" class="form-input" placeholder="Admin Rate"></div><div class="form-row2" style="margin-top:0;"><input type="number" id="c-admin-min" class="form-input" placeholder="Admin Rate From"><input type="number" id="c-min-submit" class="form-input" placeholder="Min Submit Limit"></div><button class="btn-action btn-cyan" type="button" id="add-coin-btn" style="margin-top:4px;">+ Add New Coin</button></div><div id="coin-list"></div></div>
+        </div>
+
+        <div id="settings-branding-links" class="settings-page settings-module-page hidden" data-settings-page="branding-links">
+          <div class="settings-page-head"><div class="settings-breadcrumb"><span>Settings</span><span>›</span><span>Branding & Links</span></div><div class="settings-page-title-row"><div class="settings-page-title">Branding & Links</div><button class="settings-back-inline" type="button" data-settings-back>← Back to Settings</button></div></div>
+          <div class="settings-group"><div class="settings-group-title"><div class="stitle-bar" style="background:var(--purple);"></div>🌐 BRANDING & LINKS</div><input type="text" id="site-name" class="form-input" placeholder="Site Name"><input type="text" id="link-channel" class="form-input" placeholder="Telegram Channel Link"><input type="text" id="link-help" class="form-input" placeholder="Help Line Link"><button class="btn-action btn-blue" type="button" id="save-branding-btn">💾 Save Branding & Links</button></div>
+        </div>
+
+        <div id="settings-disclaimer-notice" class="settings-page settings-module-page hidden" data-settings-page="disclaimer-notice">
+          <div class="settings-page-head"><div class="settings-breadcrumb"><span>Settings</span><span>›</span><span>Disclaimer Notice</span></div><div class="settings-page-title-row"><div class="settings-page-title">Disclaimer Notice</div><button class="settings-back-inline" type="button" data-settings-back>← Back to Settings</button></div></div>
+          <div class="settings-group"><div class="settings-group-title"><div class="stitle-bar" style="background:var(--warning);"></div>⚠️ DISCLAIMER NOTICE</div><textarea id="disclaimer-text" class="form-input admin-textarea" placeholder="Admin notice লিখুন... Bangla / English both supported."></textarea><div class="notice-box" style="margin-top:4px;"><div class="notice-title">Live Preview</div><div class="notice-text" id="disclaimer-preview">—</div></div><button class="btn-action btn-cyan" type="button" id="save-disclaimer-btn">💾 Save Disclaimer Notice</button></div>
+          <div class="settings-group">
+            <div class="settings-group-title"><div class="stitle-bar" style="background:var(--sky-dark);"></div>📢 NOTICE BOX</div>
+            <div class="notice-target-box">
+              <div class="proof-head"><span>🎯 Notice Target</span><small>Required</small></div>
+              <div class="notice-target-row">
+                <label class="notice-target-option"><input type="radio" name="broadcast-target" value="all" checked> Send to All Users</label>
+                <label class="notice-target-option"><input type="radio" name="broadcast-target" value="selected"> Send to Selected Users</label>
+              </div>
+              <div id="broadcast-selected-users-box" class="hidden" style="margin-top:12px;">
+                <div class="proof-head" style="margin-bottom:8px;"><span>👥 Select Users</span><small>Multiple</small></div>
+                <div id="broadcast-user-select-list" class="notice-user-select-list"></div>
+              </div>
+            </div>
+            <textarea id="broadcast-notice-text" class="form-input admin-textarea" placeholder="Notice text লিখুন..."></textarea>
+            <input type="url" id="broadcast-video-link" class="form-input" placeholder="Video link (optional)">
+            <div class="proof-upload" style="margin-bottom:12px;">
+              <input type="file" id="broadcast-image-file" accept="image/*" class="hidden">
+              <div class="proof-head"><span>📸 Screenshot / Image</span><small>Optional</small></div>
+              <button class="proof-select-btn" type="button" id="broadcast-image-select-btn">+ Attach Screenshot/Image</button>
+              <div class="proof-preview hidden" id="broadcast-image-preview">
+                <img id="broadcast-image-preview-img" alt="Notice Image Preview">
+                <div class="proof-preview-meta"><b id="broadcast-image-file-name">Image selected</b><small id="broadcast-image-file-size">Ready to send</small></div>
+                <button class="proof-remove-btn" type="button" id="broadcast-image-remove-btn">Remove</button>
+              </div>
+            </div>
+            <div class="notice-box" style="margin-top:4px;"><div class="notice-title">Notice Preview</div><div class="notice-text" id="broadcast-notice-preview">Notice text লিখলে preview এখানে দেখাবে।</div></div>
+            <button class="btn-action btn-cyan" type="button" id="send-broadcast-notice-btn" style="margin-top:12px;">📤 Send Notice to All Users</button>
+          </div>
+        </div>
+
+        <div id="settings-payment-methods" class="settings-page settings-module-page hidden" data-settings-page="payment-methods">
+          <div class="settings-page-head"><div class="settings-breadcrumb"><span>Settings</span><span>›</span><span>Payment Methods</span></div><div class="settings-page-title-row"><div class="settings-page-title">Payment Methods</div><button class="settings-back-inline" type="button" data-settings-back>← Back to Settings</button></div></div>
+          <div class="settings-group"><div class="settings-group-title"><div class="stitle-bar" style="background:var(--emerald);"></div>💳 PAYMENT METHODS</div><div style="display:flex;gap:9px;margin-bottom:12px;"><input type="text" id="new-pay" class="form-input" placeholder="Method Name (e.g. bKash)" style="margin-bottom:0;flex:1;"><button class="btn-action btn-emerald" type="button" id="add-payment-btn" style="width:auto;padding:12px 18px;">Add</button></div><div id="payment-list"></div></div>
+        </div>
+
+        <div id="settings-tutorial-management" class="settings-page settings-module-page hidden" data-settings-page="tutorial-management">
+          <div class="settings-page-head"><div class="settings-breadcrumb"><span>Settings</span><span>›</span><span>Tutorial Management</span></div><div class="settings-page-title-row"><div class="settings-page-title">Tutorial Management</div><button class="settings-back-inline" type="button" data-settings-back>← Back to Settings</button></div></div>
+          <div class="settings-group"><div class="settings-group-title"><div class="stitle-bar" style="background:var(--sky-dark);"></div>🎬 TUTORIAL MANAGEMENT</div><div class="add-form"><input type="url" id="tutorial-url" class="form-input" placeholder="YouTube Video Link (watch, youtu.be, embed)"><input type="text" id="tutorial-title" class="form-input" placeholder="Video Title (Optional)"><button class="btn-action btn-cyan" type="button" id="add-tutorial-btn">+ Add Tutorial Video</button></div><div id="tutorial-admin-list"></div></div>
+        </div>
+      </div>
+    </div>
+
+  <div id="admin-confirm" class="confirm-mask">
+    <div class="confirm-box"><div class="confirm-icon" id="admin-confirm-icon">⚠️</div><div class="confirm-title" id="admin-confirm-title">Confirm Action</div><p id="admin-confirm-desc" style="font-size:13px;color:var(--subtext);text-align:center;margin-bottom:20px;line-height:1.5;"></p><div class="confirm-btns"><button class="btn-back" type="button" id="admin-confirm-cancel">Cancel</button><button class="btn-go" type="button" id="admin-confirm-ok">Confirm</button></div></div>
+  </div>
+
+  <div id="payment-modal" class="confirm-mask">
+    <div class="confirm-box"><div class="confirm-icon">💸</div><div class="confirm-title">Mark Payment as Paid</div><p id="payment-modal-desc" style="font-size:13px;color:var(--subtext);text-align:center;margin-bottom:12px;line-height:1.5;"></p><input type="text" id="payment-ref-input" class="form-input" placeholder="Payment transaction / reference ID"><div class="confirm-btns"><button class="btn-back" type="button" id="payment-cancel-btn">Cancel</button><button class="btn-go" type="button" id="payment-paid-btn">✓ Mark Paid</button></div></div>
+  </div>
+  <input type="file" id="payment-proof-file" accept="image/*" class="hidden">
+
+  <div id="proof-modal" class="confirm-mask">
+    <div class="proof-viewer-box">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;">
+        <div><div class="confirm-title" style="text-align:left;margin-bottom:2px;">Proof Screenshot</div><p id="proof-modal-caption" style="font-size:11px;color:var(--subtext);font-weight:700;"></p></div>
+        <button class="x-btn" type="button" id="proof-close-btn">✕</button>
+      </div>
+      <img id="proof-modal-img" class="proof-viewer-img" alt="Order Proof Screenshot">
+      <button class="btn-primary" type="button" id="proof-open-btn" style="margin-top:12px;padding:13px;">Open Full Image</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    /**********************************************************************
+     /**********************************************************************
+ * CHANGEABLE CONFIG AREA
+ * Replace these values before publishing your Telegram Mini App.
+ **********************************************************************/
+const APP_DEFAULT_NAME = "SHISHIR COIN SHOP";
+const LEGACY_BRAND_REGEX = /META\s*BUYER\s*ZONE/gi;
+function normalizeBrandName(value){
+  const raw = String(value || '').trim();
+  if(!raw) return APP_DEFAULT_NAME;
+  return raw.replace(LEGACY_BRAND_REGEX, APP_DEFAULT_NAME).trim() || APP_DEFAULT_NAME;
+}
+function sanitizeLegacyBrandInDom(root=document.body){
+  if(!root) return;
+  try{
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    let node;
+    while(node = walker.nextNode()){
+      if(LEGACY_BRAND_REGEX.test(node.nodeValue)){
+        node.nodeValue = node.nodeValue.replace(LEGACY_BRAND_REGEX, APP_DEFAULT_NAME);
+      }
+      LEGACY_BRAND_REGEX.lastIndex = 0;
+    }
+    document.querySelectorAll('input,textarea').forEach(el => {
+      if(typeof el.value === 'string' && LEGACY_BRAND_REGEX.test(el.value)){
+        el.value = el.value.replace(LEGACY_BRAND_REGEX, APP_DEFAULT_NAME);
+      }
+      LEGACY_BRAND_REGEX.lastIndex = 0;
+    });
+  }catch(e){ console.warn('Brand sanitizer skipped:', e); }
+}
+function startLegacyBrandObserver(){
+  sanitizeLegacyBrandInDom();
+  try{
+    const obs = new MutationObserver(() => sanitizeLegacyBrandInDom());
+    obs.observe(document.body, { childList:true, subtree:true, characterData:true });
+  }catch(e){}
+}
+const DEFAULT_LOADER_LOGO = "https://blogger.googleusercontent.com/img/a/AVvXsEjGP9QLeE3svTKp0WBPd4dPU016ScT0BJkgsiXnlFqvBx1I2fRshJUs6WHsAhVzRraoiYFEd4GJ8l3uRZeatIbg4Zv_C25cMt9XLDIecl7I-TP6LcFKHIs_PJp8RPqOtgrdlmESBPnr7h6TI4Yus7SF0XnSe04_AUjAhU7K2VMeV90DJaibcjFAU5WuruFv=w669-h648";
+const DEFAULT_PROFILE_IMAGE = "https://blogger.googleusercontent.com/img/a/AVvXsEjGP9QLeE3svTKp0WBPd4dPU016ScT0BJkgsiXnlFqvBx1I2fRshJUs6WHsAhVzRraoiYFEd4GJ8l3uRZeatIbg4Zv_C25cMt9XLDIecl7I-TP6LcFKHIs_PJp8RPqOtgrdlmESBPnr7h6TI4Yus7SF0XnSe04_AUjAhU7K2VMeV90DJaibcjFAU5WuruFv=w669-h648";
+const DEFAULT_MIN_SUBMIT_LIMIT = 5000;
+const SEND_FEE = 5;
+const DEFAULT_DISCLAIMER_NOTICE = `Please check your coin amount, sender ID, payment method, and payment number carefully before submitting this order.
+অর্ডার সাবমিট করার আগে Coin Amount, Sender ID, Payment Method এবং Payment Number ভালোভাবে যাচাই করুন। ভুল তথ্য দিলে payment delay বা reject হতে পারে।`;
+
+    const ADMIN_IDS = [8505710811];
+
+    // Telegram Notification Config - DIRECT HTML MODE (NOT SAFE FOR PUBLIC HOSTING)
+    // IMPORTANT: Live bot token HTML/frontend এ রাখলে View Source থেকে সবাই দেখে ফেলতে পারবে.
+    // আমি security reason-এ real token বসাইনি. BotFather থেকে NEW token নিয়ে নিচের placeholder replace করবেন.
+    const TELEGRAM_BOT_TOKEN = "8875964438:AAF2lT2euFccjbRUbMeQWkFLZDCjUmfuQSI";
+    const TELEGRAM_ADMIN_CHAT_ID = "8505710811";
+    const TELEGRAM_NOTIFY_ENABLED = true;
+    const NOTIFICATION_BACKEND_MODE = false;
+    const MAX_PROOF_DATA_URL_LENGTH = 950000; // Realtime DB-safe guard for compressed proof image.
+
+    const firebaseConfig = {
+  apiKey: "AIzaSyCZqrp0hx-tkAJjUqyZ7Beas50HE5lzq6c",
+  authDomain: "shishir-coin-shop-94362.firebaseapp.com",
+  databaseURL: "https://shishir-coin-shop-94362-default-rtdb.firebaseio.com",
+  projectId: "shishir-coin-shop-94362",
+  storageBucket: "shishir-coin-shop-94362.firebasestorage.app",
+  messagingSenderId: "276177127608",
+  appId: "1:276177127608:web:7f1da17625285465d1cc4d",
+  measurementId: "G-C008SFXWMW"
+};
+    /**********************************************************************/
+
+    const $ = (id) => document.getElementById(id);
+    const tg = window.Telegram?.WebApp || { initDataUnsafe:{}, ready(){}, expand(){}, openLink(url){window.open(url,'_blank','noopener,noreferrer')}, openTelegramLink(url){window.open(url,'_blank','noopener,noreferrer')}, HapticFeedback:{impactOccurred(){},notificationOccurred(){}} };
+    try { tg.ready(); tg.expand(); } catch(e) {}
+
+    const tgUser = tg.initDataUnsafe?.user || { id:0, first_name:'Guest', username:'guest_user', photo_url:'' };
+    const currentUserId = Number(tgUser.id || 0);
+    const isAdmin = ADMIN_IDS.includes(currentUserId);
+    const userDisplayName = String(tgUser.first_name || tgUser.username || 'Guest').trim();
+    const userUsername = String(tgUser.username || 'no_username').trim();
+    const userRefKey = currentUserId ? `tg_${currentUserId}` : safeDbKey(userUsername || userDisplayName || 'guest');
+
+    let db = null;
+    let firebaseReady = false;
+    let appLoaded = false;
+    let selC = '', selR = 0, currentTID = '', finalP = 0;
+    let selAdminRate = 0, selAdminRateMinCoins = 0, selMinSubmitLimit = DEFAULT_MIN_SUBMIT_LIMIT, selInputType = 'username';
+    let channelLinkValue = '', helpLinkValue = '', disclaimerNoticeValue = DEFAULT_DISCLAIMER_NOTICE, submitting = false;
+    let proofFileName = '', proofImageDataUrl = '', proofProcessing = false;
+    let marketCache = {}, tutorialCache = {}, userRegistryCache = {}, leaderboardCache = {}, globalOrders = {}, currentAdminTab = 'pending', adminStarted = false, adminConfirmCallback = null, paymentTargetOrderId = '', proofModalSrc = '', paymentProofTargetOrderId = '', paymentProofProcessing = false, broadcastNoticeImageDataUrl = '', broadcastNoticeImageFileName = '', broadcastNoticeImageProcessing = false, leaderboardUserListOpen = false, userTrackingSearchTerm = '';
+    const ACTIVE_USER_WINDOW_MS = 10 * 60 * 1000;
+
+    // Safety guard: app যেন কোনো runtime error হলেও loading screen-এ আটকে না থাকে.
+    window.addEventListener('error', (event) => {
+      console.error('Runtime error:', event.error || event.message);
+      setTimeout(finishLoading, 0);
+    });
+    window.addEventListener('unhandledrejection', (event) => {
+      console.error('Unhandled promise rejection:', event.reason);
+      setTimeout(finishLoading, 0);
+    });
+
+    function escapeHtml(value){
+      return String(value ?? '').replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
+    }
+    function safeDbKey(value){
+      return String(value || '').trim().replace(/[.#$\[\]\/]/g,'_').slice(0,80) || 'item';
+    }
+    function money(n){ return `${Number(n || 0).toFixed(2)}৳`; }
+    function formatDate(ts){
+      if(!ts) return '';
+      try { return new Date(ts).toLocaleString('en-BD',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:true}); }
+      catch(e){ return ''; }
+    }
+    function getOrderStatus(order){
+      const legacy = String(order?.status || '').toLowerCase();
+      const current = String(order?.order_status || '').toLowerCase();
+      if(['pending','approved','rejected'].includes(current)) return current;
+      if(legacy === 'completed') return 'approved';
+      if(legacy === 'rejected') return 'rejected';
+      return 'pending';
+    }
+    function getPaymentStatus(order){
+      const current = String(order?.payment_status || '').toLowerCase();
+      if(current === 'paid') return 'paid';
+      return 'pending';
+    }
+    function getCreatedAt(order){ return Number(order?.created_at || order?.timestamp || 0); }
+    function getUserStatusInfo(order){
+      const os = getOrderStatus(order), ps = getPaymentStatus(order);
+      if(os === 'rejected') return { label:'Rejected', cls:'rejected' };
+      if(ps === 'paid') return { label:'Payment Done', cls:'paid' };
+      if(os === 'approved') return { label:'Accepted', cls:'accepted' };
+      return { label:'Pending', cls:'pending' };
+    }
+    function getOrderBadgeInfo(order){
+      const os = getOrderStatus(order);
+      if(os === 'approved') return { label:'APPROVED', cls:'approved' };
+      if(os === 'rejected') return { label:'REJECTED', cls:'rejected' };
+      return { label:'PENDING', cls:'pending' };
+    }
+    function getPaymentBadgeInfo(order){
+      return getPaymentStatus(order) === 'paid' ? { label:'PAID', cls:'paid' } : { label:'PAYMENT PENDING', cls:'payment-pending' };
+    }
+    function normalizeOrderForSearch(order){
+      return [order?.username, order?.user, order?.coin, order?.targetId, order?.target_id, order?.sender, order?.id, order?.number].map(v => String(v || '').toLowerCase()).join(' ');
+    }
+    function normalizeLink(url){
+      const v = String(url || '').trim();
+      if(!v) return '';
+      if(/^https?:\/\//i.test(v) || /^tg:\/\//i.test(v)) return v;
+      if(/^(t\.me|telegram\.me)\//i.test(v)) return 'https://' + v;
+      if(/^@/.test(v)) return 'https://t.me/' + v.slice(1);
+      return 'https://' + v;
+    }
+    function normalizeDisclaimerNotice(value){
+      const raw = String(value ?? '').replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
+      return raw || DEFAULT_DISCLAIMER_NOTICE;
+    }
+    function renderDisclaimerNotice(){
+      const text = normalizeDisclaimerNotice(disclaimerNoticeValue);
+      ['confirm-disclaimer-text','disclaimer-preview'].forEach(id => {
+        const el = $(id);
+        if(el) el.textContent = text;
+      });
+      const input = $('disclaimer-text');
+      if(input && document.activeElement !== input) input.value = text;
+    }
+    function normalizeBroadcastVideoLink(value){
+      const raw = String(value || '').trim();
+      if(!raw) return '';
+      return normalizeLink(raw);
+    }
+    function renderBroadcastNoticePreview(){
+      const textEl = $('broadcast-notice-text');
+      const videoEl = $('broadcast-video-link');
+      const preview = $('broadcast-notice-preview');
+      if(!preview) return;
+      const noticeText = String(textEl ? textEl.value : '').trim();
+      const videoLink = normalizeBroadcastVideoLink(videoEl ? videoEl.value : '');
+      const imageNote = broadcastNoticeImageDataUrl ? `
+
+📸 ছবি/স্ক্রিনশট যুক্ত করা হয়েছে` : '';
+      const mode = getBroadcastTargetMode();
+      const targetNote = mode === 'selected' ? `
+🎯 Target: Selected Users (${getSelectedBroadcastUserKeys().size})` : `
+🎯 Target: All Eligible Users`;
+      preview.textContent = noticeText ? `📢 SHISHIR COIN SHOP Notice${targetNote}
+
+${noticeText}${videoLink ? `
+
+🎬 ভিডিও লিংক:
+${videoLink}` : ''}${imageNote}` : 'Notice text লিখলে preview এখানে দেখাবে।';
+    }
+    function resetBroadcastNoticeImage(){
+      broadcastNoticeImageDataUrl = '';
+      broadcastNoticeImageFileName = '';
+      broadcastNoticeImageProcessing = false;
+      if($('broadcast-image-file')) $('broadcast-image-file').value = '';
+      if($('broadcast-image-preview')) $('broadcast-image-preview').classList.add('hidden');
+      if($('broadcast-image-preview-img')) $('broadcast-image-preview-img').removeAttribute('src');
+      if($('broadcast-image-file-name')) $('broadcast-image-file-name').textContent = 'Image selected';
+      if($('broadcast-image-file-size')) $('broadcast-image-file-size').textContent = 'Ready to send';
+      if($('broadcast-image-select-btn')) $('broadcast-image-select-btn').textContent = '+ Attach Screenshot/Image';
+      renderBroadcastNoticePreview();
+    }
+    function getUserChatIdFromRecord(u){
+      return String(u?.telegram_chat_id || u?.chat_id || u?.user_id || u?.userId || '').trim();
+    }
+    function getUserLabelFromRecord(u, fallback='User'){
+      const username = String(u?.username || '').trim();
+      if(username && username !== 'no_username') return username.startsWith('@') ? username : '@' + username;
+      return String(u?.display_name || u?.displayName || u?.user || u?.name || fallback || 'User').trim() || 'User';
+    }
+    function isUserBannedRecord(u){
+      return u?.banned === true || String(u?.status || '').toLowerCase() === 'banned';
+    }
+    function boolFlag(value){
+      if(value === true || value === false) return value;
+      const s = String(value ?? '').trim().toLowerCase();
+      if(['true','1','yes','on'].includes(s)) return true;
+      if(['false','0','no','off'].includes(s)) return false;
+      return null;
+    }
+    function isUserNotificationEnabledRecord(u){
+      const offFlags = [u?.notification_off, u?.notify_off, u?.notifications_off].map(boolFlag);
+      if(offFlags.includes(true)) return false;
+      const enabledFlags = [u?.notification_enabled, u?.notifications_enabled, u?.notify_enabled].map(boolFlag).filter(v => v !== null);
+      if(enabledFlags.includes(false)) return false;
+      return true;
+    }
+    function isUserActiveRecord(u){
+      const lastActive = Number(u?.last_active || u?.last_seen || u?.updated_at || 0);
+      return u?.is_online === true || (!!lastActive && (Date.now() - lastActive) <= ACTIVE_USER_WINDOW_MS);
+    }
+    function collectKnownUsers(){
+      const map = new Map();
+      const addUser = (key, data={}) => {
+        const userKey = safeDbKey(key || data.userKey || data.user_key || getUserChatIdFromRecord(data) || getUserLabelFromRecord(data, 'user'));
+        const previous = map.get(userKey) || {};
+        const merged = {...previous, ...data, userKey};
+        merged.chatId = getUserChatIdFromRecord(merged);
+        merged.label = getUserLabelFromRecord(merged, userKey);
+        merged.banned = isUserBannedRecord(merged);
+        merged.notificationEnabled = isUserNotificationEnabledRecord(merged);
+        merged.active = isUserActiveRecord(merged);
+        map.set(userKey, merged);
+      };
+      Object.entries(userRegistryCache || {}).forEach(([key,u]) => addUser(key, u || {}));
+      Object.values(globalOrders || {}).forEach(order => {
+        const chatId = getOrderUserChatId(order);
+        const key = order?.userKey || (chatId ? `tg_${chatId}` : safeDbKey(orderUserLabel(order)));
+        addUser(key, {
+          userKey:key,
+          telegram_chat_id:chatId,
+          user_id:chatId,
+          username:order?.username || '',
+          display_name:order?.user || '',
+          last_active:order?.created_at || order?.timestamp || 0
+        });
+      });
+      return Array.from(map.values()).sort((a,b) => {
+        if((b.active?1:0) !== (a.active?1:0)) return (b.active?1:0) - (a.active?1:0);
+        return String(a.label || '').localeCompare(String(b.label || ''));
+      });
+    }
+    function isCurrentUserBanned(){
+      const u = userRegistryCache[userRefKey] || {};
+      return isUserBannedRecord(u);
+    }
+    function guardBannedUser(){
+      if(isCurrentUserBanned()){
+        showToast('আপনার account temporarily restricted. Support এ যোগাযোগ করুন।','error');
+        return true;
+      }
+      return false;
+    }
+    function toggleLeaderboardUserList(){
+      leaderboardUserListOpen = !leaderboardUserListOpen;
+      renderUserTrackingSystem();
+    }
+    function renderUserTrackingSystem(){
+      const totalEl = $('track-total-users');
+      const activeEl = $('track-active-users');
+      const listEl = $('user-tracking-list');
+      const searchEl = $('user-tracking-search');
+      if(!totalEl || !activeEl || !listEl) return;
+      const allUsers = collectKnownUsers();
+      totalEl.textContent = allUsers.length;
+      activeEl.textContent = allUsers.filter(u => u.active).length;
+      if($('toggle-user-list-btn')) $('toggle-user-list-btn').textContent = leaderboardUserListOpen ? '👥 Hide User List' : '👥 User List';
+      listEl.classList.toggle('hidden', !leaderboardUserListOpen);
+      if(searchEl) searchEl.classList.toggle('hidden', !leaderboardUserListOpen);
+      if(!leaderboardUserListOpen) return;
+      const q = String(userTrackingSearchTerm || (searchEl ? searchEl.value : '') || '').trim().toLowerCase();
+      const users = q ? allUsers.filter(u => {
+        const hay = [u.label, u.username, u.display_name, u.displayName, u.user, u.name, u.chatId, u.userKey].map(v => String(v || '').toLowerCase()).join(' ');
+        return hay.includes(q);
+      }) : allUsers;
+      listEl.innerHTML = users.map(u => {
+        const safeKey = escapeHtml(u.userKey);
+        const chatId = u.chatId || '—';
+        const statusPill = u.banned ? '<span class="mini-pill bad">Banned</span>' : (u.active ? '<span class="mini-pill good">Active</span>' : '<span class="mini-pill">Inactive</span>');
+        const notifyPill = u.notificationEnabled ? '<span class="mini-pill good">Notify On</span>' : '<span class="mini-pill warn">Notify Off</span>';
+        return `<div class="tracked-user-card">
+          <div>
+            <div class="tracked-user-name">${escapeHtml(u.label)}</div>
+            <div class="tracked-user-meta">ID: ${escapeHtml(chatId)}${u.last_active ? ` · Last active: ${escapeHtml(formatDate(u.last_active))}` : ''}</div>
+            <div class="tracked-user-status">${statusPill}${notifyPill}</div>
+          </div>
+          <div class="tracked-user-controls">
+            <button class="btn-small ${u.banned ? 'green' : 'red'}" type="button" data-user-ban="${safeKey}" data-ban-state="${u.banned ? '0' : '1'}">${u.banned ? 'Unban' : 'Ban'}</button>
+            <button class="btn-small ${u.notificationEnabled ? 'gray' : 'blue'}" type="button" data-user-notify="${safeKey}" data-notify-state="${u.notificationEnabled ? '0' : '1'}">${u.notificationEnabled ? 'Notify Off' : 'Notify On'}</button>
+            <button class="btn-small blue" type="button" data-manual-leaderboard="${safeKey}">Set Score</button>
+          </div>
+        </div>`;
+      }).join('') || `<div class="empty-state"><div class="empty-icon">👥</div>${q ? 'No user matched your search' : 'No tracked users yet'}</div>`;
+      document.querySelectorAll('[data-user-ban]').forEach(btn => btn.addEventListener('click', () => updateTrackedUserBan(btn.dataset.userBan, btn.dataset.banState === '1')));
+      document.querySelectorAll('[data-user-notify]').forEach(btn => btn.addEventListener('click', () => updateTrackedUserNotification(btn.dataset.userNotify, btn.dataset.notifyState === '1')));
+      document.querySelectorAll('[data-manual-leaderboard]').forEach(btn => btn.addEventListener('click', () => setManualLeaderboardUser(btn.dataset.manualLeaderboard)));
+    }
+    function ensureUserRecordExists(key){
+      const users = collectKnownUsers();
+      const u = users.find(x => x.userKey === key) || {userKey:key};
+      const patch = { userKey:key, updated_at:firebase.database.ServerValue.TIMESTAMP };
+      if(u.chatId){ patch.telegram_chat_id = u.chatId; patch.user_id = u.chatId; }
+      if(u.username) patch.username = u.username;
+      if(u.display_name || u.displayName) patch.display_name = u.display_name || u.displayName;
+      return db.ref('users/' + key).update(patch);
+    }
+    function updateTrackedUserBan(key, shouldBan){
+      if(!requireFirebase() || !key) return;
+      adminConfirm(shouldBan ? 'Ban this user?' : 'Unban this user?', shouldBan ? 'এই user app ব্যবহার ও notice receive করা থেকে restricted থাকবে।' : 'এই user আবার normal access পাবে।', shouldBan ? '🚫' : '✅', async () => {
+        await ensureUserRecordExists(key);
+        db.ref('users/' + key).update({banned:!!shouldBan, status:shouldBan ? 'banned' : 'active', updated_at:firebase.database.ServerValue.TIMESTAMP}).then(() => showToast(shouldBan ? 'User banned' : 'User unbanned','success'));
+      });
+    }
+    function updateTrackedUserNotification(key, enabled){
+      if(!requireFirebase() || !key) return;
+      const patch = {
+        notification_enabled:!!enabled,
+        notifications_enabled:!!enabled,
+        notify_enabled:!!enabled,
+        notification_off:!enabled,
+        notify_off:!enabled,
+        notifications_off:!enabled,
+        updated_at:firebase.database.ServerValue.TIMESTAMP
+      };
+      userRegistryCache[key] = {...(userRegistryCache[key] || {}), ...patch};
+      renderUserTrackingSystem();
+      renderBroadcastUserSelectList();
+      ensureUserRecordExists(key)
+        .then(() => db.ref('users/' + key).update(patch))
+        .then(() => {
+          showToast(enabled ? 'Notification on' : 'Notification off','success');
+          renderUserTrackingSystem();
+          renderBroadcastUserSelectList();
+        })
+        .catch(err => { console.error('Notification toggle failed:', err); showToast('Notification update failed','error'); });
+    }
+    function getBroadcastTargetMode(){
+      return document.querySelector('input[name="broadcast-target"]:checked')?.value || 'all';
+    }
+    function getSelectedBroadcastUserKeys(){
+      return new Set(Array.from(document.querySelectorAll('[data-broadcast-user-check]:checked')).map(input => input.value));
+    }
+    function renderBroadcastUserSelectList(){
+      const box = $('broadcast-selected-users-box');
+      const list = $('broadcast-user-select-list');
+      if(!box || !list) return;
+      const mode = getBroadcastTargetMode();
+      box.classList.toggle('hidden', mode !== 'selected');
+      const selected = getSelectedBroadcastUserKeys();
+      const users = collectKnownUsers().filter(u => u.chatId);
+      list.innerHTML = users.map(u => {
+        const unavailable = u.banned || !u.notificationEnabled;
+        const reason = u.banned ? 'Banned' : (!u.notificationEnabled ? 'Notification Off' : (u.active ? 'Active' : 'Inactive'));
+        return `<label class="notice-user-check ${unavailable ? 'disabled' : ''}">
+          <input type="checkbox" data-broadcast-user-check value="${escapeHtml(u.userKey)}" ${selected.has(u.userKey) ? 'checked' : ''} ${unavailable ? 'disabled' : ''}>
+          <div><div class="tracked-user-name">${escapeHtml(u.label)}</div><div class="tracked-user-meta">ID: ${escapeHtml(u.chatId)} · ${escapeHtml(reason)}</div></div>
+        </label>`;
+      }).join('') || '<div class="empty-state" style="padding:18px 8px;"><div class="empty-icon">👥</div>No users available</div>';
+      list.querySelectorAll('[data-broadcast-user-check]').forEach(input => input.addEventListener('change', renderBroadcastNoticePreview));
+      renderBroadcastNoticePreview();
+    }
+    function handleBroadcastTargetChange(){
+      renderBroadcastUserSelectList();
+      renderBroadcastNoticePreview();
+    }
+    function parseYouTubeVideoId(url){
+      const raw = String(url || '').trim();
+      if(!raw) return '';
+      try{
+        const normalized = /^https?:\/\//i.test(raw) ? raw : 'https://' + raw;
+        const u = new URL(normalized);
+        const host = u.hostname.replace(/^www\./i,'').toLowerCase();
+        let id = '';
+        if(host === 'youtu.be'){
+          id = u.pathname.split('/').filter(Boolean)[0] || '';
+        }else if(host.endsWith('youtube.com') || host.endsWith('youtube-nocookie.com')){
+          const parts = u.pathname.split('/').filter(Boolean);
+          if(parts[0] === 'watch' || u.pathname === '/') id = u.searchParams.get('v') || '';
+          if(['embed','shorts','live'].includes(parts[0])) id = parts[1] || '';
+        }
+        id = String(id || '').trim();
+        return /^[A-Za-z0-9_-]{11}$/.test(id) ? id : '';
+      }catch(e){ return ''; }
+    }
+    function youtubeWatchUrl(videoId){ return `https://www.youtube.com/watch?v=${videoId}`; }
+    function youtubeEmbedUrl(videoId){ return `https://www.youtube.com/embed/${videoId}`; }
+    function isDuplicateTutorial(videoId, exceptKey=''){
+      return Object.entries(tutorialCache || {}).some(([key,v]) => key !== exceptKey && String(v?.video_id || parseYouTubeVideoId(v?.youtube_url || v?.youtubeUrl || v?.url || '')) === videoId);
+    }
+    function isFirebaseConfigured(){
+      return firebaseConfig.apiKey && firebaseConfig.apiKey !== 'API_KEY' &&
+             firebaseConfig.databaseURL && !/YOUR/i.test(firebaseConfig.databaseURL) &&
+             firebaseConfig.projectId && !/YOUR/i.test(firebaseConfig.projectId);
+    }
+    function showToast(msg, type='info'){
+      const t = $('toast');
+      t.textContent = msg;
+      t.className = 'toast' + ($('admin-panel').classList.contains('hidden') ? '' : ' admin');
+      t.style.background = type === 'success' ? '#065f46' : type === 'error' ? '#991b1b' : type === 'warning' ? '#92400e' : '#3f3f46';
+      t.style.color = '#fff';
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2600);
+    }
+
+    function tgEscape(value){
+      return String(value ?? '').replace(/[&<>]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[ch]));
+    }
+    function telegramApiUrl(method){
+      return `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/${method}`;
+    }
+    function telegramPostByHiddenForm(payload){
+      const iframeName = 'tg_notify_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+      const iframe = document.createElement('iframe');
+      iframe.name = iframeName;
+      iframe.style.display = 'none';
+      iframe.setAttribute('aria-hidden','true');
+      document.body.appendChild(iframe);
+
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = telegramApiUrl('sendMessage');
+      form.target = iframeName;
+      form.acceptCharset = 'UTF-8';
+      form.style.display = 'none';
+
+      Object.entries(payload).forEach(([name,value]) => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = String(value ?? '');
+        form.appendChild(input);
+      });
+
+      document.body.appendChild(form);
+      form.submit();
+
+      setTimeout(() => {
+        try{ form.remove(); iframe.remove(); }catch(e){}
+      }, 8000);
+
+      return true;
+    }
+    function telegramPingByImage(payload){
+      const params = new URLSearchParams(payload);
+      const img = new Image();
+      img.style.display = 'none';
+      img.referrerPolicy = 'no-referrer';
+      img.src = telegramApiUrl('sendMessage') + '?' + params.toString();
+      document.body.appendChild(img);
+      setTimeout(() => { try{ img.remove(); }catch(e){} }, 8000);
+      return true;
+    }
+    async function sendTelegramMessage(chatId, text){
+      const token = String(TELEGRAM_BOT_TOKEN || '').trim();
+      const target = String(chatId || '').trim();
+      const message = String(text || '').trim();
+      if(!TELEGRAM_NOTIFY_ENABLED || NOTIFICATION_BACKEND_MODE) return false;
+      if(!token || token === 'PASTE_NEW_BOT_TOKEN_HERE'){
+        console.warn('Telegram token not set. Replace TELEGRAM_BOT_TOKEN placeholder to enable direct HTML notification.');
+        return false;
+      }
+      if(!target || !message) return false;
+      const payload = {
+        chat_id: target,
+        text: message,
+        parse_mode: 'HTML',
+        disable_web_page_preview: 'true'
+      };
+
+      // Browser CORS এর কারণে response read করা যায় না; hidden form request reliably send করে.
+      try{
+        telegramPostByHiddenForm(payload);
+        return true;
+      }catch(formErr){
+        console.warn('Telegram form submit failed, trying fetch no-cors:', formErr);
+      }
+
+      try{
+        await fetch(telegramApiUrl('sendMessage'), {
+          method:'POST',
+          mode:'no-cors',
+          headers:{ 'Content-Type':'application/json' },
+          body:JSON.stringify(payload)
+        });
+        return true;
+      }catch(fetchErr){
+        console.error('Telegram notification failed:', fetchErr);
+        return false;
+      }
+    }
+    function dataUrlToBlob(dataUrl){
+      const parts = String(dataUrl || '').split(',');
+      if(parts.length < 2) throw new Error('Invalid image data');
+      const mimeMatch = parts[0].match(/data:([^;]+);base64/i);
+      const mime = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+      const binary = atob(parts[1]);
+      const bytes = new Uint8Array(binary.length);
+      for(let i=0;i<binary.length;i++) bytes[i] = binary.charCodeAt(i);
+      return new Blob([bytes], {type:mime});
+    }
+    async function sendTelegramPhoto(chatId, imageDataUrl, caption=''){
+      const token = String(TELEGRAM_BOT_TOKEN || '').trim();
+      const target = String(chatId || '').trim();
+      const img = String(imageDataUrl || '').trim();
+      if(!TELEGRAM_NOTIFY_ENABLED || NOTIFICATION_BACKEND_MODE) return false;
+      if(!token || token === 'PASTE_NEW_BOT_TOKEN_HERE' || !target || !img) return false;
+      try{
+        const formData = new FormData();
+        formData.append('chat_id', target);
+        formData.append('photo', dataUrlToBlob(img), 'payment-proof.jpg');
+        if(caption){
+          formData.append('caption', caption);
+          formData.append('parse_mode', 'HTML');
+        }
+        await fetch(telegramApiUrl('sendPhoto'), { method:'POST', mode:'no-cors', body:formData });
+        return true;
+      }catch(err){
+        console.error('Telegram payment proof photo failed:', err);
+        return false;
+      }
+    }
+    function orderUserLabel(order){
+      return order?.username && order.username !== 'no_username' ? '@' + order.username : (order?.user || 'Guest');
+    }
+    function orderShortId(order){
+      return String(order?.id || '').slice(-7) || '—';
+    }
+    function getOrderPaymentNumber(order){
+      const candidates = [
+        order?.number,
+        order?.payment_number,
+        order?.paymentNumber,
+        order?.pay_number,
+        order?.payNumber,
+        order?.receiver_number,
+        order?.receiverNumber,
+        order?.account_number,
+        order?.mobile_number
+      ];
+      for(const value of candidates){
+        const num = String(value ?? '').trim();
+        if(num && num !== '{PAYMENT_NUMBER}') return num;
+      }
+      return '—';
+    }
+    function buildNewOrderMessage(order){
+      return `🆕 <b>NEW ORDER RECEIVED</b>
+
+👤 <b>User:</b> ${tgEscape(orderUserLabel(order))}
+🆔 <b>User ID:</b> ${tgEscape(order.userId || order.user_id || '—')}
+🪙 <b>Coin:</b> ${tgEscape(order.coin || '—')}
+📦 <b>Amount:</b> ${Number(order.amt || 0).toLocaleString()}
+💰 <b>Payout:</b> ${Number(order.payable || 0).toFixed(2)}৳
+💳 <b>Method:</b> ${tgEscape(order.method || '—')}
+📱 <b>Payment:</b> ${tgEscape(getOrderPaymentNumber(order))}
+📨 <b>Sender:</b> ${tgEscape(order.sender || '—')}
+🎯 <b>Target ID:</b> ${tgEscape(order.targetId || order.target_id || '—')}
+📸 <b>Proof:</b> ${order.proof_uploaded ? 'Uploaded' : 'Not uploaded'}
+
+🆔 <b>Order ID:</b> #${tgEscape(orderShortId(order))}
+⏳ <b>Status:</b> Pending / অপেক্ষমান`;
+    }
+    function buildUserOrderSubmittedMessage(order){
+      return `📩 <b>অর্ডার গ্রহণ করা হয়েছে</b>
+
+আপনার কয়েন সেল অর্ডারটি সফলভাবে গ্রহণ করা হয়েছে। আমাদের টিম অর্ডারটি যাচাই করছে। যাচাই শেষে পরবর্তী আপডেট দেওয়া হবে।
+
+🆔 <b>অর্ডার আইডি:</b> #${tgEscape(orderShortId(order))}
+🪙 <b>কয়েন:</b> ${tgEscape(order.coin || '—')}
+📦 <b>পরিমাণ:</b> ${Number(order.amt || 0).toLocaleString()}
+💰 <b>পেমেন্ট:</b> ${Number(order.payable || 0).toFixed(2)}৳
+💳 <b>মাধ্যম:</b> ${tgEscape(order.method || '—')}
+📱 <b>পেমেন্ট নম্বর:</b> ${tgEscape(getOrderPaymentNumber(order))}
+
+<b>SHISHIR COIN SHOP-এর সাথে নিরাপদ লেনদেনের জন্য ধন্যবাদ।</b>`;
+    }
+    function getOrderUserChatId(order){
+      const candidates = [
+        order?.telegram_chat_id,
+        order?.userId,
+        order?.user_id,
+        order?.telegram_user_id
+      ];
+      for(const value of candidates){
+        const chatId = String(value ?? '').trim();
+        if(chatId && chatId !== '0' && /^-?\d+$/.test(chatId)) return chatId;
+      }
+      return '';
+    }
+    async function sendUserTelegramMessage(order, message){
+      const chatId = getOrderUserChatId(order);
+      if(!chatId){
+        console.warn('User Telegram chat_id missing. User must open the app from Telegram bot/WebApp.', order);
+        return false;
+      }
+      return sendTelegramMessage(chatId, message);
+    }
+    function getPaymentProofSrc(order){
+      return String(order?.payment_proof_image_url || order?.paymentProofImageUrl || order?.payment_proof_data_url || order?.paymentProofDataUrl || '').trim();
+    }
+    async function sendUserPaymentProofPhoto(order){
+      const chatId = getOrderUserChatId(order);
+      const src = getPaymentProofSrc(order);
+      if(!chatId || !src) return false;
+      return sendTelegramPhoto(chatId, src, '📸 <b>পেমেন্ট প্রুফ স্ক্রিনশট</b>');
+    }
+
+    function buildOrderStatusMessage(order, orderStatus){
+      const status = String(orderStatus || '').toLowerCase();
+      const approved = status === 'approved' || status === 'completed';
+      const rejected = status === 'rejected';
+
+      if(approved){
+        return `✅ <b>অর্ডার অনুমোদিত হয়েছে</b>
+
+আপনার কয়েন সেল অর্ডারটি যাচাই করে অনুমোদন করা হয়েছে। পেমেন্ট প্রক্রিয়া চলমান আছে। পেমেন্ট সম্পন্ন হলে আপডেট দেওয়া হবে।
+
+🆔 <b>অর্ডার আইডি:</b> #${tgEscape(orderShortId(order))}
+🪙 <b>কয়েন:</b> ${tgEscape(order.coin || '—')}
+📦 <b>পরিমাণ:</b> ${Number(order.amt || 0).toLocaleString()}
+💰 <b>পেমেন্ট:</b> ${Number(order.payable || 0).toFixed(2)}৳
+💳 <b>মাধ্যম:</b> ${tgEscape(order.method || '—')}
+📱 <b>পেমেন্ট নম্বর:</b> ${tgEscape(getOrderPaymentNumber(order))}
+
+<b>SHISHIR COIN SHOP-এর সাথে নিরাপদ লেনদেনের জন্য ধন্যবাদ।</b>`;
+      }
+
+      if(rejected){
+        return `❌ <b>অর্ডার বাতিল করা হয়েছে</b>
+
+আপনার কয়েন সেল অর্ডারটি যাচাই করা হয়েছে, কিন্তু এই মুহূর্তে অনুমোদন করা সম্ভব হয়নি। বিস্তারিত জানতে সাপোর্টে যোগাযোগ করুন।
+
+🆔 <b>অর্ডার আইডি:</b> #${tgEscape(orderShortId(order))}
+🪙 <b>কয়েন:</b> ${tgEscape(order.coin || '—')}
+📦 <b>পরিমাণ:</b> ${Number(order.amt || 0).toLocaleString()}
+💳 <b>মাধ্যম:</b> ${tgEscape(order.method || '—')}
+
+<b>SHISHIR COIN SHOP-এর সাথে থাকার জন্য ধন্যবাদ।</b>`;
+      }
+
+      return `ℹ️ <b>অর্ডার আপডেট হয়েছে</b>
+
+আপনার কয়েন সেল অর্ডারের স্ট্যাটাস আপডেট করা হয়েছে।
+
+🆔 <b>অর্ডার আইডি:</b> #${tgEscape(orderShortId(order))}
+🪙 <b>কয়েন:</b> ${tgEscape(order.coin || '—')}
+📦 <b>পরিমাণ:</b> ${Number(order.amt || 0).toLocaleString()}
+
+<b>SHISHIR COIN SHOP-এর সাথে নিরাপদ লেনদেনের জন্য ধন্যবাদ।</b>`;
+    }
+    function buildPaymentPaidMessage(order){
+      return `💸 <b>পেমেন্ট সম্পন্ন হয়েছে</b>
+
+আপনার কয়েন সেল অর্ডারের পেমেন্ট সফলভাবে সম্পন্ন করা হয়েছে। অনুগ্রহ করে আপনার পেমেন্ট অ্যাকাউন্ট চেক করুন।
+
+🆔 <b>অর্ডার আইডি:</b> #${tgEscape(orderShortId(order))}
+🪙 <b>কয়েন:</b> ${tgEscape(order.coin || '—')}
+📦 <b>পরিমাণ:</b> ${Number(order.amt || 0).toLocaleString()}
+💰 <b>পেমেন্ট:</b> ${Number(order.payable || 0).toFixed(2)}৳
+💳 <b>মাধ্যম:</b> ${tgEscape(order.method || '—')}
+📱 <b>পেমেন্ট নম্বর:</b> ${tgEscape(getOrderPaymentNumber(order))}
+🔖 <b>রেফারেন্স:</b> ${tgEscape(order.payment_reference_id || '—')}
+
+<b>SHISHIR COIN SHOP-এর সাথে নিরাপদ লেনদেনের জন্য ধন্যবাদ।</b>`;
+    }
+    function finishLoading(){
+      if(appLoaded) return;
+      appLoaded = true;
+      $('loading').style.opacity = '0';
+      setTimeout(() => { $('loading').style.display = 'none'; }, 420);
+    }
+
+    function initFirebase(){
+      if(!isFirebaseConfigured()){
+        firebaseReady = false;
+        renderNoFirebaseState();
+        finishLoading();
+        return;
+      }
+      try{
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.database();
+        firebaseReady = true;
+      }catch(err){
+        console.error(err);
+        firebaseReady = false;
+        renderNoFirebaseState();
+        finishLoading();
+      }
+    }
+    function requireFirebase(){
+      if(firebaseReady && db) return true;
+      showToast('Firebase config set করা হয়নি। আগে config বসান।','error');
+      return false;
+    }
+    function renderNoFirebaseState(){
+      $('market-list').innerHTML = '<div class="empty-state"><div class="empty-icon">⚙️</div>Firebase config set করা হয়নি। নিচের line list দেখে config বসান।</div>';
+      $('history-list').innerHTML = '<div class="empty-state"><div class="empty-icon">🕒</div>No history yet</div>';
+      $('rank-list').innerHTML = '<div class="empty-state"><div class="empty-icon">🏆</div>Leaderboard empty</div>';
+      $('tutorial-list').innerHTML = '<div class="empty-state"><div class="empty-icon">🎬</div>No tutorial videos available right now.</div>';
+      $('m-select').innerHTML = '<option value="">No payment method</option>';
+      renderDisclaimerNotice();
+    }
+    function registerCurrentUser(){
+      if(!firebaseReady || !db || !currentUserId) return;
+      const profile = {
+        userKey:userRefKey,
+        telegram_chat_id:currentUserId,
+        user_id:currentUserId,
+        username:userUsername,
+        display_name:userDisplayName,
+        photo_url:tgUser.photo_url || '',
+        is_online:true,
+        last_active:firebase.database.ServerValue.TIMESTAMP
+      };
+      const ref = db.ref('users/' + userRefKey);
+      ref.update(profile).catch(err => console.warn('User register skipped:', err));
+      ref.child('notification_enabled').transaction(v => v === null ? true : v).catch(() => {});
+      ref.child('banned').transaction(v => v === null ? false : v).catch(() => {});
+      try{
+        db.ref('.info/connected').on('value', snap => {
+          if(snap.val() === true){
+            ref.update({is_online:true,last_active:firebase.database.ServerValue.TIMESTAMP}).catch(() => {});
+            ref.onDisconnect().update({is_online:false,last_seen:firebase.database.ServerValue.TIMESTAMP}).catch(() => {});
+          }
+        });
+      }catch(e){ console.warn('Online tracking skipped:', e); }
+    }
+
+    function initUserProfile(){
+      $('u-name').textContent = userDisplayName || 'Guest';
+      $('u-tag').textContent = '@' + (userUsername || 'no_username');
+      $('pfp').src = tgUser.photo_url || DEFAULT_PROFILE_IMAGE;
+      $('loader-logo').src = DEFAULT_LOADER_LOGO;
+      $('brand-text').textContent = normalizeBrandName(APP_DEFAULT_NAME);
+      $('admin-brand-name').textContent = normalizeBrandName(APP_DEFAULT_NAME);
+      $('fee-val').textContent = `- ${SEND_FEE.toFixed(2)} ৳`;
+      $('fee-note').textContent = `${SEND_FEE} TK Send Money Fee Deducted`;
+      renderDisclaimerNotice();
+      if(isAdmin) $('admin-btn').classList.remove('hidden');
+    }
+
+    function startUserListeners(){
+      if(!firebaseReady) return;
+      registerCurrentUser();
+      if(currentUserId){
+        db.ref('users/' + userRefKey).on('value', snap => {
+          const me = snap.val() || {};
+          userRegistryCache = {...userRegistryCache, [userRefKey]:me};
+          if(isUserBannedRecord(me)) showToast('আপনার account temporarily restricted. Support এ যোগাযোগ করুন।','error');
+        });
+      }
+      db.ref('settings/branding').on('value', snap => {
+        const b = snap.val() || {};
+        const name = normalizeBrandName(b.siteName || APP_DEFAULT_NAME);
+        if(b.siteName && b.siteName !== name) db.ref('settings/branding/siteName').set(name).catch(() => {});
+        document.title = name;
+        $('brand-text').textContent = name;
+        $('admin-brand-name').textContent = name;
+        sanitizeLegacyBrandInDom();
+      });
+      db.ref('settings/links').on('value', snap => {
+        const l = snap.val() || {};
+        channelLinkValue = normalizeLink(l.channel || '');
+        helpLinkValue = normalizeLink(l.help || '');
+      });
+      db.ref('settings/disclaimer').on('value', snap => {
+        const d = snap.val();
+        disclaimerNoticeValue = normalizeDisclaimerNotice(typeof d === 'string' ? d : (d && d.noticeText));
+        renderDisclaimerNotice();
+      });
+      db.ref('marketConfig').on('value', snap => {
+        marketCache = snap.val() || {};
+        renderMarket(marketCache);
+        finishLoading();
+      });
+      db.ref('paymentMethods').on('value', snap => renderUserPayments(snap.val() || {}));
+      db.ref('orders').orderByChild('userKey').equalTo(userRefKey).on('value', snap => renderUserHistory(snap.val() || {}));
+      db.ref('leaderboard').on('value', snap => { leaderboardCache = snap.val() || {}; renderLeaderboard(leaderboardCache); });
+      db.ref('tutorialVideos').on('value', snap => renderTutorialVideos(snap.val() || {}));
+      setTimeout(finishLoading, 3500);
+    }
+
+    function renderMarket(data){
+      const entries = Object.entries(data || {});
+      if(!entries.length){
+        $('market-list').innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div>No coins available</div>';
+        return;
+      }
+      const html = entries.map(([key,v],idx) => {
+        const on = v.status !== false;
+        const logo = v.logo ? `<img src="${escapeHtml(v.logo)}" alt="${escapeHtml(key)}" onerror="this.parentNode.innerHTML='<span style=&quot;font-size:24px;&quot;>💰</span>'">` : '<span style="font-size:24px;">💰</span>';
+        return `<div class="coin-card ${on?'online':''}" data-coin="${escapeHtml(key)}" style="animation-delay:${idx*.06}s;">
+          <div class="coin-card-top"><div class="coin-logo-wrap">${logo}</div><div><div class="coin-name-txt">${escapeHtml(key)}</div><div class="coin-label-txt">MARKET ASSET</div></div><div class="status-pill ${on?'on':'off'}"><div class="s-dot ${on?'on':'off'}"></div>${on?'ONLINE':'OFFLINE'}</div></div>
+          <div class="rates-grid"><div class="rate-cell"><small>USER RATE</small><b>${Number(v.userRate || 0)}৳</b></div><div class="rate-cell"><small>ADMIN RATE</small><b>${Number(v.adminRate || 0)}৳</b></div></div>
+          <div class="coin-tags"><span class="ctag">Min: ${Number(v.minSubmitLimit || DEFAULT_MIN_SUBMIT_LIMIT).toLocaleString()}</span><span class="ctag">Admin From: ${v.adminRateMinCoins ? Number(v.adminRateMinCoins).toLocaleString() : 'N/A'}</span></div>
+        </div>`;
+      }).join('');
+      $('market-list').innerHTML = html;
+      document.querySelectorAll('.coin-card.online').forEach(card => card.addEventListener('click', () => openOrderModal(card.dataset.coin)));
+    }
+    function renderUserPayments(data){
+      const entries = Object.entries(data || {}).filter(([,v]) => v && v.status !== false);
+      $('m-select').innerHTML = '<option value="">Payment Method</option>' + entries.map(([key]) => `<option value="${escapeHtml(key)}">${escapeHtml(key)}</option>`).join('');
+    }
+    function renderUserHistory(data){
+      const arr = Object.values(data || {}).sort((a,b) => getCreatedAt(b) - getCreatedAt(a));
+      const approved = arr.filter(o => getOrderStatus(o) === 'approved').length;
+      $('suc-count').textContent = approved;
+      if(!arr.length){
+        $('history-list').innerHTML = '<div class="empty-state"><div class="empty-icon">🕒</div>No orders yet</div>';
+        return;
+      }
+      $('history-list').innerHTML = arr.map((o,i) => {
+        const info = getUserStatusInfo(o);
+        const paidAt = Number(o.paid_at || 0);
+        const ref = String(o.payment_reference_id || '').trim();
+        const extraPaymentCells = getPaymentStatus(o) === 'paid' ? `<div class="hist-info-cell"><div class="hic-label">PAID AT</div><div class="hic-value">${escapeHtml(formatDate(paidAt) || '—')}</div></div><div class="hist-info-cell"><div class="hic-label">PAYMENT REF</div><div class="hic-value">${escapeHtml(ref || '—')}</div></div>` : `<div class="hist-info-cell"><div class="hic-label">PAYMENT STATUS</div><div class="hic-value">${getOrderStatus(o) === 'approved' ? 'Pending' : '—'}</div></div><div class="hist-info-cell"><div class="hic-label">ORDER STATUS</div><div class="hic-value">${escapeHtml(info.label)}</div></div>`;
+        return `<div class="hist-card" style="animation-delay:${i*.04}s;"><div class="hist-top"><div><div class="hist-coin-label">${escapeHtml(o.coin || '—')}</div><div class="hist-time">${formatDate(getCreatedAt(o))}</div></div><span class="hist-status-badge hs-${info.cls}">${escapeHtml(info.label).toUpperCase()}</span></div><div class="hist-body"><div class="hist-info-row"><div class="hist-info-cell"><div class="hic-label">AMOUNT</div><div class="hic-value">${Number(o.amt || 0)} ${escapeHtml(o.coin || '')}</div></div><div class="hist-info-cell"><div class="hic-label">METHOD</div><div class="hic-value">${escapeHtml(o.method || '—')}</div></div><div class="hist-info-cell"><div class="hic-label">PAYMENT</div><div class="hic-value">${escapeHtml(o.number || '—')}</div></div><div class="hist-info-cell"><div class="hic-label">SENDER</div><div class="hic-value">${escapeHtml(o.sender || '—')}</div></div>${extraPaymentCells}</div></div><div class="hist-footer"><span class="hist-order-id">💰 Total Paid Out</span><span class="hist-payout">${money(o.payable)}</span></div></div>`;
+      }).join('');
+    }
+    function sortLeaderboardEntries(entries){
+      return entries.filter(Boolean).sort((a,b) => {
+        const amountDiff = Number(b.totalAmount || 0) - Number(a.totalAmount || 0);
+        if(amountDiff !== 0) return amountDiff;
+        return String(a.displayName || a.user || '').localeCompare(String(b.displayName || b.user || ''));
+      });
+    }
+    function renderLeaderboard(data){
+      const arr = sortLeaderboardEntries(Object.values(data || {})).slice(0,10);
+      if(!arr.length){
+        $('rank-list').innerHTML = '<div class="empty-state"><div class="empty-icon">🏆</div>Leaderboard empty</div>';
+        return;
+      }
+      $('rank-list').innerHTML = arr.map((u,i) => {
+        const rClass = i===0 ? 'rank-1' : i===1 ? 'rank-2' : i===2 ? 'rank-3' : 'rank-n';
+        const name = String(u.displayName || u.user || 'Unknown').replace(/^@/, '');
+        return `<div class="lb-card" style="animation-delay:${i*.03}s;"><div style="display:flex;align-items:center;gap:11px;"><div class="lb-rank ${rClass}">${i+1}</div><div><div style="font-weight:800;font-size:14px;">${escapeHtml(name)}</div><div style="font-size:10px;color:var(--subtext);">Total Amount</div></div></div><b style="color:var(--sky-dark);font-size:15px;">${money(u.totalAmount)}</b></div>`;
+      }).join('');
+    }
+    function renderTutorialVideos(data){
+      tutorialCache = data || {};
+      const arr = Object.values(data || {}).filter(v => v && v.status !== false && (v.video_id || parseYouTubeVideoId(v.youtube_url || v.youtubeUrl || v.url || ''))).sort((a,b) => Number(b.created_at || b.createdAt || b.updated_at || 0) - Number(a.created_at || a.createdAt || a.updated_at || 0));
+      if(!arr.length){
+        $('tutorial-list').innerHTML = '<div class="empty-state"><div class="empty-icon">🎬</div>No tutorial videos available right now.</div>';
+        return;
+      }
+      $('tutorial-list').innerHTML = arr.map((v,i) => {
+        const videoId = String(v.video_id || parseYouTubeVideoId(v.youtube_url || v.youtubeUrl || v.url || '')).trim();
+        const title = String(v.video_title || v.title || 'Tutorial Video').trim() || 'Tutorial Video';
+        const date = formatDate(v.created_at || v.createdAt || v.updated_at || v.updatedAt);
+        return `<div class="tutorial-card" style="animation-delay:${i*.04}s;"><div class="tutorial-frame"><iframe src="${youtubeEmbedUrl(videoId)}" title="${escapeHtml(title)}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div><div class="tutorial-meta"><div class="tutorial-title">${escapeHtml(title)}</div>${date ? `<div class="tutorial-date">Added ${escapeHtml(date)}</div>` : ''}</div></div>`;
+      }).join('');
+    }
+
+    function openOrderModal(key){
+      if(guardBannedUser()) return;
+      const v = marketCache[key] || {};
+      selC = key;
+      selR = Number(v.userRate || 0);
+      currentTID = v.transferId || '';
+      selAdminRate = Number(v.adminRate || 0);
+      selAdminRateMinCoins = Number(v.adminRateMinCoins || 0);
+      selMinSubmitLimit = Number(v.minSubmitLimit || DEFAULT_MIN_SUBMIT_LIMIT);
+      selInputType = v.inputType || 'username';
+      $('m-title').textContent = '⚡ Sell ' + key;
+      $('admin-id').textContent = currentTID || '—';
+      $('c-qty').placeholder = `Enter Amount (Min: ${selMinSubmitLimit.toLocaleString()})`;
+      $('c-sender').placeholder = selInputType === 'code' ? 'Enter Transfer Code' : 'Sender Username';
+      ['c-qty','c-sender','m-num'].forEach(id => $(id).value = '');
+      $('m-select').value = '';
+      $('coin-unit-val').textContent = '0.00';
+      $('base-val').textContent = '0.00 ৳';
+      $('c-res').textContent = '0.00 ৳';
+      resetProofInput();
+      finalP = 0;
+      $('order-modal').classList.add('active');
+      try{ tg.HapticFeedback.impactOccurred('light'); }catch(e){}
+    }
+    function closeOrderModal(){ $('order-modal').classList.remove('active'); }
+    function getActiveRate(q){
+      return (selAdminRate > 0 && selAdminRateMinCoins > 0 && q >= selAdminRateMinCoins) ? selAdminRate : selR;
+    }
+    function calc(){
+      const q = Number($('c-qty').value || 0);
+      const activeRate = getActiveRate(q);
+      const coinUnit = q / 1000;
+      const base = coinUnit * activeRate;
+      finalP = Math.max(0, base - SEND_FEE);
+      $('coin-unit-val').textContent = coinUnit.toFixed(2);
+      $('base-val').textContent = money(base);
+      $('c-res').textContent = money(finalP);
+    }
+    function formatFileSize(bytes){
+      const n = Number(bytes || 0);
+      if(n >= 1024 * 1024) return (n / (1024 * 1024)).toFixed(2) + ' MB';
+      if(n >= 1024) return (n / 1024).toFixed(1) + ' KB';
+      return n + ' B';
+    }
+    function resetProofInput(){
+      proofFileName = '';
+      proofImageDataUrl = '';
+      proofProcessing = false;
+      if($('proof-file')) $('proof-file').value = '';
+      if($('proof-preview')) $('proof-preview').classList.add('hidden');
+      if($('proof-preview-img')) $('proof-preview-img').removeAttribute('src');
+      if($('proof-file-name')) $('proof-file-name').textContent = 'Screenshot selected';
+      if($('proof-file-size')) $('proof-file-size').textContent = 'Ready to submit';
+      if($('proof-select-btn')) $('proof-select-btn').textContent = '+ Upload Transfer Screenshot';
+    }
+    function compressImageFile(file){
+      return new Promise((resolve,reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error('file-read-failed'));
+        reader.onload = () => {
+          const img = new Image();
+          img.onerror = () => reject(new Error('image-load-failed'));
+          img.onload = () => {
+            const maxSide = 900;
+            let w = img.width, h = img.height;
+            const ratio = Math.min(1, maxSide / Math.max(w, h));
+            w = Math.max(1, Math.round(w * ratio));
+            h = Math.max(1, Math.round(h * ratio));
+            const canvas = document.createElement('canvas');
+            canvas.width = w; canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            if(!ctx) return reject(new Error('canvas-context-failed'));
+            ctx.drawImage(img, 0, 0, w, h);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.62);
+            if(dataUrl.length > MAX_PROOF_DATA_URL_LENGTH) return reject(new Error('proof-too-large-after-compression'));
+            resolve(dataUrl);
+          };
+          img.src = String(reader.result || '');
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+    async function handleProofFileChange(e){
+      const file = e.target.files && e.target.files[0];
+      if(!file) return;
+      if(!/^image\//i.test(file.type || '')){
+        resetProofInput();
+        showToast('Only image screenshot upload করুন','error');
+        return;
+      }
+      if(file.size > 8 * 1024 * 1024){
+        resetProofInput();
+        showToast('Screenshot max 8MB হতে হবে','error');
+        return;
+      }
+      try{
+        proofProcessing = true;
+        proofFileName = file.name || 'proof-screenshot.jpg';
+        $('proof-select-btn').textContent = 'Processing screenshot...';
+        proofImageDataUrl = await compressImageFile(file);
+        $('proof-preview-img').src = proofImageDataUrl;
+        $('proof-file-name').textContent = proofFileName;
+        $('proof-file-size').textContent = `${formatFileSize(file.size)} · compressed for upload`;
+        $('proof-preview').classList.remove('hidden');
+        $('proof-select-btn').textContent = 'Change Screenshot';
+        showToast('Screenshot ready','success');
+      }catch(err){
+        console.error('Proof processing failed:', err);
+        resetProofInput();
+        showToast(err && err.message === 'proof-too-large-after-compression' ? 'Screenshot অনেক বড়। Crop করে আবার upload করুন' : 'Screenshot process failed','error');
+      }finally{
+        proofProcessing = false;
+      }
+    }
+    function getProofSrc(order){
+      return String(order?.proof_image_url || order?.proofImageUrl || order?.proof_data_url || order?.proofDataUrl || '').trim();
+    }
+    function openProofModal(orderId){
+      const order = globalOrders[orderId];
+      if(!order) return showToast('Order not found','error');
+      const src = getProofSrc(order);
+      if(!src) return showToast('No screenshot uploaded','warning');
+      proofModalSrc = src;
+      $('proof-modal-img').src = src;
+      $('proof-modal-caption').textContent = `${order.username && order.username !== 'no_username' ? '@' + order.username : (order.user || 'User')} · ${Number(order.amt || 0).toLocaleString()} ${order.coin || ''}`;
+      $('proof-modal').classList.add('active');
+    }
+    function closeProofModal(){
+      $('proof-modal').classList.remove('active');
+      $('proof-modal-img').removeAttribute('src');
+      proofModalSrc = '';
+    }
+    function fallbackCopyText(txt){
+      const ta = document.createElement('textarea');
+      ta.value = txt;
+      ta.setAttribute('readonly','');
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      ta.style.top = '0';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      const ok = document.execCommand('copy');
+      ta.remove();
+      if(!ok) throw new Error('fallback-copy-failed');
+    }
+    async function copyTextValue(txt,label='Data'){
+      const value = String(txt || '').trim();
+      if(!value || value === '—'){ showToast('Copy করার মতো data নেই','warning'); return; }
+      try{
+        if(navigator.clipboard && navigator.clipboard.writeText) await navigator.clipboard.writeText(value);
+        else fallbackCopyText(value);
+        try{ tg.HapticFeedback.notificationOccurred('success'); }catch(e){}
+        showToast(`${label} copied`,'success');
+      }catch(e){
+        try{ fallbackCopyText(value); showToast(`${label} copied`,'success'); }
+        catch(err){ showToast('Copy failed. Manually copy করুন।','error'); }
+      }
+    }
+    async function copyID(){
+      const txt = currentTID || $('admin-id').textContent || '';
+      await copyTextValue(txt,'Transfer ID');
+    }
+    function showConfirm(){
+      if(!requireFirebase()) return;
+      const q = Number($('c-qty').value || 0);
+      const sender = $('c-sender').value.trim();
+      const number = $('m-num').value.trim();
+      const method = $('m-select').value;
+      if(!selC){ showToast('Coin select করুন','error'); return; }
+      if(!q || q <= 0){ showToast('Valid amount দিন','error'); return; }
+      if(q < selMinSubmitLimit){ showToast(`Minimum is ${selMinSubmitLimit.toLocaleString()} coins`,'error'); return; }
+      if(!sender){ showToast(selInputType === 'code' ? 'Transfer code দিন' : 'Sender username দিন','error'); return; }
+      if(!method){ showToast('Payment method select করুন','error'); return; }
+      if(!number){ showToast('Payment number দিন','error'); return; }
+      if(proofProcessing){ showToast('Screenshot processing হচ্ছে, একটু অপেক্ষা করুন','warning'); return; }
+      if(!proofImageDataUrl){ showToast('Proof screenshot upload করুন','error'); return; }
+      calc();
+      const activeRate = getActiveRate(q);
+      $('sum-amt').textContent = `${q} ${selC} = ${(q / 1000).toFixed(2)} unit`;
+      $('sum-method').textContent = method;
+      $('sum-number').textContent = number;
+      $('sum-sender').textContent = sender;
+      renderDisclaimerNotice();
+      $('sum-total').textContent = money(finalP);
+      $('confirm-modal').classList.add('active');
+    }
+    function hideConfirm(){ $('confirm-modal').classList.remove('active'); }
+    function submitOrder(){
+      if(submitting || !requireFirebase()) return;
+      if(guardBannedUser()) return;
+      const q = Number($('c-qty').value || 0);
+      const sender = $('c-sender').value.trim();
+      const number = $('m-num').value.trim();
+      const method = $('m-select').value;
+      if(!q || q <= 0){ showToast('Valid amount দিন','error'); return; }
+      if(q < selMinSubmitLimit){ showToast(`Minimum is ${selMinSubmitLimit.toLocaleString()} coins`,'error'); return; }
+      if(!sender){ showToast(selInputType === 'code' ? 'Transfer code দিন' : 'Sender username দিন','error'); return; }
+      if(!method){ showToast('Payment method select করুন','error'); return; }
+      if(!number){ showToast('Payment number দিন','error'); return; }
+      if(proofProcessing){ showToast('Screenshot processing হচ্ছে, একটু অপেক্ষা করুন','warning'); return; }
+      if(!proofImageDataUrl){ showToast('Proof screenshot upload করুন','error'); return; }
+      calc();
+      const activeRate = getActiveRate(q);
+      const coinUnit = q / 1000;
+      const orderRef = db.ref('orders').push();
+      const orderId = orderRef.key;
+      submitting = true;
+      const btn = $('submit-btn');
+      btn.textContent = '⏳ Submitting...';
+      btn.disabled = true;
+      const orderData = {
+        id:orderId,
+        user_id:currentUserId,
+        userId:currentUserId,
+        telegram_user_id:currentUserId,
+        telegram_chat_id:currentUserId,
+        userKey:userRefKey,
+        user:userDisplayName,
+        username:userUsername,
+        coin:selC,
+        amt:q,
+        coinUnit:parseFloat(coinUnit.toFixed(4)),
+        payable:parseFloat(finalP.toFixed(2)),
+        sender,
+        number,
+        method,
+        status:'pending',
+        order_status:'pending',
+        payment_status:'pending',
+        notification_backend:'direct_html',
+        admin_notification_sent:false,
+        user_status_notification_sent:false,
+        payment_notification_sent:false,
+        targetId:currentTID, target_id:currentTID, appliedRate:activeRate, appliedRateType:(activeRate === selAdminRate && selAdminRate > 0) ? 'admin' : 'user', rateBase:'per_1000_coins',
+        proof_image_url:proofImageDataUrl, proof_file_name:proofFileName, proof_uploaded:true,
+        disclaimer_notice:normalizeDisclaimerNotice(disclaimerNoticeValue),
+        adminRateMinCoins:selAdminRateMinCoins, minSubmitLimit:selMinSubmitLimit, timestamp:firebase.database.ServerValue.TIMESTAMP, created_at:firebase.database.ServerValue.TIMESTAMP, approved_at:0, paid_at:0, payment_reference_id:''
+      };
+      orderRef.set(orderData).then(() => {
+        sendTelegramMessage(TELEGRAM_ADMIN_CHAT_ID, buildNewOrderMessage(orderData));
+        sendUserTelegramMessage(orderData, buildUserOrderSubmittedMessage(orderData));
+        try{ tg.HapticFeedback.notificationOccurred('success'); }catch(e){}
+        hideConfirm(); closeOrderModal(); showToast('✓ Order Submitted!','success'); userSwitchTab('history-scr');
+      }).catch(err => {
+        console.error(err); showToast('Submit failed, try again','error');
+      }).finally(() => {
+        submitting = false; btn.textContent = '✓ Submit'; btn.disabled = false;
+      });
+    }
+    function userSwitchTab(screenId){
+      ['home-scr','history-scr','rank-scr','tutorial-scr'].forEach(s => $(s).style.display = s === screenId ? 'block' : 'none');
+      document.querySelectorAll('#user-nav .nav-tab').forEach(tab => tab.classList.toggle('active', tab.dataset.screen === screenId));
+      try{ tg.HapticFeedback.impactOccurred('light'); }catch(e){}
+    }
+    function openSafeLink(url){
+      const s = normalizeLink(url);
+      if(!s){ showToast('Link not set by admin yet.','error'); return; }
+      try{
+        if(/^(https?:\/\/)?(t\.me|telegram\.me)\//i.test(s) && typeof tg.openTelegramLink === 'function'){ tg.openTelegramLink(s); return; }
+        if(typeof tg.openLink === 'function'){ tg.openLink(s,{try_instant_view:false}); return; }
+      }catch(e){}
+      window.open(s,'_blank','noopener,noreferrer');
+    }
+    function cleanAdminRouteFromUrl(){
+      try{
+        const url = new URL(location.href);
+        url.searchParams.delete('admin');
+        if(hashOpensAdmin()) url.hash = '';
+        return url.pathname + url.search + url.hash;
+      }catch(e){
+        return location.pathname + location.search.replace(/([?&])admin=1(&?)/, (m,p,tail) => tail ? p : '') + (hashOpensAdmin() ? '' : location.hash);
+      }
+    }
+
+    function showUserPanel(){
+      $('access-denied').style.display = 'none';
+      $('admin-panel').classList.add('hidden');
+      $('user-panel').classList.remove('hidden');
+      $('user-nav').classList.remove('hidden');
+      $('cv').style.display = 'none';
+      document.body.style.padding = '14px 13px 120px';
+      history.replaceState(null,'',cleanAdminRouteFromUrl());
+    }
+    function showAdminPanel(){
+      if(!isAdmin){ $('access-denied').style.display = 'flex'; return; }
+      $('user-panel').classList.add('hidden');
+      $('user-nav').classList.add('hidden');
+      $('admin-panel').classList.remove('hidden');
+      $('cv').style.display = 'block';
+      document.body.style.padding = '0 0 40px';
+      if(!adminStarted){ startAdminSystem(); adminStarted = true; }
+      initParticles();
+    }
+
+    function startAdminSystem(){
+      if(!requireFirebase()) return;
+      db.ref('orders').on('value', snap => {
+        globalOrders = snap.val() || {};
+        const cnt = {pending:0,approved:0,rejected:0,payment:0,paid:0};
+        Object.values(globalOrders).forEach(o => {
+          const os = getOrderStatus(o), ps = getPaymentStatus(o);
+          if(cnt[os] !== undefined) cnt[os]++;
+          if(os === 'approved' && ps === 'pending') cnt.payment++;
+          if(os === 'approved' && ps === 'paid') cnt.paid++;
+        });
+        $('stat-pending').textContent = cnt.pending;
+        $('cnt-pending').textContent = cnt.pending;
+        $('cnt-completed').textContent = cnt.approved;
+        $('cnt-rejected').textContent = cnt.rejected;
+        if($('cnt-payment')) $('cnt-payment').textContent = cnt.payment;
+        if(currentAdminTab !== 'settings') renderAdminOrders();
+        renderUserTrackingSystem();
+        renderBroadcastUserSelectList();
+      });
+      db.ref('users').on('value', snap => { userRegistryCache = snap.val() || {}; renderUserTrackingSystem(); renderBroadcastUserSelectList(); });
+      db.ref('leaderboard').on('value', snap => { leaderboardCache = snap.val() || {}; renderAdminLeaderboard(leaderboardCache); });
+      db.ref('marketConfig').on('value', snap => renderAdminCoins(snap.val() || {}));
+      db.ref('paymentMethods').on('value', snap => renderAdminPayments(snap.val() || {}));
+      db.ref('tutorialVideos').on('value', snap => { tutorialCache = snap.val() || {}; renderAdminTutorials(tutorialCache); });
+      loadAdminBranding();
+    }
+    const SETTINGS_MODULE_LABELS = {
+      'leaderboard-management':'Leaderboard Management',
+      'coin-management':'Coin Management',
+      'branding-links':'Branding & Links',
+      'disclaimer-notice':'Disclaimer Notice',
+      'payment-methods':'Payment Methods',
+      'tutorial-management':'Tutorial Management'
+    };
+    function normalizeSettingsModuleKey(key){
+      const cleaned = String(key || '').trim().toLowerCase().replace(/^\/+|\/+$/g,'');
+      return Object.prototype.hasOwnProperty.call(SETTINGS_MODULE_LABELS, cleaned) ? cleaned : '';
+    }
+    function getSettingsRouteKeyFromHash(){
+      const raw = String(location.hash || '').replace(/^#\/?/, '').trim().toLowerCase();
+      if(raw === 'settings') return 'main';
+      if(raw.startsWith('settings/')) return normalizeSettingsModuleKey(raw.split('/')[1] || '');
+      return '';
+    }
+    function setSettingsRouteHash(key){
+      const target = key === 'main' ? '#settings' : '#/settings/' + key;
+      if(location.hash !== target){
+        try{ history.pushState(null, '', target); }
+        catch(e){ location.hash = target; }
+      }
+    }
+    function openSettingsMain(updateUrl = false){
+      const main = $('settings-main-page');
+      if(main) main.classList.remove('hidden');
+      document.querySelectorAll('.settings-module-page').forEach(page => page.classList.add('hidden'));
+      if(updateUrl) setSettingsRouteHash('main');
+      try{ tg.HapticFeedback.impactOccurred('light'); }catch(e){}
+    }
+    function openSettingsModule(key, updateUrl = false){
+      const moduleKey = normalizeSettingsModuleKey(key);
+      if(!moduleKey){ openSettingsMain(updateUrl); return; }
+      const main = $('settings-main-page');
+      if(main) main.classList.add('hidden');
+      document.querySelectorAll('.settings-module-page').forEach(page => page.classList.toggle('hidden', page.dataset.settingsPage !== moduleKey));
+      if(updateUrl) setSettingsRouteHash(moduleKey);
+      try{ tg.HapticFeedback.impactOccurred('light'); }catch(e){}
+    }
+    function handleSettingsHashRoute(){
+      const routeKey = getSettingsRouteKeyFromHash();
+      if(!routeKey) return false;
+      adminSwitchTab('settings', { skipSettingsRoute:true });
+      if(routeKey === 'main') openSettingsMain(false);
+      else openSettingsModule(routeKey, false);
+      return true;
+    }
+    function hashOpensAdmin(){
+      const h = String(location.hash || '').toLowerCase();
+      return h === '#admin' || h === '#settings' || h === '#/settings' || h.startsWith('#settings/') || h.startsWith('#/settings/');
+    }
+    function adminSwitchTab(tab, options = {}){
+      currentAdminTab = tab;
+      document.querySelectorAll('[data-admin-tab]').forEach(t => t.classList.toggle('active', t.dataset.adminTab === tab));
+      const isSettings = tab === 'settings';
+      $('order-section').style.display = isSettings ? 'none' : 'block';
+      $('settings-section').style.display = isSettings ? 'block' : 'none';
+      if($('payment-tools')) $('payment-tools').classList.toggle('hidden', tab !== 'payment');
+      if(tab === 'payment' && $('payment-filter') && !$('payment-filter').value) $('payment-filter').value = 'pending';
+      if(isSettings){
+        openSettingsMain(!options.skipSettingsRoute);
+      }else{
+        renderAdminOrders();
+      }
+    }
+    function renderAdminOrders(){
+      const q = currentAdminTab === 'payment' && $('payment-search') ? $('payment-search').value.trim().toLowerCase() : '';
+      const payFilter = currentAdminTab === 'payment' && $('payment-filter') ? $('payment-filter').value : 'pending';
+      let arr = Object.values(globalOrders || {}).filter(o => {
+        const os = getOrderStatus(o), ps = getPaymentStatus(o);
+        if(currentAdminTab === 'pending') return os === 'pending';
+        if(currentAdminTab === 'approved') return os === 'approved';
+        if(currentAdminTab === 'rejected') return os === 'rejected';
+        if(currentAdminTab === 'payment'){
+          if(os !== 'approved') return false;
+          if(payFilter === 'pending' && ps !== 'pending') return false;
+          if(payFilter === 'paid' && ps !== 'paid') return false;
+          return q ? normalizeOrderForSearch(o).includes(q) : true;
+        }
+        return false;
+      }).sort((a,b) => {
+        if(currentAdminTab === 'payment'){
+          const ap = getPaymentStatus(a) === 'paid' ? Number(a.paid_at || 0) : Number(a.approved_at || getCreatedAt(a));
+          const bp = getPaymentStatus(b) === 'paid' ? Number(b.paid_at || 0) : Number(b.approved_at || getCreatedAt(b));
+          return bp - ap;
+        }
+        return getCreatedAt(b) - getCreatedAt(a);
+      });
+      if(!arr.length){ $('order-list').innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div>${currentAdminTab === 'payment' ? 'No payment orders found' : 'No orders here'}</div>`; return; }
+      $('order-list').innerHTML = arr.map((o,i) => {
+        const os = getOrderStatus(o), ps = getPaymentStatus(o);
+        const ob = getOrderBadgeInfo(o), pb = getPaymentBadgeInfo(o);
+        const displayName = o.username && o.username !== 'no_username' ? '@' + o.username : (o.user || '—');
+        const cardClass = currentAdminTab === 'payment' ? (ps === 'paid' ? 'paid' : 'payment') : os;
+        const paymentMetaItems = `${Number(o.approved_at || 0) ? `<span class="payment-pill">Approved: ${escapeHtml(formatDate(o.approved_at))}</span>` : ''}${ps === 'paid' ? `<span class="payment-pill good">Paid: ${escapeHtml(formatDate(o.paid_at))}</span><span class="payment-pill">Ref: ${escapeHtml(o.payment_reference_id || '—')}</span>` : ''}`;
+        const paymentMeta = os === 'approved' && paymentMetaItems ? `<div class="payment-meta">${paymentMetaItems}</div>` : '';
+        let actionBtns = '';
+        if(os === 'pending') actionBtns = `<button class="btn-accept" type="button" data-order-action="accept" data-id="${escapeHtml(o.id)}">✓ Approve</button><button class="btn-reject" type="button" data-order-action="reject" data-id="${escapeHtml(o.id)}">✗ Reject</button>`;
+        if(currentAdminTab === 'payment' && os === 'approved' && ps === 'pending') { const paymentProofReady = !!getPaymentProofSrc(o); actionBtns = `<button class="btn-payment-proof ${paymentProofReady ? 'has-proof' : ''}" type="button" data-order-action="payment-proof" data-id="${escapeHtml(o.id)}">${paymentProofReady ? '✓ Screenshot Added' : 'Screenshot Submit'}</button><button class="btn-paid" type="button" data-order-action="mark-paid" data-id="${escapeHtml(o.id)}">✓ Mark as Paid</button>`; }
+        const senderValue = String(o.sender || '').trim();
+        const payNumberValue = String(getOrderPaymentNumber(o) || '').trim();
+        const senderCopyBtn = currentAdminTab === 'pending' && senderValue ? `<button class="info-copy-btn" type="button" data-copy-value="${escapeHtml(senderValue)}" data-copy-label="Sender ID">⧉ Copy</button>` : '';
+        const payToCopyBtn = currentAdminTab === 'payment' && payNumberValue ? `<button class="info-copy-btn" type="button" data-copy-value="${escapeHtml(payNumberValue)}" data-copy-label="Payment Number">⧉ Copy</button>` : '';
+        const hasProof = !!getProofSrc(o);
+        const proofBtn = currentAdminTab === 'pending' ? `<button class="proof-view-btn" type="button" data-proof-id="${escapeHtml(o.id)}" ${hasProof ? '' : 'disabled'}>${hasProof ? '👁 View Screenshot' : 'No Screenshot'}</button>` : '';
+        const payToCell = `<div class="info-cell"><small>PAY TO</small><b>${escapeHtml(o.number || '—')} (${escapeHtml(o.method || '—')})</b>${payToCopyBtn}</div>`;
+        const senderCell = `<div class="info-cell"><small>SENDER</small><b>${escapeHtml(o.sender || '—')}</b>${senderCopyBtn}</div>`;
+        const coinUnit = Number(o.coinUnit || (Number(o.amt || 0) / 1000));
+        const rateLabel = `${Number(o.appliedRate || 0)}৳ / 1000 coins (${escapeHtml(o.appliedRateType || 'user')})`;
+        return `<div class="order-card ${escapeHtml(cardClass)}" style="animation-delay:${i*.04}s;"><div class="order-header"><div><div class="order-user">${escapeHtml(displayName)}</div><div class="order-id">#${escapeHtml(String(o.id || '').slice(-7))} · ${formatDate(getCreatedAt(o))}</div></div><div style="display:flex;flex-direction:column;gap:5px;align-items:flex-end;"><span class="order-badge badge-${escapeHtml(ob.cls)}">${escapeHtml(ob.label)}</span>${os === 'approved' ? `<span class="order-badge badge-${escapeHtml(pb.cls)}">${escapeHtml(pb.label)}</span>` : ''}</div></div>${paymentMeta}<div class="info-grid">${payToCell}<div class="info-cell"><small>COIN</small><b>${Number(o.amt || 0)} ${escapeHtml(o.coin || '—')}</b><div style="font-size:9px;font-weight:800;color:var(--subtext);margin-top:3px;">Unit: ${coinUnit.toFixed(2)}</div></div>${senderCell}<div class="info-cell"><small>PAYOUT</small><b style="color:var(--sky-dark);">${money(o.payable)}</b></div><div class="info-cell"><small>RATE USED</small><b>${rateLabel}</b></div><div class="info-cell"><small>TARGET ID</small><b style="font-size:10px;">${escapeHtml(o.targetId || o.target_id || '—')}</b></div>${ps === 'paid' ? `<div class="info-cell"><small>PAID AT</small><b>${escapeHtml(formatDate(o.paid_at) || '—')}</b></div><div class="info-cell"><small>PAYMENT REF</small><b>${escapeHtml(o.payment_reference_id || '—')}</b></div>` : ''}</div><div class="order-actions">${proofBtn}${actionBtns}<button class="btn-del" type="button" data-order-action="delete" data-id="${escapeHtml(o.id)}">Del</button></div></div>`;
+      }).join('');
+      document.querySelectorAll('[data-order-action]').forEach(btn => btn.addEventListener('click', () => {
+        const id = btn.dataset.id;
+        if(btn.dataset.orderAction === 'accept') updateOrderStatus(id,'approved');
+        if(btn.dataset.orderAction === 'reject') updateOrderStatus(id,'rejected');
+        if(btn.dataset.orderAction === 'payment-proof') openPaymentProofUpload(id);
+        if(btn.dataset.orderAction === 'mark-paid') openPaymentModal(id);
+        if(btn.dataset.orderAction === 'delete') deleteOrder(id);
+      }));
+      document.querySelectorAll('[data-proof-id]').forEach(btn => btn.addEventListener('click', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        if(!btn.disabled) openProofModal(btn.dataset.proofId || '');
+      }));
+      document.querySelectorAll('[data-copy-value]').forEach(btn => btn.addEventListener('click', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        copyTextValue(btn.dataset.copyValue || '', btn.dataset.copyLabel || 'Data');
+      }));
+    }
+    function openPaymentProofUpload(id){
+      const order = globalOrders[id];
+      if(!order) return showToast('Order not found','error');
+      paymentProofTargetOrderId = id;
+      const input = $('payment-proof-file');
+      if(input){
+        input.value = '';
+        input.click();
+      }
+    }
+    async function handlePaymentProofFileChange(e){
+      if(!requireFirebase()) return;
+      const file = e.target.files && e.target.files[0];
+      const id = paymentProofTargetOrderId;
+      if(!file || !id) return;
+      if(!file.type || !file.type.startsWith('image/')){ showToast('শুধু image screenshot upload করুন','error'); return; }
+      const order = globalOrders[id];
+      if(!order) return showToast('Order not found','error');
+      try{
+        paymentProofProcessing = true;
+        showToast('Payment screenshot processing হচ্ছে...','warning');
+        const dataUrl = await compressImageFile(file);
+        const patch = {
+          payment_proof_image_url:dataUrl,
+          payment_proof_file_name:file.name || 'payment-proof.jpg',
+          payment_proof_uploaded:true,
+          updated_at:firebase.database.ServerValue.TIMESTAMP
+        };
+        Object.assign(order, patch);
+        await db.ref('orders/' + id).update(patch);
+        showToast('✓ Payment proof screenshot uploaded','success');
+        renderAdminOrders();
+      }catch(err){
+        console.error(err);
+        showToast(err && err.message === 'proof-too-large-after-compression' ? 'Screenshot অনেক বড়। Crop করে আবার upload করুন' : 'Payment proof upload failed','error');
+      }finally{
+        paymentProofProcessing = false;
+        paymentProofTargetOrderId = '';
+        if(e.target) e.target.value = '';
+      }
+    }
+    async function handleBroadcastNoticeImageChange(e){
+      const file = e.target.files && e.target.files[0];
+      if(!file) return;
+      if(!/^image\//i.test(file.type || '')){
+        resetBroadcastNoticeImage();
+        showToast('শুধু image/screenshot upload করুন','error');
+        return;
+      }
+      if(file.size > 8 * 1024 * 1024){
+        resetBroadcastNoticeImage();
+        showToast('Image max 8MB হতে হবে','error');
+        return;
+      }
+      try{
+        broadcastNoticeImageProcessing = true;
+        broadcastNoticeImageFileName = file.name || 'notice-image.jpg';
+        $('broadcast-image-select-btn').textContent = 'Processing image...';
+        broadcastNoticeImageDataUrl = await compressImageFile(file);
+        $('broadcast-image-preview-img').src = broadcastNoticeImageDataUrl;
+        $('broadcast-image-file-name').textContent = broadcastNoticeImageFileName;
+        $('broadcast-image-file-size').textContent = `${formatFileSize(file.size)} · compressed for sending`;
+        $('broadcast-image-preview').classList.remove('hidden');
+        $('broadcast-image-select-btn').textContent = 'Change Image';
+        showToast('Notice image ready','success');
+        renderBroadcastNoticePreview();
+      }catch(err){
+        console.error('Notice image processing failed:', err);
+        resetBroadcastNoticeImage();
+        showToast(err && err.message === 'proof-too-large-after-compression' ? 'Image অনেক বড়। Crop করে আবার upload করুন' : 'Image process failed','error');
+      }finally{
+        broadcastNoticeImageProcessing = false;
+      }
+    }
+    function collectBroadcastRecipients(){
+      const users = collectKnownUsers().filter(u => u.chatId && !u.banned && u.notificationEnabled);
+      const mode = getBroadcastTargetMode();
+      if(mode === 'selected'){
+        const selected = getSelectedBroadcastUserKeys();
+        return users.filter(u => selected.has(u.userKey)).map(u => ({ chatId:u.chatId, label:u.label, userKey:u.userKey }));
+      }
+      return users.map(u => ({ chatId:u.chatId, label:u.label, userKey:u.userKey }));
+    }
+    function buildBroadcastNoticeMessage(text, videoLink){
+      const safeText = tgEscape(text);
+      const safeVideo = tgEscape(videoLink || '');
+      return `📢 <b>SHISHIR COIN SHOP Notice</b>
+
+${safeText}${safeVideo ? `
+
+🎬 <b>ভিডিও লিংক:</b>
+${safeVideo}` : ''}
+
+<b>SHISHIR COIN SHOP-এর সাথে নিরাপদ লেনদেনের জন্য ধন্যবাদ।</b>`;
+    }
+    function delay(ms){ return new Promise(resolve => setTimeout(resolve, ms)); }
+    function sendBroadcastNotice(){
+      if(!requireFirebase()) return;
+      const noticeText = String($('broadcast-notice-text')?.value || '').trim();
+      const videoLink = normalizeBroadcastVideoLink($('broadcast-video-link')?.value || '');
+      const mode = getBroadcastTargetMode();
+      if(!noticeText){ showToast('Notice text লিখুন','error'); $('broadcast-notice-text').focus(); return; }
+      if(broadcastNoticeImageProcessing){ showToast('Image processing হচ্ছে, একটু অপেক্ষা করুন','warning'); return; }
+      if(mode === 'selected' && !getSelectedBroadcastUserKeys().size){ showToast('কমপক্ষে একজন user select করুন','error'); return; }
+      const recipients = collectBroadcastRecipients();
+      if(!recipients.length){ showToast(mode === 'selected' ? 'Selected user available নয় বা notification off আছে' : 'কোনো active user পাওয়া যায়নি','error'); return; }
+      const confirmDesc = mode === 'selected' ? `${recipients.length} জন selected user-এর কাছে এই notice পাঠানো হবে।` : `${recipients.length} জন eligible user-এর কাছে এই notice পাঠানো হবে। Notification Off/Banned users বাদ থাকবে।`;
+      adminConfirm('Send Notice?', confirmDesc, '📢', async () => {
+        const btn = $('send-broadcast-notice-btn');
+        const oldText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = `⏳ Sending to ${recipients.length} users...`;
+        const message = buildBroadcastNoticeMessage(noticeText, videoLink);
+        let sent = 0;
+        try{
+          for(const user of recipients){
+            await sendTelegramMessage(user.chatId, message);
+            if(broadcastNoticeImageDataUrl){
+              await delay(180);
+              await sendTelegramPhoto(user.chatId, broadcastNoticeImageDataUrl, '📸 <b>Notice Screenshot</b>');
+            }
+            sent++;
+            await delay(180);
+          }
+          db.ref('noticeBroadcasts').push({
+            notice_text:noticeText,
+            video_link:videoLink,
+            image_attached:!!broadcastNoticeImageDataUrl,
+            target_mode:mode,
+            selected_users:mode === 'selected' ? recipients.map(u => u.userKey) : [],
+            sent_count:sent,
+            created_at:firebase.database.ServerValue.TIMESTAMP,
+            sent_by:currentUserId || 0
+          }).catch(() => {});
+          $('broadcast-notice-text').value = '';
+          $('broadcast-video-link').value = '';
+          document.querySelectorAll('[data-broadcast-user-check]').forEach(input => { input.checked = false; });
+          resetBroadcastNoticeImage();
+          renderBroadcastNoticePreview();
+          showToast(`✓ Notice sent to ${sent} users`,'success');
+        }catch(err){
+          console.error('Broadcast notice failed:', err);
+          showToast('Notice send failed','error');
+        }finally{
+          btn.disabled = false;
+          btn.textContent = oldText;
+        }
+      });
+    }
+    function updateOrderStatus(id,orderStatus){
+      if(!requireFirebase()) return;
+      const order = globalOrders[id];
+      if(!order) return showToast('Order not found','error');
+      if(paymentProofProcessing) return showToast('Payment screenshot processing হচ্ছে, একটু অপেক্ষা করুন','warning');
+      const now = firebase.database.ServerValue.TIMESTAMP;
+      const patch = { order_status:orderStatus, status:orderStatus === 'approved' ? 'completed' : orderStatus, updated_at:now };
+      if(orderStatus === 'approved'){
+        patch.payment_status = 'pending';
+        patch.approved_at = now;
+        patch.paid_at = Number(order.paid_at || 0) || 0;
+        patch.payment_reference_id = String(order.payment_reference_id || '');
+      }
+      if(orderStatus === 'rejected'){
+        patch.payment_status = 'pending';
+        patch.rejected_at = now;
+      }
+      Object.assign(order, patch);
+      renderAdminOrders();
+      db.ref('orders/' + id).update(patch).then(() => {
+        sendUserTelegramMessage(order, buildOrderStatusMessage(order, orderStatus));
+        if(orderStatus === 'approved' && order){ updateLeaderboardFromOrder(order); showToast('✓ Order Approved. Payment pending now.','success'); adminSwitchTab('payment'); }
+        else if(orderStatus === 'rejected') showToast('Order Rejected','warning');
+      }).catch(err => { console.error(err); showToast('Update failed','error'); });
+      try{ tg.HapticFeedback.notificationOccurred('success'); }catch(e){}
+    }
+    function openPaymentModal(id){
+      const order = globalOrders[id];
+      if(!order) return showToast('Order not found','error');
+      if(paymentProofProcessing) return showToast('Payment screenshot processing হচ্ছে, একটু অপেক্ষা করুন','warning');
+      if(!getPaymentProofSrc(order)) return showToast('আগে Screenshot Submit করুন, তারপর Mark as Paid দিন','error');
+      paymentTargetOrderId = id;
+      $('payment-modal-desc').textContent = `${order.username && order.username !== 'no_username' ? '@' + order.username : (order.user || 'User')} · ${Number(order.amt || 0)} ${order.coin || ''} · ${money(order.payable)}`;
+      $('payment-ref-input').value = '';
+      $('payment-modal').classList.add('active');
+      setTimeout(() => $('payment-ref-input').focus(), 120);
+    }
+    function closePaymentModal(){ $('payment-modal').classList.remove('active'); paymentTargetOrderId = ''; }
+    function confirmMarkPaid(){
+      if(!requireFirebase()) return;
+      const id = paymentTargetOrderId;
+      const ref = $('payment-ref-input').value.trim();
+      if(!id) return showToast('Order not selected','error');
+      if(!ref) return showToast('Payment reference ID দিন','error');
+      const order = globalOrders[id];
+      if(!order) return showToast('Order not found','error');
+      const now = firebase.database.ServerValue.TIMESTAMP;
+      const patch = { order_status:'approved', status:'completed', payment_status:'paid', paid_at:now, payment_reference_id:ref, updated_at:now };
+      Object.assign(order, patch);
+      db.ref('orders/' + id).update(patch).then(() => {
+        sendUserTelegramMessage(order, buildPaymentPaidMessage(order));
+        sendUserPaymentProofPhoto(order);
+        closePaymentModal();
+        showToast('✓ Payment marked as paid','success');
+        renderAdminOrders();
+      }).catch(err => { console.error(err); showToast('Payment update failed','error'); });
+      try{ tg.HapticFeedback.notificationOccurred('success'); }catch(e){}
+    }
+    function updateOrder(id,status){
+      updateOrderStatus(id, status === 'completed' ? 'approved' : status);
+    }
+    function resetManualLeaderboardForm(){
+      if($('manual-leaderboard-key')) $('manual-leaderboard-key').value = '';
+      if($('manual-leaderboard-name')) $('manual-leaderboard-name').value = '';
+      if($('manual-leaderboard-amount')) $('manual-leaderboard-amount').value = '';
+      if($('save-manual-leaderboard-btn')) $('save-manual-leaderboard-btn').textContent = '+ Add / Update Entry';
+    }
+    function manualLeaderboardKeyFromName(name){
+      return 'manual_' + safeDbKey(String(name || '').trim().toLowerCase());
+    }
+    function fillManualLeaderboardForm(entry){
+      if(!entry) return;
+      const key = entry.key || entry.userKey || '';
+      const name = String(entry.displayName || entry.user || entry.label || key || '').replace(/^@/, '');
+      const amount = Number(entry.totalAmount || 0);
+      if($('manual-leaderboard-key')) $('manual-leaderboard-key').value = key;
+      if($('manual-leaderboard-name')) $('manual-leaderboard-name').value = name;
+      if($('manual-leaderboard-amount')) $('manual-leaderboard-amount').value = Number.isFinite(amount) && amount > 0 ? String(amount) : '';
+      if($('save-manual-leaderboard-btn')) $('save-manual-leaderboard-btn').textContent = 'Update Entry';
+      try{ $('manual-leaderboard-name').scrollIntoView({behavior:'smooth', block:'center'}); }catch(e){}
+      setTimeout(() => { try{ $('manual-leaderboard-amount').focus(); }catch(e){} }, 250);
+    }
+    function setManualLeaderboardUser(key){
+      const user = collectKnownUsers().find(u => u.userKey === key) || {userKey:key, label:key};
+      const current = leaderboardCache[key] ? {key, ...leaderboardCache[key]} : {key, userKey:key, displayName:user.label, user:user.label, totalAmount:0};
+      fillManualLeaderboardForm(current);
+      showToast('Name এবং amount দিয়ে leaderboard entry save করুন','success');
+    }
+    function saveManualLeaderboardEntry(){
+      if(!requireFirebase()) return;
+      const name = String(($('manual-leaderboard-name') || {}).value || '').trim();
+      const amountRaw = String(($('manual-leaderboard-amount') || {}).value || '').replace(/,/g,'').trim();
+      const amount = parseFloat(amountRaw);
+      if(!name){ showToast('User Name / Demo Name দিন','error'); return; }
+      if(!Number.isFinite(amount) || amount < 0){ showToast('Valid amount / score দিন','error'); return; }
+      let key = String(($('manual-leaderboard-key') || {}).value || '').trim();
+      if(!key) key = manualLeaderboardKeyFromName(name);
+      const existing = leaderboardCache[key] || {};
+      const patch = {
+        ...existing,
+        userKey:key,
+        user:name,
+        displayName:name,
+        totalAmount:parseFloat(amount.toFixed(2)),
+        manual_entry:true,
+        manual_updated_at:firebase.database.ServerValue.TIMESTAMP,
+        updated_at:firebase.database.ServerValue.TIMESTAMP
+      };
+      delete patch.manual_rank;
+      delete patch.manualRank;
+      delete patch.rank_position;
+      delete patch.rankPosition;
+      db.ref('leaderboard/' + key).set(patch).then(() => {
+        resetManualLeaderboardForm();
+        showToast('Leaderboard entry saved','success');
+      }).catch(err => { console.error('Manual leaderboard save failed:', err); showToast('Leaderboard save failed','error'); });
+    }
+    function editLeaderboardEntry(key){
+      if(!key) return;
+      const entry = leaderboardCache[key];
+      if(!entry){ showToast('Leaderboard entry not found','error'); return; }
+      fillManualLeaderboardForm({key, ...entry});
+    }
+    function updateLeaderboardFromOrder(order){
+      if(!order || !order.id) return;
+      const key = order.userKey || safeDbKey(order.userId ? `tg_${order.userId}` : (order.username || order.user || 'unknown'));
+      const displayName = order.username && order.username !== 'no_username' ? '@' + order.username : (order.user || key);
+      const amount = Number(order.payable || 0);
+      if(!Number.isFinite(amount) || amount <= 0) return;
+      db.ref('orders/' + order.id + '/leaderboard_updated').transaction(current => current ? current : true, (err, committed) => {
+        if(err){ console.error('Leaderboard flag failed:', err); return; }
+        if(!committed) return;
+        const lbRef = db.ref('leaderboard/' + key);
+        lbRef.transaction(current => {
+          const d = current || {};
+          const totalAmount = parseFloat((Number(d.totalAmount || 0) + amount).toFixed(2));
+          return { ...d, userKey:key, user:displayName, displayName, totalAmount };
+        }, txErr => { if(txErr) console.error('Leaderboard update failed:', txErr); });
+      });
+    }
+    function deleteOrder(id){
+      adminConfirm('Delete Order permanently?','This order will be removed forever. This cannot be undone.','🗑️',() => {
+        if(globalOrders[id]) delete globalOrders[id];
+        renderAdminOrders();
+        db.ref('orders/' + id).remove().then(() => showToast('Order deleted','warning'));
+      });
+    }
+    function renderAdminLeaderboard(data){
+      const arr = sortLeaderboardEntries(Object.entries(data || {}).map(([key,v]) => ({key,...v})));
+      $('leaderboard-list').innerHTML = arr.map((u, i) => {
+        const entryType = u.manual_entry ? 'Manual Entry' : 'Auto from orders';
+        return `<div class="user-row"><div><div class="user-name">#${i + 1} ${escapeHtml(u.displayName || u.user || u.key)}</div><div class="user-amount">${money(u.totalAmount)}</div><div class="tracked-user-meta">${entryType} · Sorted by amount</div></div><div class="leader-row-actions"><button class="leader-edit-btn" type="button" data-edit-leader="${escapeHtml(u.key)}">Edit</button><button class="del-btn" type="button" data-del-leader="${escapeHtml(u.key)}">DEL</button></div></div>`;
+      }).join('') || '<div class="empty-state"><div class="empty-icon">🏆</div>No users yet</div>';
+      document.querySelectorAll('[data-edit-leader]').forEach(btn => btn.addEventListener('click', () => editLeaderboardEntry(btn.dataset.editLeader)));
+      document.querySelectorAll('[data-del-leader]').forEach(btn => btn.addEventListener('click', () => deleteLeaderboardUser(btn.dataset.delLeader)));
+      renderUserTrackingSystem();
+    }
+    function deleteLeaderboardUser(key){
+      adminConfirm('Remove Leaderboard Entry?',`Are you sure you want to delete ${key} from leaderboard?`,'👤',() => db.ref('leaderboard/' + key).remove().then(() => showToast('Leaderboard entry deleted','warning')));
+    }
+    function clearLeaderboard(){
+      adminConfirm('Reset All Leaderboard Data?','This will wipe out all seller volume completely. This action is irreversible.','🏆',() => db.ref('leaderboard').remove().then(() => showToast('Leaderboard cleared','warning')));
+    }
+    function renderAdminCoins(data){
+      const entries = Object.entries(data || {});
+      $('coin-list').innerHTML = entries.map(([key,v]) => `<div class="coin-box ${v.status === false ? 'offline' : ''}" data-coin-box="${escapeHtml(key)}"><div class="coin-box-header"><div class="coin-name-row">${v.logo ? `<img src="${escapeHtml(v.logo)}" class="coin-logo-sm" alt="">` : '<span style="font-size:18px;">💰</span>'}<span class="coin-key">${escapeHtml(key)}</span></div><label class="switch"><input type="checkbox" data-coin-field="status" data-key="${escapeHtml(key)}" ${v.status !== false ? 'checked' : ''}><span class="slider"></span></label></div><input class="form-input" type="text" value="${escapeHtml(v.logo || '')}" placeholder="Logo URL" data-coin-field="logo" data-key="${escapeHtml(key)}"><input class="form-input" type="text" value="${escapeHtml(v.transferId || '')}" placeholder="Transfer ID" data-coin-field="transferId" data-key="${escapeHtml(key)}"><select class="form-input" data-coin-field="inputType" data-key="${escapeHtml(key)}"><option value="username" ${v.inputType !== 'code' ? 'selected' : ''}>Sender Username</option><option value="code" ${v.inputType === 'code' ? 'selected' : ''}>Transfer Code</option></select><div class="form-row2"><input class="form-input" type="number" value="${Number(v.userRate || 0)}" placeholder="User Rate" data-coin-field="userRate" data-key="${escapeHtml(key)}"><input class="form-input" type="number" value="${Number(v.adminRate || 0)}" placeholder="Admin Rate" data-coin-field="adminRate" data-key="${escapeHtml(key)}"></div><div class="form-row2"><input class="form-input" type="number" value="${Number(v.adminRateMinCoins || 0)}" placeholder="Admin Rate From" data-coin-field="adminRateMinCoins" data-key="${escapeHtml(key)}"><input class="form-input" type="number" value="${Number(v.minSubmitLimit || DEFAULT_MIN_SUBMIT_LIMIT)}" placeholder="Min Submit" data-coin-field="minSubmitLimit" data-key="${escapeHtml(key)}"></div><button class="btn-action btn-danger" type="button" style="margin-top:10px;font-size:11px;padding:9px;" data-remove-coin="${escapeHtml(key)}">Remove Coin</button></div>`).join('') || '<div class="empty-state" style="padding:20px 0;"><div class="empty-icon">🪙</div>No coins configured</div>';
+      document.querySelectorAll('[data-coin-field]').forEach(input => input.addEventListener('change', () => updateCoinField(input)));
+      document.querySelectorAll('[data-remove-coin]').forEach(btn => btn.addEventListener('click', () => removeCoin(btn.dataset.removeCoin)));
+    }
+    function updateCoinField(input){
+      if(!requireFirebase()) return;
+      const key = input.dataset.key, field = input.dataset.coinField;
+      if(!key || !field){ showToast('Coin field missing','error'); return; }
+
+      let value = input.type === 'checkbox' ? input.checked : input.value.trim();
+      if(['userRate','adminRate','adminRateMinCoins','minSubmitLimit'].includes(field)){
+        value = Number(value);
+        const mustBeGreaterThanZero = field === 'userRate' || field === 'minSubmitLimit';
+        if(!Number.isFinite(value) || value < 0 || (mustBeGreaterThanZero && value <= 0)){
+          showToast(mustBeGreaterThanZero ? 'Value 0 এর বেশি হতে হবে' : 'Valid positive number দিন','error');
+          input.focus();
+          return;
+        }
+      }
+
+      input.disabled = true;
+      db.ref('marketConfig/' + key).update({ [field]: value }).then(() => {
+        showToast('✓ Coin updated','success');
+      }).catch(err => {
+        console.error('Coin update failed:', err);
+        showToast(err && err.code === 'PERMISSION_DENIED' ? 'Firebase rules write permission দিচ্ছে না' : 'Coin update failed','error');
+      }).finally(() => {
+        input.disabled = false;
+      });
+    }
+    function addCoin(){
+      if(!requireFirebase()) return;
+
+      const rawName = $('c-name').value.trim();
+      const key = safeDbKey(rawName).toUpperCase();
+      const tid = $('c-tid').value.trim();
+      const logo = $('c-logo').value.trim();
+      const inputType = $('c-input-type').value || 'username';
+      const userRate = Number($('c-user-rate').value);
+      const adminRateRaw = $('c-admin-rate').value.trim();
+      const adminRate = adminRateRaw === '' ? userRate : Number(adminRateRaw);
+      const adminRateMinRaw = $('c-admin-min').value.trim();
+      const adminRateMinCoins = adminRateMinRaw === '' ? 0 : Number(adminRateMinRaw);
+      const minSubmitRaw = $('c-min-submit').value.trim();
+      const minSubmitLimit = minSubmitRaw === '' ? DEFAULT_MIN_SUBMIT_LIMIT : Number(minSubmitRaw);
+
+      if(!rawName){ showToast('Coin name দিন','error'); $('c-name').focus(); return; }
+      if(!tid){ showToast('Transfer Target ID দিন','error'); $('c-tid').focus(); return; }
+      if(!Number.isFinite(userRate) || userRate <= 0){ showToast('Valid User Rate দিন','error'); $('c-user-rate').focus(); return; }
+      if(!Number.isFinite(adminRate) || adminRate < 0){ showToast('Valid Admin Rate দিন','error'); $('c-admin-rate').focus(); return; }
+      if(!Number.isFinite(adminRateMinCoins) || adminRateMinCoins < 0){ showToast('Valid Admin Rate From দিন','error'); $('c-admin-min').focus(); return; }
+      if(!Number.isFinite(minSubmitLimit) || minSubmitLimit <= 0){ showToast('Valid Min Submit Limit দিন','error'); $('c-min-submit').focus(); return; }
+
+      const btn = $('add-coin-btn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Adding...';
+
+      db.ref('marketConfig/' + key).set({
+        name: rawName,
+        transferId: tid,
+        logo,
+        userRate,
+        adminRate,
+        adminRateMinCoins,
+        minSubmitLimit,
+        inputType,
+        status: true,
+        updatedAt: firebase.database.ServerValue.TIMESTAMP
+      }).then(() => {
+        ['c-name','c-logo','c-tid','c-user-rate','c-admin-rate','c-admin-min','c-min-submit'].forEach(id => $(id).value = '');
+        $('c-input-type').value = 'username';
+        showToast('✓ Coin Added','success');
+      }).catch(err => {
+        console.error('Add coin failed:', err);
+        showToast(err && err.code === 'PERMISSION_DENIED' ? 'Firebase rules write permission দিচ্ছে না' : 'Coin add failed','error');
+      }).finally(() => {
+        btn.disabled = false;
+        btn.textContent = '+ Add New Coin';
+      });
+    }
+    function removeCoin(key){
+      adminConfirm('Remove Asset?',`Are you sure you want to remove ${key} from market listing?`,'🪙',() => {
+        db.ref('marketConfig/' + key).remove().then(() => showToast('Coin removed','warning')).catch(err => {
+          console.error('Remove coin failed:', err);
+          showToast(err && err.code === 'PERMISSION_DENIED' ? 'Firebase rules write permission দিচ্ছে না' : 'Coin remove failed','error');
+        });
+      });
+    }
+    function loadAdminBranding(){
+      db.ref('settings/branding').on('value', snap => { const b = snap.val() || {}; const name = normalizeBrandName(b.siteName || APP_DEFAULT_NAME); $('site-name').value = name; $('admin-brand-name').textContent = name; if(b.siteName && b.siteName !== name) db.ref('settings/branding/siteName').set(name).catch(() => {}); sanitizeLegacyBrandInDom(); });
+      db.ref('settings/links').on('value', snap => { const l = snap.val() || {}; $('link-channel').value = l.channel || ''; $('link-help').value = l.help || ''; });
+      db.ref('settings/disclaimer').on('value', snap => { const d = snap.val(); disclaimerNoticeValue = normalizeDisclaimerNotice(typeof d === 'string' ? d : (d && d.noticeText)); renderDisclaimerNotice(); });
+    }
+    function saveBranding(){
+      if(!requireFirebase()) return;
+      const siteName = normalizeBrandName($('site-name').value || APP_DEFAULT_NAME);
+      const channel = normalizeLink($('link-channel').value);
+      const help = normalizeLink($('link-help').value);
+      Promise.all([db.ref('settings/branding').set({siteName}), db.ref('settings/links').set({channel,help})]).then(() => { $('link-channel').value = channel; $('link-help').value = help; showToast('✓ Branding Saved','success'); });
+    }
+    function saveDisclaimerNotice(){
+      if(!requireFirebase()) return;
+      const noticeText = normalizeDisclaimerNotice($('disclaimer-text').value);
+      db.ref('settings/disclaimer').set({noticeText, updated_at:firebase.database.ServerValue.TIMESTAMP}).then(() => {
+        disclaimerNoticeValue = noticeText;
+        renderDisclaimerNotice();
+        showToast('✓ Disclaimer Notice Saved','success');
+      }).catch(err => {
+        console.error('Disclaimer save failed:', err);
+        showToast(err && err.code === 'PERMISSION_DENIED' ? 'Firebase rules write permission দিচ্ছে না' : 'Disclaimer save failed','error');
+      });
+    }
+    function renderAdminPayments(data){
+      const entries = Object.entries(data || {});
+      $('payment-list').innerHTML = entries.map(([key,v]) => `<div class="pay-row"><div class="pay-name">${escapeHtml(key)}</div><div class="pay-controls"><label class="switch"><input type="checkbox" ${v.status !== false ? 'checked' : ''} data-pay-status="${escapeHtml(key)}"><span class="slider"></span></label><button class="del-btn" type="button" data-remove-pay="${escapeHtml(key)}">DEL</button></div></div>`).join('') || '<div style="color:var(--subtext);font-size:12px;text-align:center;padding:12px 0;">No methods added</div>';
+      document.querySelectorAll('[data-pay-status]').forEach(input => input.addEventListener('change', () => db.ref('paymentMethods/' + input.dataset.payStatus).update({status:input.checked})));
+      document.querySelectorAll('[data-remove-pay]').forEach(btn => btn.addEventListener('click', () => removePayment(btn.dataset.removePay)));
+    }
+    function addPayment(){
+      if(!requireFirebase()) return;
+      const rawName = $('new-pay').value.trim();
+      if(!rawName){ showToast('Enter method name','error'); $('new-pay').focus(); return; }
+      const name = safeDbKey(rawName);
+      db.ref('paymentMethods/' + name).set({status:true}).then(() => { $('new-pay').value = ''; showToast('✓ Method Added','success'); });
+    }
+    function removePayment(key){ adminConfirm('Delete Payment Method?',`Are you sure you want to delete ${key}?`,'💳',() => db.ref('paymentMethods/' + key).remove().then(() => showToast('Method removed','warning'))); }
+    function renderAdminTutorials(data){
+      tutorialCache = data || {};
+      const entries = Object.entries(data || {}).sort(([,a],[,b]) => Number(b.created_at || b.createdAt || b.updated_at || 0) - Number(a.created_at || a.createdAt || a.updated_at || 0));
+      if(!entries.length){
+        $('tutorial-admin-list').innerHTML = '<div class="empty-state" style="padding:20px 0;"><div class="empty-icon">🎬</div>No tutorial videos added</div>';
+        return;
+      }
+      $('tutorial-admin-list').innerHTML = entries.map(([key,v]) => {
+        const videoId = String(v.video_id || parseYouTubeVideoId(v.youtube_url || v.youtubeUrl || v.url || '')).trim();
+        const title = String(v.video_title || v.title || 'Tutorial Video').trim() || 'Tutorial Video';
+        const url = videoId ? youtubeWatchUrl(videoId) : String(v.youtube_url || v.youtubeUrl || v.url || '');
+        const date = formatDate(v.created_at || v.createdAt || v.updated_at || v.updatedAt);
+        return `<div class="tutorial-admin-card ${v.status === false ? 'offline' : ''}" data-tutorial-card="${escapeHtml(key)}"><div class="tutorial-admin-head"><div><div class="tutorial-admin-title">${escapeHtml(title)}</div><div class="tutorial-admin-sub">${videoId ? 'ID: ' + escapeHtml(videoId) : 'Invalid/legacy URL'}${date ? ' · ' + escapeHtml(date) : ''}</div></div><label class="switch"><input type="checkbox" ${v.status !== false ? 'checked' : ''} data-tutorial-field="status" data-key="${escapeHtml(key)}"><span class="slider"></span></label></div><input class="form-input" type="text" value="${escapeHtml(title)}" placeholder="Video Title" data-tutorial-field="video_title" data-key="${escapeHtml(key)}"><input class="form-input" type="url" value="${escapeHtml(url)}" placeholder="YouTube Video Link" data-tutorial-field="youtube_url" data-key="${escapeHtml(key)}"><div class="tutorial-admin-actions"><a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" class="btn-action btn-blue" style="text-align:center;text-decoration:none;display:block;">Open Video</a><button class="btn-action btn-danger" type="button" style="width:auto;padding:12px 18px;" data-remove-tutorial="${escapeHtml(key)}">DEL</button></div></div>`;
+      }).join('');
+      document.querySelectorAll('[data-tutorial-field]').forEach(input => input.addEventListener('change', () => updateTutorialField(input)));
+      document.querySelectorAll('[data-remove-tutorial]').forEach(btn => btn.addEventListener('click', () => removeTutorial(btn.dataset.removeTutorial)));
+    }
+    function addTutorialVideo(){
+      if(!requireFirebase()) return;
+      const rawUrl = $('tutorial-url').value.trim();
+      const rawTitle = $('tutorial-title').value.trim();
+      if(!rawUrl){ showToast('Enter YouTube video link','error'); $('tutorial-url').focus(); return; }
+      const videoId = parseYouTubeVideoId(rawUrl);
+      if(!videoId){ showToast('Invalid YouTube URL. Use youtube.com/watch, youtu.be, or embed link.','error'); $('tutorial-url').focus(); return; }
+      if(isDuplicateTutorial(videoId)){ showToast('This tutorial video already exists','warning'); return; }
+      const title = rawTitle || 'Tutorial Video';
+      const ref = db.ref('tutorialVideos').push();
+      const id = ref.key;
+      const btn = $('add-tutorial-btn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Adding...';
+      ref.set({ id, youtube_url:youtubeWatchUrl(videoId), video_title:title, video_id:videoId, status:true, created_at:firebase.database.ServerValue.TIMESTAMP, updated_at:firebase.database.ServerValue.TIMESTAMP }).then(() => {
+        $('tutorial-url').value = '';
+        $('tutorial-title').value = '';
+        showToast('✓ Tutorial Video Added','success');
+      }).catch(err => {
+        console.error('Tutorial add failed:', err);
+        showToast(err && err.code === 'PERMISSION_DENIED' ? 'Firebase rules write permission দিচ্ছে না' : 'Tutorial add failed','error');
+      }).finally(() => {
+        btn.disabled = false;
+        btn.textContent = '+ Add Tutorial Video';
+      });
+    }
+    function updateTutorialField(input){
+      if(!requireFirebase()) return;
+      const key = input.dataset.key, field = input.dataset.tutorialField;
+      if(!key || !field){ showToast('Tutorial field missing','error'); return; }
+      let update = { updated_at: firebase.database.ServerValue.TIMESTAMP };
+      if(field === 'status'){
+        update.status = input.checked;
+      }else if(field === 'video_title'){
+        const title = input.value.trim() || 'Tutorial Video';
+        update.video_title = title;
+        input.value = title;
+      }else if(field === 'youtube_url'){
+        const videoId = parseYouTubeVideoId(input.value.trim());
+        if(!videoId){ showToast('Invalid YouTube URL','error'); input.focus(); return; }
+        if(isDuplicateTutorial(videoId, key)){ showToast('This tutorial video already exists','warning'); input.focus(); return; }
+        update.youtube_url = youtubeWatchUrl(videoId);
+        update.video_id = videoId;
+      }
+      input.disabled = true;
+      db.ref('tutorialVideos/' + key).update(update).then(() => {
+        showToast('✓ Tutorial updated','success');
+      }).catch(err => {
+        console.error('Tutorial update failed:', err);
+        showToast(err && err.code === 'PERMISSION_DENIED' ? 'Firebase rules write permission দিচ্ছে না' : 'Tutorial update failed','error');
+      }).finally(() => {
+        input.disabled = false;
+      });
+    }
+    function removeTutorial(key){
+      adminConfirm('Delete Tutorial Video?', 'This tutorial will be removed from the user Tutorial page.', '🎬', () => db.ref('tutorialVideos/' + key).remove().then(() => showToast('Tutorial removed','warning')).catch(err => { console.error('Tutorial remove failed:', err); showToast('Tutorial remove failed','error'); }));
+    }
+    function adminConfirm(title,desc,icon,callback){
+      $('admin-confirm-title').textContent = title; $('admin-confirm-desc').textContent = desc; $('admin-confirm-icon').textContent = icon; adminConfirmCallback = callback; $('admin-confirm').classList.add('active');
+    }
+    function closeAdminConfirm(){ $('admin-confirm').classList.remove('active'); adminConfirmCallback = null; }
+
+    let particlesStarted = false;
+    function initParticles(){
+      if(particlesStarted) return;
+      particlesStarted = true;
+      const cv = $('cv'), cx = cv.getContext('2d');
+      let W,H,pts=[]; const C=['rgba(56,189,248,.3)','rgba(14,165,233,.2)','rgba(161,161,170,.2)','rgba(63,63,70,.25)'];
+      function resize(){ W = cv.width = window.innerWidth; H = cv.height = window.innerHeight; }
+      function mk(){ return {x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.5+.3,vx:(Math.random()-.5)*.3,vy:-(Math.random()*.7+.2),c:C[Math.floor(Math.random()*C.length)],a:Math.random()*.55+.25}; }
+      function draw(){ cx.clearRect(0,0,W,H); for(const p of pts){ p.x+=p.vx; p.y+=p.vy; if(p.y<-4){p.y=H+4;p.x=Math.random()*W;} if(p.x<-4||p.x>W+4){p.x=Math.random()*W;p.y=H+4;} cx.globalAlpha=p.a; cx.fillStyle=p.c; cx.beginPath(); cx.arc(p.x,p.y,p.r,0,Math.PI*2); cx.fill(); } cx.globalAlpha=1; requestAnimationFrame(draw); }
+      resize(); window.addEventListener('resize', resize); for(let i=0;i<50;i++) pts.push(mk()); draw();
+    }
+
+    function bindEvents(){
+      $('help-btn').addEventListener('click', () => openSafeLink(helpLinkValue));
+      $('channel-btn').addEventListener('click', () => openSafeLink(channelLinkValue));
+      $('admin-btn').addEventListener('click', showAdminPanel);
+      $('return-user-btn').addEventListener('click', showUserPanel);
+      $('admin-back-btn').addEventListener('click', showUserPanel);
+      document.querySelectorAll('#user-nav .nav-tab').forEach(tab => tab.addEventListener('click', () => userSwitchTab(tab.dataset.screen)));
+      $('order-modal').addEventListener('click', e => { if(e.target === $('order-modal')) closeOrderModal(); });
+      $('confirm-modal').addEventListener('click', e => { if(e.target === $('confirm-modal')) hideConfirm(); });
+      $('admin-confirm').addEventListener('click', e => { if(e.target === $('admin-confirm')) closeAdminConfirm(); });
+      $('payment-modal').addEventListener('click', e => { if(e.target === $('payment-modal')) closePaymentModal(); });
+      $('proof-modal').addEventListener('click', e => { if(e.target === $('proof-modal')) closeProofModal(); });
+      $('close-order-btn').addEventListener('click', closeOrderModal);
+      $('proof-close-btn').addEventListener('click', closeProofModal);
+      $('proof-open-btn').addEventListener('click', () => { if(proofModalSrc) window.open(proofModalSrc,'_blank','noopener,noreferrer'); });
+      $('proof-select-btn').addEventListener('click', () => $('proof-file').click());
+      $('proof-file').addEventListener('change', handleProofFileChange);
+      $('proof-remove-btn').addEventListener('click', resetProofInput);
+      $('copy-id-btn').addEventListener('click', copyID);
+      $('c-qty').addEventListener('input', calc);
+      $('confirm-order-btn').addEventListener('click', showConfirm);
+      $('confirm-back-btn').addEventListener('click', hideConfirm);
+      $('submit-btn').addEventListener('click', submitOrder);
+      document.querySelectorAll('[data-admin-tab]').forEach(tab => tab.addEventListener('click', () => adminSwitchTab(tab.dataset.adminTab)));
+      document.querySelectorAll('[data-settings-module]').forEach(btn => btn.addEventListener('click', () => openSettingsModule(btn.dataset.settingsModule, true)));
+      document.querySelectorAll('[data-settings-back]').forEach(btn => btn.addEventListener('click', () => openSettingsMain(true)));
+      window.addEventListener('popstate', () => { if(hashOpensAdmin()) handleSettingsHashRoute(); });
+      window.addEventListener('hashchange', () => { if(hashOpensAdmin()) handleSettingsHashRoute(); });
+      $('clear-leaderboard-btn').addEventListener('click', clearLeaderboard);
+      if($('save-manual-leaderboard-btn')) $('save-manual-leaderboard-btn').addEventListener('click', saveManualLeaderboardEntry);
+      if($('clear-manual-leaderboard-form-btn')) $('clear-manual-leaderboard-form-btn').addEventListener('click', resetManualLeaderboardForm);
+      $('toggle-user-list-btn').addEventListener('click', toggleLeaderboardUserList);
+      if($('user-tracking-search')) $('user-tracking-search').addEventListener('input', () => { userTrackingSearchTerm = $('user-tracking-search').value; renderUserTrackingSystem(); });
+      $('refresh-user-tracking-btn').addEventListener('click', () => { renderUserTrackingSystem(); renderBroadcastUserSelectList(); showToast('User tracking refreshed','success'); });
+      $('add-coin-btn').addEventListener('click', addCoin);
+      $('save-branding-btn').addEventListener('click', saveBranding);
+      $('save-disclaimer-btn').addEventListener('click', saveDisclaimerNotice);
+      $('disclaimer-text').addEventListener('input', () => { disclaimerNoticeValue = normalizeDisclaimerNotice($('disclaimer-text').value); renderDisclaimerNotice(); });
+      $('broadcast-notice-text').addEventListener('input', renderBroadcastNoticePreview);
+      $('broadcast-video-link').addEventListener('input', renderBroadcastNoticePreview);
+      document.querySelectorAll('input[name="broadcast-target"]').forEach(input => input.addEventListener('change', handleBroadcastTargetChange));
+      $('broadcast-image-select-btn').addEventListener('click', () => $('broadcast-image-file').click());
+      $('broadcast-image-file').addEventListener('change', handleBroadcastNoticeImageChange);
+      $('broadcast-image-remove-btn').addEventListener('click', resetBroadcastNoticeImage);
+      $('send-broadcast-notice-btn').addEventListener('click', sendBroadcastNotice);
+      $('add-payment-btn').addEventListener('click', addPayment);
+      $('add-tutorial-btn').addEventListener('click', addTutorialVideo);
+      $('payment-cancel-btn').addEventListener('click', closePaymentModal);
+      $('payment-paid-btn').addEventListener('click', confirmMarkPaid);
+      $('payment-proof-file').addEventListener('change', handlePaymentProofFileChange);
+      $('payment-search').addEventListener('input', renderAdminOrders);
+      $('payment-filter').addEventListener('change', renderAdminOrders);
+      $('admin-confirm-cancel').addEventListener('click', closeAdminConfirm);
+      $('admin-confirm-ok').addEventListener('click', () => { if(typeof adminConfirmCallback === 'function') adminConfirmCallback(); closeAdminConfirm(); });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      try{
+        initUserProfile();
+        bindEvents();
+        renderDisclaimerNotice();
+        renderUserTrackingSystem();
+        renderBroadcastUserSelectList();
+        renderBroadcastNoticePreview();
+        startLegacyBrandObserver();
+        initFirebase();
+        startUserListeners();
+        const wantsAdmin = hashOpensAdmin() || new URLSearchParams(location.search).get('admin') === '1';
+        if(wantsAdmin){
+          showAdminPanel();
+          handleSettingsHashRoute();
+        }else showUserPanel();
+      }catch(err){
+        console.error('App init failed:', err);
+        try{ renderNoFirebaseState(); }catch(e){}
+        try{ showUserPanel(); }catch(e){}
+      }finally{
+        setTimeout(finishLoading, 800);
+        setTimeout(finishLoading, 4000);
+      }
+    });
+  </script>
+</body>
+</html>
