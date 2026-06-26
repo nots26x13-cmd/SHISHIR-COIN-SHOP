@@ -412,7 +412,7 @@
     </div>
 
     <div id="vpn-scr" style="display:none;padding-top:6px;">
-      <div class="sec-title flex" style="justify-content:space-between;width:100%;"><div style="display:flex;align-items:center;gap:7px;">PREMIUM VPN STORE</div><button type="button" class="settings-back-inline" onclick="userSwitchTab('home-scr')" style="padding:4px 8px;">← Back</button></div>
+      <div class="sec-title" style="justify-content:space-between;width:100%;"><div style="display:flex;align-items:center;gap:7px;">PREMIUM VPN STORE</div><button type="button" class="settings-back-inline" onclick="userSwitchTab('home-scr')" style="padding:4px 8px;">← Back</button></div>
       <div id="vpn-brand-list"></div>
     </div>
 
@@ -444,7 +444,7 @@
       <div class="calc-box"><div class="calc-row"><span style="color:var(--subtext);">Coin Unit</span><span id="coin-unit-val" style="font-weight:800;">0.00</span></div><div class="calc-row"><span style="color:var(--subtext);">Base Amount</span><span id="base-val" style="font-weight:800;">0.00 ৳</span></div><div class="calc-row"><span style="color:var(--danger);">Send Fee</span><span id="fee-val" style="color:var(--danger);font-weight:800;">- 5.00 ৳</span></div><div class="calc-divider"></div><div class="calc-row"><span style="color:var(--subtext);">Net Payable</span><span id="c-res" style="color:var(--sky-dark);">0.00 ৳</span></div></div>
       <div class="proof-upload" id="proof-upload-box">
         <input type="file" id="proof-file" accept="image/*" class="hidden">
-        <div class="proof-head"><span>📸 Proof / Screenshot</span><small>Required for verification</small></div>
+        <div class="proof-head"><span>📸 Proof / Screenshot</span><small>Required</small></div>
         <button class="proof-select-btn" type="button" id="proof-select-btn">+ Upload Transfer Screenshot</button>
         <div class="proof-preview hidden" id="proof-preview">
           <img id="proof-preview-img" alt="Proof Screenshot Preview">
@@ -546,12 +546,12 @@
         <div id="settings-main-page" class="settings-page">
           <div class="settings-main-head">
             <div class="settings-main-title">Settings Modules</div>
-            <div class="settings-main-sub">Choose one module to manage. Each section opens on its own clean page so the admin panel stays simple and mobile friendly.</div>
+            <div class="settings-main-sub">Choose one module to manage.</div>
           </div>
           <div class="settings-menu-grid">
             <button class="settings-module-card" type="button" data-settings-module="user-management">
               <div class="settings-module-icon" style="background:rgba(251,191,36,.1);color:var(--warning);">👥</div>
-              <div><div class="settings-module-title">User Management</div><div class="settings-module-desc">View tracked users, manage bans, and notifications.</div><div class="settings-module-path">/settings/user-management</div></div>
+              <div><div class="settings-module-title">User Management</div><div class="settings-module-desc">View tracked users, manage bans, and notifications.</div></div>
               <div class="settings-module-arrow">›</div>
             </button>
             <button class="settings-module-card" type="button" data-settings-module="coin-management">
@@ -564,19 +564,24 @@
               <div><div class="settings-module-title">VPN Management</div><div class="settings-module-desc">Add VPN brands, plans, and manage stock.</div></div>
               <div class="settings-module-arrow">›</div>
             </button>
+            <button class="settings-module-card" type="button" data-settings-module="payment-methods">
+              <div class="settings-module-icon" style="background:var(--success-bg);color:var(--success);">💳</div>
+              <div><div class="settings-module-title">Coin Payment Methods</div><div class="settings-module-desc">Manage payment methods for coins.</div></div>
+              <div class="settings-module-arrow">›</div>
+            </button>
+            <button class="settings-module-card" type="button" data-settings-module="vpn-payment-methods">
+              <div class="settings-module-icon" style="background:var(--success-bg);color:var(--success);">💳</div>
+              <div><div class="settings-module-title">VPN Payment Methods</div><div class="settings-module-desc">Manage payment methods for VPNs.</div></div>
+              <div class="settings-module-arrow">›</div>
+            </button>
             <button class="settings-module-card" type="button" data-settings-module="branding-links">
-              <div class="settings-module-icon" style="background:rgba(167,139,250,.12);color:var(--purple);">🌐</div>
+              <div class="settings-module-icon" style="background:rgba(167,139,250,.12);color:var(--purple);">🔗</div>
               <div><div class="settings-module-title">Branding & Links</div><div class="settings-module-desc">Manage app name, channel link, and help line.</div></div>
               <div class="settings-module-arrow">›</div>
             </button>
             <button class="settings-module-card" type="button" data-settings-module="disclaimer-notice">
               <div class="settings-module-icon" style="background:rgba(251,191,36,.1);color:var(--warning);">⚠️</div>
               <div><div class="settings-module-title">Disclaimer Notice</div><div class="settings-module-desc">Edit disclaimer and send notices.</div></div>
-              <div class="settings-module-arrow">›</div>
-            </button>
-            <button class="settings-module-card" type="button" data-settings-module="payment-methods">
-              <div class="settings-module-icon" style="background:var(--success-bg);color:var(--success);">💳</div>
-              <div><div class="settings-module-title">Payment Methods</div><div class="settings-module-desc">Add/remove payment methods and logos.</div></div>
               <div class="settings-module-arrow">›</div>
             </button>
             <button class="settings-module-card" type="button" data-settings-module="tutorial-management">
@@ -606,7 +611,28 @@
 
         <div id="settings-coin-management" class="settings-page settings-module-page hidden" data-settings-page="coin-management">
           <div class="settings-page-head"><div class="settings-breadcrumb"><span>Settings</span><span>›</span><span>Coin Management</span></div><div class="settings-page-title-row"><div class="settings-page-title">Coin Management</div><button class="settings-back-inline" type="button" data-settings-back>← Back</button></div></div>
-          <div class="settings-group"><div class="settings-group-title"><div class="stitle-bar" style="background:var(--sky-dark);"></div>🪙 COIN MANAGEMENT</div><div class="add-form"><input type="text" id="c-name" class="form-input" placeholder="Coin Name (e.g. BKASH)"><input type="text" id="c-logo" class="form-input" placeholder="Logo URL (Optional)"><input type="text" id="c-tid" class="form-input" placeholder="Transfer Target ID"><select id="c-input-type" class="form-input"><option value="username">Sender Username</option><option value="code">Transfer Code</option></select><div class="form-row2"><input type="number" id="c-user-rate" class="form-input" placeholder="User Rate"><input type="number" id="c-admin-rate" class="form-input" placeholder="Admin Rate"></div><div class="form-row2" style="margin-top:0;"><input type="number" id="c-admin-min" class="form-input" placeholder="Admin Rate From"><input type="number" id="c-min-submit" class="form-input" placeholder="Min Submit Limit"></div><button class="btn-action btn-cyan" type="button" id="add-coin-btn" style="margin-top:4px;">+ Add New Coin</button></div><div id="coin-list"></div></div>
+          <div class="settings-group">
+            <div class="settings-group-title"><div class="stitle-bar" style="background:var(--sky-dark);"></div>🪙 COIN MANAGEMENT</div>
+            <div class="add-form">
+               <input type="text" id="c-name" class="form-input" placeholder="Coin Name (e.g. BKASH)">
+               <div class="proof-upload" style="margin-bottom:12px;">
+                 <input type="file" id="c-logo-file" accept="image/*" class="hidden">
+                 <div class="proof-head"><span>📸 Coin Logo</span><small>Gallery</small></div>
+                 <button class="proof-select-btn" type="button" onclick="document.getElementById('c-logo-file').click()">+ Select Logo</button>
+                 <div class="proof-preview hidden" id="c-logo-preview">
+                   <img id="c-logo-preview-img" alt="Coin Logo">
+                   <div class="proof-preview-meta"><b id="c-logo-file-name">Selected</b></div>
+                   <button class="proof-remove-btn" type="button" id="c-logo-remove-btn">Remove</button>
+                 </div>
+               </div>
+               <input type="text" id="c-tid" class="form-input" placeholder="Transfer Target ID">
+               <select id="c-input-type" class="form-input"><option value="username">Sender Username</option><option value="code">Transfer Code</option></select>
+               <div class="form-row2"><input type="number" id="c-user-rate" class="form-input" placeholder="User Rate"><input type="number" id="c-admin-rate" class="form-input" placeholder="Admin Rate"></div>
+               <div class="form-row2" style="margin-top:0;"><input type="number" id="c-admin-min" class="form-input" placeholder="Admin Rate From"><input type="number" id="c-min-submit" class="form-input" placeholder="Min Submit Limit"></div>
+               <button class="btn-action btn-cyan" type="button" id="add-coin-btn" style="margin-top:4px;">+ Add New Coin</button>
+            </div>
+            <div id="coin-list"></div>
+          </div>
         </div>
 
         <div id="settings-vpn-management" class="settings-page settings-module-page hidden" data-settings-page="vpn-management">
@@ -670,9 +696,9 @@
         </div>
 
         <div id="settings-payment-methods" class="settings-page settings-module-page hidden" data-settings-page="payment-methods">
-          <div class="settings-page-head"><div class="settings-breadcrumb"><span>Settings</span><span>›</span><span>Payment Methods</span></div><div class="settings-page-title-row"><div class="settings-page-title">Payment Methods</div><button class="settings-back-inline" type="button" data-settings-back>← Back</button></div></div>
+          <div class="settings-page-head"><div class="settings-breadcrumb"><span>Settings</span><span>›</span><span>Coin Payment Methods</span></div><div class="settings-page-title-row"><div class="settings-page-title">Coin Payment Methods</div><button class="settings-back-inline" type="button" data-settings-back>← Back</button></div></div>
           <div class="settings-group">
-             <div class="settings-group-title"><div class="stitle-bar" style="background:var(--emerald);"></div>💳 PAYMENT METHODS</div>
+             <div class="settings-group-title"><div class="stitle-bar" style="background:var(--emerald);"></div>💳 COIN PAYMENTS</div>
              <div class="add-form" style="display:flex;flex-direction:column;gap:9px;margin-bottom:12px;">
                 <input type="text" id="new-pay" class="form-input" placeholder="Method Name (e.g. bKash)">
                 <input type="text" id="new-pay-num" class="form-input" placeholder="Payment Number">
@@ -692,13 +718,60 @@
           </div>
         </div>
 
+        <div id="settings-vpn-payment-methods" class="settings-page settings-module-page hidden" data-settings-page="vpn-payment-methods">
+          <div class="settings-page-head"><div class="settings-breadcrumb"><span>Settings</span><span>›</span><span>VPN Payment Methods</span></div><div class="settings-page-title-row"><div class="settings-page-title">VPN Payment Methods</div><button class="settings-back-inline" type="button" data-settings-back>← Back</button></div></div>
+          <div class="settings-group">
+             <div class="settings-group-title"><div class="stitle-bar" style="background:var(--emerald);"></div>💳 VPN PAYMENTS</div>
+             <div class="add-form" style="display:flex;flex-direction:column;gap:9px;margin-bottom:12px;">
+                <input type="text" id="new-vpn-pay" class="form-input" placeholder="Method Name (e.g. bKash)">
+                <input type="text" id="new-vpn-pay-num" class="form-input" placeholder="Payment Number">
+                <div class="proof-upload" style="margin-bottom:0;">
+                   <input type="file" id="vpn-p-logo-file" accept="image/*" class="hidden">
+                   <div class="proof-head"><span>📸 Method Logo</span><small>Gallery</small></div>
+                   <button class="proof-select-btn" type="button" onclick="document.getElementById('vpn-p-logo-file').click()">+ Select Logo</button>
+                   <div class="proof-preview hidden" id="vpn-p-logo-preview">
+                     <img id="vpn-p-logo-preview-img" alt="Pay Logo">
+                     <div class="proof-preview-meta"><b id="vpn-p-logo-file-name">Selected</b></div>
+                     <button class="proof-remove-btn" type="button" id="vpn-p-logo-remove-btn">Remove</button>
+                   </div>
+                </div>
+                <button class="btn-action btn-emerald" type="button" id="add-vpn-payment-btn">Add Method</button>
+             </div>
+             <div id="vpn-payment-list"></div>
+          </div>
+        </div>
+
         <div id="settings-tutorial-management" class="settings-page settings-module-page hidden" data-settings-page="tutorial-management">
           <div class="settings-page-head"><div class="settings-breadcrumb"><span>Settings</span><span>›</span><span>Tutorial Management</span></div><div class="settings-page-title-row"><div class="settings-page-title">Tutorial Management</div><button class="settings-back-inline" type="button" data-settings-back>← Back</button></div></div>
           <div class="settings-group"><div class="settings-group-title"><div class="stitle-bar" style="background:var(--sky-dark);"></div>🎬 TUTORIAL MANAGEMENT</div><div class="add-form"><input type="url" id="tutorial-url" class="form-input" placeholder="YouTube Video Link (watch, youtu.be, embed)"><input type="text" id="tutorial-title" class="form-input" placeholder="Video Title (Optional)"><button class="btn-action btn-cyan" type="button" id="add-tutorial-btn">+ Add Tutorial Video</button></div><div id="tutorial-admin-list"></div></div>
         </div>
       </div>
     </div>
-  </div> <!-- END ADMIN PANEL (Fixed) -->
+  </div> <!-- END ADMIN PANEL -->
+
+  <div id="coin-edit-modal" class="modal-mask z-[5000]">
+     <div class="bottom-sheet">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><div class="sheet-title">Edit Coin</div><button class="x-btn" type="button" onclick="document.getElementById('coin-edit-modal').classList.remove('active')">✕</button></div>
+        <div class="add-form">
+           <input type="text" id="edit-c-name" class="form-input" disabled style="opacity:0.7">
+           <div class="proof-upload" style="margin-bottom:12px;">
+             <input type="file" id="edit-c-logo-file" accept="image/*" class="hidden">
+             <div class="proof-head"><span>📸 Coin Logo</span><small>Gallery</small></div>
+             <button class="proof-select-btn" type="button" onclick="document.getElementById('edit-c-logo-file').click()">+ Change Logo</button>
+             <div class="proof-preview hidden" id="edit-c-logo-preview">
+               <img id="edit-c-logo-preview-img" alt="Coin Logo">
+               <div class="proof-preview-meta"><b>Selected</b></div>
+               <button class="proof-remove-btn" type="button" id="edit-c-logo-remove-btn">Remove</button>
+             </div>
+           </div>
+           <input type="text" id="edit-c-tid" class="form-input" placeholder="Transfer Target ID">
+           <select id="edit-c-input-type" class="form-input"><option value="username">Sender Username</option><option value="code">Transfer Code</option></select>
+           <div class="form-row2"><input type="number" id="edit-c-user-rate" class="form-input" placeholder="User Rate"><input type="number" id="edit-c-admin-rate" class="form-input" placeholder="Admin Rate"></div>
+           <div class="form-row2" style="margin-top:0;"><input type="number" id="edit-c-admin-min" class="form-input" placeholder="Admin Rate From"><input type="number" id="edit-c-min-submit" class="form-input" placeholder="Min Submit Limit"></div>
+           <button class="btn-action btn-cyan" type="button" id="save-coin-edit-btn" style="margin-top:4px;">💾 Save Changes</button>
+        </div>
+     </div>
+  </div>
 
   <div id="admin-stock-modal" class="modal-mask z-[4000]">
      <div class="bottom-sheet">
@@ -708,16 +781,16 @@
      </div>
   </div>
 
-  <div id="admin-confirm" class="confirm-mask">
+  <div id="admin-confirm" class="confirm-mask z-[5000]">
     <div class="confirm-box"><div class="confirm-icon" id="admin-confirm-icon">⚠️</div><div class="confirm-title" id="admin-confirm-title">Confirm Action</div><p id="admin-confirm-desc" style="font-size:13px;color:var(--subtext);text-align:center;margin-bottom:20px;line-height:1.5;"></p><div class="confirm-btns"><button class="btn-back" type="button" id="admin-confirm-cancel">Cancel</button><button class="btn-go" type="button" id="admin-confirm-ok">Confirm</button></div></div>
   </div>
 
-  <div id="payment-modal" class="confirm-mask">
+  <div id="payment-modal" class="confirm-mask z-[4000]">
     <div class="confirm-box"><div class="confirm-icon">💸</div><div class="confirm-title">Mark Payment as Paid</div><p id="payment-modal-desc" style="font-size:13px;color:var(--subtext);text-align:center;margin-bottom:12px;line-height:1.5;"></p><input type="text" id="payment-ref-input" class="form-input" placeholder="Payment transaction / reference ID"><div class="confirm-btns"><button class="btn-back" type="button" id="payment-cancel-btn">Cancel</button><button class="btn-go" type="button" id="payment-paid-btn">✓ Mark Paid</button></div></div>
   </div>
   <input type="file" id="payment-proof-file" accept="image/*" class="hidden">
 
-  <div id="proof-modal" class="confirm-mask">
+  <div id="proof-modal" class="confirm-mask z-[5000]">
     <div class="proof-viewer-box">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;">
         <div><div class="confirm-title" style="text-align:left;margin-bottom:2px;">Proof Screenshot</div><p id="proof-modal-caption" style="font-size:11px;color:var(--subtext);font-weight:700;"></p></div>
@@ -805,15 +878,21 @@
     let channelLinkValue = '', helpLinkValue = '', disclaimerNoticeValue = DEFAULT_DISCLAIMER_NOTICE, submitting = false;
     let proofFileName = '', proofImageDataUrl = '', proofProcessing = false;
     
+    // Config Caches
+    let marketCache = {}, vpnConfigCache = {}, paymentMethodsCache = {}, vpnPaymentMethodsCache = {}, tutorialCache = {}, userRegistryCache = {}, globalOrders = {};
+    let currentAdminTab = 'pending', adminStarted = false, adminConfirmCallback = null;
+    let paymentTargetOrderId = '', proofModalSrc = '', paymentProofTargetOrderId = '', paymentProofProcessing = false;
+    let broadcastNoticeImageDataUrl = '', broadcastNoticeImageFileName = '', broadcastNoticeImageProcessing = false, leaderboardUserListOpen = false, userTrackingSearchTerm = '';
+    const ACTIVE_USER_WINDOW_MS = 10 * 60 * 1000;
+
+    // Logo Caches
+    let cLogoDataUrl = '', editCLogoDataUrl = '', vpnLogoDataUrl = '', payLogoDataUrl = '', vpnPayLogoDataUrl = '';
+    let editCoinTargetKey = '';
+
     // VPN States
-    let vpnConfigCache = {}, paymentMethodsCache = {};
     let selVpnBrand = '', selVpnPlanName = '', selVpnPlanPrice = 0, selVpnPayMethod = '', selVpnPayNumberTarget = '';
     let vpnProofFileName = '', vpnProofImageDataUrl = '', vpnProofProcessing = false;
-    let vpnLogoDataUrl = '', payLogoDataUrl = '';
     let deliveryTargetOrderId = '', deliveryTargetVpnBrand = '';
-
-    let marketCache = {}, tutorialCache = {}, userRegistryCache = {}, globalOrders = {}, currentAdminTab = 'pending', adminStarted = false, adminConfirmCallback = null, paymentTargetOrderId = '', proofModalSrc = '', paymentProofTargetOrderId = '', paymentProofProcessing = false, broadcastNoticeImageDataUrl = '', broadcastNoticeImageFileName = '', broadcastNoticeImageProcessing = false, leaderboardUserListOpen = false, userTrackingSearchTerm = '';
-    const ACTIVE_USER_WINDOW_MS = 10 * 60 * 1000;
 
     window.addEventListener('error', (event) => { setTimeout(finishLoading, 0); });
     window.addEventListener('unhandledrejection', (event) => { setTimeout(finishLoading, 0); });
@@ -1082,7 +1161,8 @@
       db.ref('settings/disclaimer').on('value', snap => { disclaimerNoticeValue = normalizeDisclaimerNotice(typeof snap.val() === 'string' ? snap.val() : snap.val()?.noticeText); renderDisclaimerNotice(); });
       db.ref('marketConfig').on('value', snap => { marketCache = snap.val() || {}; renderMarket(marketCache); finishLoading(); });
       db.ref('vpnConfig').on('value', snap => { vpnConfigCache = snap.val() || {}; renderVpns(vpnConfigCache); });
-      db.ref('paymentMethods').on('value', snap => { paymentMethodsCache = snap.val() || {}; renderUserPayments(paymentMethodsCache); });
+      db.ref('paymentMethods').on('value', snap => { paymentMethodsCache = snap.val() || {}; renderUserCoinPayments(paymentMethodsCache); });
+      db.ref('vpnPaymentMethods').on('value', snap => { vpnPaymentMethodsCache = snap.val() || {}; renderUserVpnPayments(vpnPaymentMethodsCache); });
       db.ref('orders').orderByChild('userKey').equalTo(userRefKey).on('value', snap => renderUserHistory(snap.val() || {}));
       db.ref('tutorialVideos').on('value', snap => { tutorialCache = snap.val() || {}; renderTutorialVideos(tutorialCache); });
       setTimeout(finishLoading, 3500);
@@ -1108,11 +1188,13 @@
       }).join('');
     }
 
-    function renderUserPayments(data){
+    function renderUserCoinPayments(data){
       const entries = Object.entries(data || {}).filter(([,v]) => v && v.status !== false);
-      // Populate Coin Dropdown
       $('m-select').innerHTML = '<option value="">Payment Method</option>' + entries.map(([key]) => `<option value="${escapeHtml(key)}">${escapeHtml(key)}</option>`).join('');
-      // Populate VPN Payment Grid
+    }
+
+    function renderUserVpnPayments(data){
+      const entries = Object.entries(data || {}).filter(([,v]) => v && v.status !== false);
       if($('vpn-pay-methods-grid')) {
          $('vpn-pay-methods-grid').innerHTML = entries.map(([key,v]) => {
             const logoHtml = v.logo ? `<img src="${escapeHtml(v.logo)}">` : `<div style="width:40px;height:40px;border-radius:10px;background:var(--panel2);display:flex;align-items:center;justify-content:center;font-size:16px;">💳</div>`;
@@ -1296,6 +1378,9 @@
     }
     function copyID(){ copyTextValue($('admin-id').textContent, 'Transfer ID'); }
 
+    function cleanAdminRouteFromUrl() {
+      try { const url = new URL(location.href); url.searchParams.delete('admin'); return url.pathname + url.search + url.hash; } catch(e) { return location.pathname; }
+    }
     function showUserPanel(){
       $('access-denied').style.display = 'none';
       $('admin-panel').classList.add('hidden');
@@ -1320,9 +1405,10 @@
         if(currentAdminTab !== 'settings') renderAdminOrders(); renderUserTrackingSystem();
       });
       db.ref('users').on('value', snap => { userRegistryCache = snap.val() || {}; renderUserTrackingSystem(); });
-      db.ref('marketConfig').on('value', snap => renderAdminCoins(snap.val() || {}));
+      db.ref('marketConfig').on('value', snap => { marketCache = snap.val() || {}; renderAdminCoins(marketCache); });
       db.ref('vpnConfig').on('value', snap => { vpnConfigCache = snap.val() || {}; renderAdminVpns(vpnConfigCache); });
-      db.ref('paymentMethods').on('value', snap => renderAdminPayments(snap.val() || {}));
+      db.ref('paymentMethods').on('value', snap => { paymentMethodsCache = snap.val() || {}; renderAdminCoinPayments(paymentMethodsCache); });
+      db.ref('vpnPaymentMethods').on('value', snap => { vpnPaymentMethodsCache = snap.val() || {}; renderAdminVpnPayments(vpnPaymentMethodsCache); });
       db.ref('tutorialVideos').on('value', snap => { tutorialCache = snap.val() || {}; renderAdminTutorials(tutorialCache); });
       db.ref('settings/branding').on('value', snap => { const b = snap.val() || {}; $('site-name').value = normalizeBrandName(b.siteName || APP_DEFAULT_NAME); });
       db.ref('settings/links').on('value', snap => { const l = snap.val() || {}; $('link-channel').value = l.channel || ''; $('link-help').value = l.help || ''; });
@@ -1371,7 +1457,6 @@
            actionBtns = `<button class="btn-payment-proof ${proofReady ? 'has-proof' : ''}" type="button" onclick="paymentProofTargetOrderId='${escapeHtml(o.id)}'; document.getElementById('payment-proof-file').click();">${proofReady ? '✓ Screenshot Added' : 'Screenshot Submit'}</button><button class="btn-paid" type="button" onclick="openPaymentModal('${escapeHtml(o.id)}')">✓ Mark as Paid</button>`;
         }
         
-        const hasProof = !!(o.proof_image_url);
         const proofBtn = currentAdminTab === 'pending' ? `<button class="proof-view-btn" type="button" onclick="openProofModal('${escapeHtml(o.id)}')">👁 Proof</button>` : '';
         
         let gridHtml = `<div class="info-cell"><small>PAY TO / SENDER</small><b>${escapeHtml(o.number)} (${escapeHtml(o.method)})</b></div>`;
@@ -1451,15 +1536,70 @@
 
     function renderAdminCoins(data){
       const entries = Object.entries(data || {});
-      $('coin-list').innerHTML = entries.map(([key,v]) => `<div class="coin-box ${v.status===false?'offline':''}"><div class="coin-box-header"><div class="coin-name-row">${v.logo ? `<img src="${escapeHtml(v.logo)}" class="coin-logo-sm">` : '<span>💰</span>'}<span class="coin-key">${escapeHtml(key)}</span></div><label class="switch"><input type="checkbox" onchange="updateDbField('marketConfig/${escapeHtml(key)}/status', this.checked)" ${v.status!==false?'checked':''}><span class="slider"></span></label></div><input class="form-input" type="text" value="${escapeHtml(v.logo||'')}" placeholder="Logo URL" onchange="updateDbField('marketConfig/${escapeHtml(key)}/logo', this.value)"><div class="form-row2"><input class="form-input" type="number" value="${Number(v.userRate||0)}" placeholder="User Rate" onchange="updateDbField('marketConfig/${escapeHtml(key)}/userRate', Number(this.value))"><input class="form-input" type="number" value="${Number(v.adminRate||0)}" placeholder="Admin Rate" onchange="updateDbField('marketConfig/${escapeHtml(key)}/adminRate', Number(this.value))"></div><button class="btn-action btn-danger" type="button" style="margin-top:8px;padding:9px;" onclick="db.ref('marketConfig/${escapeHtml(key)}').remove()">Remove</button></div>`).join('') || '<div class="empty-state">No coins added</div>';
+      $('coin-list').innerHTML = entries.map(([key,v]) => `
+      <div class="coin-box ${v.status===false?'offline':''}">
+        <div class="coin-box-header">
+           <div class="coin-name-row">${v.logo ? `<img src="${escapeHtml(v.logo)}" class="coin-logo-sm">` : '<span>💰</span>'}<span class="coin-key">${escapeHtml(key)}</span></div>
+           <label class="switch"><input type="checkbox" onchange="updateDbField('marketConfig/${escapeHtml(key)}/status', this.checked)" ${v.status!==false?'checked':''}><span class="slider"></span></label>
+        </div>
+        <div style="font-size:10px; color:var(--subtext); margin-bottom:10px; line-height:1.5;">
+           <div>User Rate: <b>${v.userRate}</b> ৳ | Admin Rate: <b>${v.adminRate}</b> ৳</div>
+           <div>Min Limit: <b>${v.minSubmitLimit}</b> | From: <b>${v.adminRateMinCoins}</b></div>
+           <div>Target ID: <b>${v.transferId || 'N/A'}</b></div>
+        </div>
+        <div style="display:flex; gap:8px;">
+           <button class="btn-action btn-cyan" type="button" style="padding:9px;" onclick="openEditCoin('${escapeHtml(key)}')">Edit Details</button>
+           <button class="btn-action btn-danger" type="button" style="padding:9px;" onclick="db.ref('marketConfig/${escapeHtml(key)}').remove()">Remove</button>
+        </div>
+      </div>`).join('') || '<div class="empty-state">No coins added</div>';
     }
+
+    function openEditCoin(key){
+      const v = marketCache[key]; if(!v) return;
+      editCoinTargetKey = key;
+      $('edit-c-name').value = v.name || key;
+      $('edit-c-tid').value = v.transferId || '';
+      $('edit-c-input-type').value = v.inputType || 'username';
+      $('edit-c-user-rate').value = v.userRate || 0;
+      $('edit-c-admin-rate').value = v.adminRate || 0;
+      $('edit-c-admin-min').value = v.adminRateMinCoins || 0;
+      $('edit-c-min-submit').value = v.minSubmitLimit || DEFAULT_MIN_SUBMIT_LIMIT;
+      
+      editCLogoDataUrl = v.logo || '';
+      if(editCLogoDataUrl) {
+         $('edit-c-logo-preview-img').src = editCLogoDataUrl;
+         $('edit-c-logo-preview').classList.remove('hidden');
+      } else {
+         $('edit-c-logo-preview').classList.add('hidden');
+      }
+      $('coin-edit-modal').classList.add('active');
+    }
+
+    function saveCoinEdit(){
+       if(!editCoinTargetKey) return;
+       const key = editCoinTargetKey;
+       const patch = {
+          transferId: $('edit-c-tid').value.trim(),
+          inputType: $('edit-c-input-type').value,
+          userRate: Number($('edit-c-user-rate').value),
+          adminRate: Number($('edit-c-admin-rate').value),
+          adminRateMinCoins: Number($('edit-c-admin-min').value),
+          minSubmitLimit: Number($('edit-c-min-submit').value),
+          logo: editCLogoDataUrl
+       };
+       db.ref('marketConfig/'+key).update(patch).then(()=>{
+          $('coin-edit-modal').classList.remove('active');
+          showToast('Coin Updated Successfully','success');
+       }).catch(()=>{ showToast('Update Failed','error'); });
+    }
+
     function updateDbField(path, val){ db.ref(path).set(val).then(()=>showToast('Saved','success')).catch(()=>showToast('Failed','error')); }
     
     function renderAdminVpns(data){
       const entries = Object.entries(data || {});
       $('adm-vpn-list').innerHTML = entries.map(([key,v]) => {
          let plansHtml = (v.plans || []).map((p, idx) => `<div class="form-row2" style="margin-bottom:8px;"><input type="text" class="form-input" placeholder="Plan Name" value="${escapeHtml(p.name||'')}" onchange="updateDbField('vpnConfig/${escapeHtml(key)}/plans/${idx}/name', this.value)"><input type="number" class="form-input" placeholder="Price" value="${p.price||''}" onchange="updateDbField('vpnConfig/${escapeHtml(key)}/plans/${idx}/price', Number(this.value))"></div>`).join('');
-         // Add blank plan fields if less than 2
+         // Add blank plan fields to ensure there are always at least 2 input rows available in admin panel
          if(!(v.plans && v.plans.length >= 2)){
             const startIdx = v.plans ? v.plans.length : 0;
             for(let idx=startIdx; idx<2; idx++) {
@@ -1479,9 +1619,14 @@
       db.ref(`vpnConfig/${brandKey}/stock`).push({email:em, pass:ps}).then(()=>{ showToast('Stock Added','success'); });
     }
 
-    function renderAdminPayments(data){
+    function renderAdminCoinPayments(data){
       const entries = Object.entries(data || {});
       $('payment-list').innerHTML = entries.map(([key,v]) => `<div class="pay-row"><div class="pay-name">${v.logo?`<img src="${escapeHtml(v.logo)}" style="width:24px;height:24px;border-radius:6px;object-fit:cover;">`:''} ${escapeHtml(key)}</div><div class="pay-controls"><label class="switch"><input type="checkbox" onchange="updateDbField('paymentMethods/${escapeHtml(key)}/status', this.checked)" ${v.status!==false?'checked':''}><span class="slider"></span></label><button class="del-btn" onclick="db.ref('paymentMethods/${escapeHtml(key)}').remove()">DEL</button></div></div>`).join('') || '<div class="empty-state">No methods added</div>';
+    }
+
+    function renderAdminVpnPayments(data){
+      const entries = Object.entries(data || {});
+      $('vpn-payment-list').innerHTML = entries.map(([key,v]) => `<div class="pay-row"><div class="pay-name">${v.logo?`<img src="${escapeHtml(v.logo)}" style="width:24px;height:24px;border-radius:6px;object-fit:cover;">`:''} ${escapeHtml(key)}</div><div class="pay-controls"><label class="switch"><input type="checkbox" onchange="updateDbField('vpnPaymentMethods/${escapeHtml(key)}/status', this.checked)" ${v.status!==false?'checked':''}><span class="slider"></span></label><button class="del-btn" onclick="db.ref('vpnPaymentMethods/${escapeHtml(key)}').remove()">DEL</button></div></div>`).join('') || '<div class="empty-state">No methods added</div>';
     }
 
     function renderAdminTutorials(data){
@@ -1500,6 +1645,9 @@
         $(previewImgId).src = dataUrl; $(previewImgId).parentElement.classList.remove('hidden');
         if(dataUrlVarName === 'vpnLogoDataUrl') vpnLogoDataUrl = dataUrl;
         if(dataUrlVarName === 'payLogoDataUrl') payLogoDataUrl = dataUrl;
+        if(dataUrlVarName === 'vpnPayLogoDataUrl') vpnPayLogoDataUrl = dataUrl;
+        if(dataUrlVarName === 'cLogoDataUrl') cLogoDataUrl = dataUrl;
+        if(dataUrlVarName === 'editCLogoDataUrl') editCLogoDataUrl = dataUrl;
         return dataUrl;
       }catch(err){ showToast('Image optimization failed','error'); return null; }
     }
@@ -1507,17 +1655,29 @@
     function addCoin(){
       const n = $('c-name').value.trim(), key = safeDbKey(n).toUpperCase();
       if(!n){ showToast('Enter name','error'); return; }
-      db.ref('marketConfig/'+key).set({ name:n, transferId:$('c-tid').value.trim(), logo:$('c-logo').value.trim(), inputType:$('c-input-type').value||'username', userRate:Number($('c-user-rate').value), adminRate:Number($('c-admin-rate').value), status:true }).then(()=>{ showToast('Coin Added','success'); });
+      db.ref('marketConfig/'+key).set({ name:n, transferId:$('c-tid').value.trim(), logo:cLogoDataUrl, inputType:$('c-input-type').value||'username', userRate:Number($('c-user-rate').value), adminRate:Number($('c-admin-rate').value), adminRateMinCoins:Number($('c-admin-min').value), minSubmitLimit:Number($('c-min-submit').value||DEFAULT_MIN_SUBMIT_LIMIT), status:true }).then(()=>{ 
+         $('c-name').value=''; $('c-tid').value=''; $('c-user-rate').value=''; $('c-admin-rate').value=''; $('c-admin-min').value=''; $('c-min-submit').value='';
+         cLogoDataUrl=''; $('c-logo-preview').classList.add('hidden');
+         showToast('Coin Added','success'); 
+      });
     }
+    
     function addVpnBrand(){
       const n = $('v-name').value.trim(), key = safeDbKey(n).toUpperCase();
       if(!n){ showToast('Enter Brand Name','error'); return; }
       db.ref('vpnConfig/'+key).set({ name:n, logo:vpnLogoDataUrl, status:true, plans: [{name:'',price:0},{name:'',price:0}] }).then(()=>{ $('v-name').value=''; $('v-logo-preview').classList.add('hidden'); vpnLogoDataUrl=''; showToast('VPN Added','success'); });
     }
+    
     function addPaymentMethod(){
       const n = $('new-pay').value.trim(), num = $('new-pay-num').value.trim(), key = safeDbKey(n);
       if(!n){ showToast('Enter method name','error'); return; }
       db.ref('paymentMethods/'+key).set({ status:true, number:num, logo:payLogoDataUrl }).then(()=>{ $('new-pay').value=''; $('new-pay-num').value=''; $('p-logo-preview').classList.add('hidden'); payLogoDataUrl=''; showToast('Method Added','success'); });
+    }
+
+    function addVpnPaymentMethod(){
+      const n = $('new-vpn-pay').value.trim(), num = $('new-vpn-pay-num').value.trim(), key = safeDbKey(n);
+      if(!n){ showToast('Enter method name','error'); return; }
+      db.ref('vpnPaymentMethods/'+key).set({ status:true, number:num, logo:vpnPayLogoDataUrl }).then(()=>{ $('new-vpn-pay').value=''; $('new-vpn-pay-num').value=''; $('vpn-p-logo-preview').classList.add('hidden'); vpnPayLogoDataUrl=''; showToast('Method Added','success'); });
     }
 
     function bindEvents(){
@@ -1542,10 +1702,22 @@
       $('proof-file').addEventListener('change', handleProofFileChange);
       $('vpn-proof-file').addEventListener('change', handleVpnProofFileChange);
       $('payment-proof-file').addEventListener('change', handlePaymentProofFileChange);
+      
+      $('c-logo-file').addEventListener('change', () => handleLogoUpload('c-logo-file', 'c-logo-preview-img', 'cLogoDataUrl'));
+      $('c-logo-remove-btn').addEventListener('click', () => { cLogoDataUrl=''; $('c-logo-preview').classList.add('hidden'); $('c-logo-file').value=''; });
+      
+      $('edit-c-logo-file').addEventListener('change', () => handleLogoUpload('edit-c-logo-file', 'edit-c-logo-preview-img', 'editCLogoDataUrl'));
+      $('edit-c-logo-remove-btn').addEventListener('click', () => { editCLogoDataUrl=''; $('edit-c-logo-preview').classList.add('hidden'); $('edit-c-logo-file').value=''; });
+
       $('v-logo-file').addEventListener('change', () => handleLogoUpload('v-logo-file', 'v-logo-preview-img', 'vpnLogoDataUrl'));
       $('v-logo-remove-btn').addEventListener('click', () => { vpnLogoDataUrl=''; $('v-logo-preview').classList.add('hidden'); $('v-logo-file').value=''; });
+      
       $('p-logo-file').addEventListener('change', () => handleLogoUpload('p-logo-file', 'p-logo-preview-img', 'payLogoDataUrl'));
       $('p-logo-remove-btn').addEventListener('click', () => { payLogoDataUrl=''; $('p-logo-preview').classList.add('hidden'); $('p-logo-file').value=''; });
+
+      $('vpn-p-logo-file').addEventListener('change', () => handleLogoUpload('vpn-p-logo-file', 'vpn-p-logo-preview-img', 'vpnPayLogoDataUrl'));
+      $('vpn-p-logo-remove-btn').addEventListener('click', () => { vpnPayLogoDataUrl=''; $('vpn-p-logo-preview').classList.add('hidden'); $('vpn-p-logo-file').value=''; });
+      
       $('broadcast-image-file').addEventListener('change', async (e) => { const f=e.target.files[0]; if(f){ broadcastNoticeImageDataUrl = await compressImageFile(f); $('broadcast-image-preview-img').src=broadcastNoticeImageDataUrl; $('broadcast-image-preview').classList.remove('hidden'); renderBroadcastNoticePreview(); } });
       $('broadcast-image-remove-btn').addEventListener('click', resetBroadcastNoticeImage);
       
@@ -1555,6 +1727,7 @@
       $('submit-vpn-order-btn').addEventListener('click', submitVpnOrder);
       $('submit-btn').addEventListener('click', submitOrder);
       $('payment-paid-btn').addEventListener('click', confirmMarkPaid);
+      $('save-coin-edit-btn').addEventListener('click', saveCoinEdit);
       
       // Admin Tools
       document.querySelectorAll('[data-admin-tab]').forEach(tab => tab.addEventListener('click', () => adminSwitchTab(tab.dataset.adminTab)));
@@ -1563,6 +1736,7 @@
       $('add-coin-btn').addEventListener('click', addCoin);
       $('add-vpn-btn').addEventListener('click', addVpnBrand);
       $('add-payment-btn').addEventListener('click', addPaymentMethod);
+      $('add-vpn-payment-btn').addEventListener('click', addVpnPaymentMethod);
       $('save-branding-btn').addEventListener('click', () => { db.ref('settings/branding/siteName').set(normalizeBrandName($('site-name').value)); db.ref('settings/links').set({channel:normalizeLink($('link-channel').value),help:normalizeLink($('link-help').value)}); showToast('Saved','success'); });
       $('save-disclaimer-btn').addEventListener('click', () => { db.ref('settings/disclaimer/noticeText').set($('disclaimer-text').value); showToast('Saved','success'); });
       $('disclaimer-text').addEventListener('input', () => { disclaimerNoticeValue = $('disclaimer-text').value; renderDisclaimerNotice(); });
