@@ -1057,6 +1057,8 @@
     
     function tgEscape(value){ return String(value ?? '').replace(/[&<>]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[ch])); }
     function telegramApiUrl(method){ return `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/${method}`; }
+    
+    // Telegram Message Builders and Sender Utilities
     function telegramPostByHiddenForm(payload){
       const iframeName = 'tg_notify_' + Date.now();
       const iframe = document.createElement('iframe'); iframe.name = iframeName; iframe.style.display = 'none'; document.body.appendChild(iframe);
@@ -1090,26 +1092,61 @@
       }catch(err){ return false; }
     }
     
+    function orderShortId(order){ return String(order?.id || '').slice(-7) || '—'; }
+    function orderUserLabel(order){ return order?.username && order.username !== 'no_username' ? '@' + order.username : (order?.user || 'Guest'); }
+    function getOrderPaymentNumber(order){ return order?.number || '—'; }
+    function getOrderUserChatId(order){
+      const candidates = [order?.telegram_chat_id, order?.userId, order?.user_id];
+      for(const value of candidates){
+        const chatId = String(value ?? '').trim();
+        if(chatId && chatId !== '0' && /^-?\d+$/.test(chatId)) return chatId;
+      }
+      return '';
+    }
+    async function sendUserTelegramMessage(order, message){
+      const chatId = getOrderUserChatId(order);
+      if(!chatId) return false;
+      return sendTelegramMessage(chatId, message);
+    }
+    function getPaymentProofSrc(order){ return String(order?.payment_proof_image_url || '').trim(); }
+    async function sendUserPaymentProofPhoto(order){
+      const chatId = getOrderUserChatId(order);
+      const src = getPaymentProofSrc(order);
+      if(!chatId || !src) return false;
+      return sendTelegramPhoto(chatId, src, '📸 <b>পেমেন্ট প্রুফ স্ক্রিনশট</b>');
+    }
+
     function buildNewOrderMessage(order){
       if(order.order_type === 'vpn'){
-        return `🆕 <b>NEW VPN ORDER</b>\n\n👤 <b>User:</b> ${tgEscape(order.username ? '@'+order.username : order.user)}\n🆔 <b>User ID:</b> ${tgEscape(order.userId)}\n🌐 <b>VPN:</b> ${tgEscape(order.vpn_brand)}\n📦 <b>Plan:</b> ${tgEscape(order.vpn_plan)}\n💰 <b>Payout:</b> ${Number(order.payable).toFixed(2)}৳\n💳 <b>Method:</b> ${tgEscape(order.method)}\n📱 <b>Payment:</b> ${tgEscape(order.number)}\n\n🆔 <b>Order ID:</b> #${tgEscape(String(order.id).slice(-7))}\n⏳ <b>Status:</b> Pending`;
+        return `🆕 <b>NEW VPN ORDER</b>\n\n👤 <b>User:</b> ${tgEscape(orderUserLabel(order))}\n🆔 <b>User ID:</b> ${tgEscape(order.userId || order.user_id || '—')}\n🌐 <b>VPN:</b> ${tgEscape(order.vpn_brand || '—')}\n📦 <b>Plan:</b> ${tgEscape(order.vpn_plan || '—')}\n💰 <b>Payout:</b> ${Number(order.payable || 0).toFixed(2)}৳\n💳 <b>Method:</b> ${tgEscape(order.method || '—')}\n📱 <b>Payment:</b> ${tgEscape(getOrderPaymentNumber(order))}\n📸 <b>Proof:</b> ${order.proof_uploaded ? 'Uploaded' : 'Not uploaded'}\n\n🆔 <b>Order ID:</b> #${tgEscape(orderShortId(order))}\n⏳ <b>Status:</b> Pending`;
       }
-      return `🆕 <b>NEW COIN ORDER</b>\n\n👤 <b>User:</b> ${tgEscape(order.username ? '@'+order.username : order.user)}\n🆔 <b>User ID:</b> ${tgEscape(order.userId)}\n🪙 <b>Coin:</b> ${tgEscape(order.coin)}\n📦 <b>Amount:</b> ${Number(order.amt).toLocaleString()}\n💰 <b>Payout:</b> ${Number(order.payable).toFixed(2)}৳\n💳 <b>Method:</b> ${tgEscape(order.method)}\n📱 <b>Payment:</b> ${tgEscape(order.number)}\n📨 <b>Sender:</b> ${tgEscape(order.sender)}\n🎯 <b>Target ID:</b> ${tgEscape(order.targetId)}\n\n🆔 <b>Order ID:</b> #${tgEscape(String(order.id).slice(-7))}\n⏳ <b>Status:</b> Pending`;
+      return `🆕 <b>NEW COIN ORDER</b>\n\n👤 <b>User:</b> ${tgEscape(orderUserLabel(order))}\n🆔 <b>User ID:</b> ${tgEscape(order.userId || order.user_id || '—')}\n🪙 <b>Coin:</b> ${tgEscape(order.coin || '—')}\n📦 <b>Amount:</b> ${Number(order.amt || 0).toLocaleString()}\n💰 <b>Payout:</b> ${Number(order.payable || 0).toFixed(2)}৳\n💳 <b>Method:</b> ${tgEscape(order.method || '—')}\n📱 <b>Payment:</b> ${tgEscape(getOrderPaymentNumber(order))}\n📨 <b>Sender:</b> ${tgEscape(order.sender || '—')}\n🎯 <b>Target ID:</b> ${tgEscape(order.targetId || order.target_id || '—')}\n📸 <b>Proof:</b> ${order.proof_uploaded ? 'Uploaded' : 'Not uploaded'}\n\n🆔 <b>Order ID:</b> #${tgEscape(orderShortId(order))}\n⏳ <b>Status:</b> Pending`;
     }
     
     function buildUserOrderSubmittedMessage(order){
-      return `📩 <b>Order Received / অর্ডার গ্রহণ করা হয়েছে</b>\n\nআপনার অর্ডারটি সফলভাবে গ্রহণ করা হয়েছে।\n\n🆔 <b>অর্ডার আইডি:</b> #${tgEscape(String(order.id).slice(-7))}\n${order.order_type === 'vpn' ? `🌐 <b>VPN:</b> ${tgEscape(order.vpn_brand)}\n📦 <b>Plan:</b> ${tgEscape(order.vpn_plan)}` : `🪙 <b>কয়েন:</b> ${tgEscape(order.coin)}\n📦 <b>পরিমাণ:</b> ${Number(order.amt).toLocaleString()}`}\n💰 <b>পেমেন্ট:</b> ${Number(order.payable).toFixed(2)}৳\n💳 <b>মাধ্যম:</b> ${tgEscape(order.method)}`;
+      let details = order.order_type === 'vpn' ? `🌐 <b>VPN:</b> ${tgEscape(order.vpn_brand || '—')}\n📦 <b>Plan:</b> ${tgEscape(order.vpn_plan || '—')}` : `🪙 <b>কয়েন:</b> ${tgEscape(order.coin || '—')}\n📦 <b>পরিমাণ:</b> ${Number(order.amt || 0).toLocaleString()}`;
+      return `📩 <b>অর্ডার গ্রহণ করা হয়েছে</b>\n\nআপনার অর্ডারটি সফলভাবে গ্রহণ করা হয়েছে। আমাদের টিম অর্ডারটি যাচাই করছে।\n\n🆔 <b>অর্ডার আইডি:</b> #${tgEscape(orderShortId(order))}\n${details}\n💰 <b>পেমেন্ট:</b> ${Number(order.payable || 0).toFixed(2)}৳\n💳 <b>মাধ্যম:</b> ${tgEscape(order.method || '—')}\n📱 <b>পেমেন্ট নম্বর:</b> ${tgEscape(getOrderPaymentNumber(order))}\n\n<b>আমাদের সাথে নিরাপদ লেনদেনের জন্য ধন্যবাদ।</b>`;
     }
     
     function buildOrderStatusMessage(order, orderStatus){
-      const status = String(orderStatus).toLowerCase();
+      const status = String(orderStatus || '').toLowerCase();
+      let details = order.order_type === 'vpn' ? `🌐 <b>VPN:</b> ${tgEscape(order.vpn_brand || '—')}` : `🪙 <b>কয়েন:</b> ${tgEscape(order.coin || '—')}\n📦 <b>পরিমাণ:</b> ${Number(order.amt || 0).toLocaleString()}`;
+
       if(status === 'approved' || status === 'completed'){
-        return `✅ <b>Order Approved / অর্ডার অনুমোদিত হয়েছে</b>\n\nআপনার অর্ডারটি অনুমোদন করা হয়েছে।\n\n🆔 <b>অর্ডার আইডি:</b> #${tgEscape(String(order.id).slice(-7))}\n${order.order_type === 'vpn' ? `🌐 <b>VPN:</b> ${tgEscape(order.vpn_brand)}\n🔐 <b>Credentials:</b> Check App History` : `🪙 <b>কয়েন:</b> ${tgEscape(order.coin)}`}\n💰 <b>পেমেন্ট:</b> ${Number(order.payable).toFixed(2)}৳`;
+        let extra = order.order_type === 'vpn' ? `\n🔐 <b>Credentials:</b> Check App History` : `\n💰 <b>পেমেন্ট:</b> ${Number(order.payable || 0).toFixed(2)}৳\n💳 <b>মাধ্যম:</b> ${tgEscape(order.method || '—')}\n📱 <b>পেমেন্ট নম্বর:</b> ${tgEscape(getOrderPaymentNumber(order))}`;
+        return `✅ <b>অর্ডার অনুমোদিত হয়েছে</b>\n\nআপনার অর্ডারটি যাচাই করে অনুমোদন করা হয়েছে।\n\n🆔 <b>অর্ডার আইডি:</b> #${tgEscape(orderShortId(order))}\n${details}${extra}\n\n<b>আমাদের সাথে নিরাপদ লেনদেনের জন্য ধন্যবাদ।</b>`;
       }
+
       if(status === 'rejected'){
-        return `❌ <b>Order Rejected / অর্ডার বাতিল করা হয়েছে</b>\n\nআপনার অর্ডারটি যাচাই করা হয়েছে, কিন্তু এই মুহূর্তে অনুমোদন করা সম্ভব হয়নি।\n\n🆔 <b>অর্ডার আইডি:</b> #${tgEscape(String(order.id).slice(-7))}`;
+        return `❌ <b>অর্ডার বাতিল করা হয়েছে</b>\n\nআপনার অর্ডারটি যাচাই করা হয়েছে, কিন্তু এই মুহূর্তে অনুমোদন করা সম্ভব হয়নি। বিস্তারিত জানতে সাপোর্টে যোগাযোগ করুন।\n\n🆔 <b>অর্ডার আইডি:</b> #${tgEscape(orderShortId(order))}\n${details}\n💳 <b>মাধ্যম:</b> ${tgEscape(order.method || '—')}\n\n<b>আমাদের সাথে থাকার জন্য ধন্যবাদ।</b>`;
       }
-      return `ℹ️ <b>Order Updated</b>\n\nআপনার অর্ডারের স্ট্যাটাস আপডেট করা হয়েছে।`;
+
+      return `ℹ️ <b>অর্ডার আপডেট হয়েছে</b>\n\nআপনার অর্ডারের স্ট্যাটাস আপডেট করা হয়েছে।\n\n🆔 <b>অর্ডার আইডি:</b> #${tgEscape(orderShortId(order))}\n${details}\n\n<b>আমাদের সাথে নিরাপদ লেনদেনের জন্য ধন্যবাদ।</b>`;
+    }
+
+    function buildPaymentPaidMessage(order){
+      let details = order.order_type === 'vpn' ? `🌐 <b>VPN:</b> ${tgEscape(order.vpn_brand || '—')}` : `🪙 <b>কয়েন:</b> ${tgEscape(order.coin || '—')}\n📦 <b>পরিমাণ:</b> ${Number(order.amt || 0).toLocaleString()}`;
+      return `💸 <b>পেমেন্ট সম্পন্ন হয়েছে</b>\n\nআপনার অর্ডারের পেমেন্ট সফলভাবে সম্পন্ন করা হয়েছে। অনুগ্রহ করে আপনার পেমেন্ট অ্যাকাউন্ট চেক করুন।\n\n🆔 <b>অর্ডার আইডি:</b> #${tgEscape(orderShortId(order))}\n${details}\n💰 <b>পেমেন্ট:</b> ${Number(order.payable || 0).toFixed(2)}৳\n💳 <b>মাধ্যম:</b> ${tgEscape(order.method || '—')}\n📱 <b>পেমেন্ট নম্বর:</b> ${tgEscape(getOrderPaymentNumber(order))}\n🔖 <b>রেফারেন্স:</b> ${tgEscape(order.payment_reference_id || '—')}\n\n<b>আমাদের সাথে নিরাপদ লেনদেনের জন্য ধন্যবাদ।</b>`;
     }
 
     function finishLoading(){
@@ -1291,6 +1328,7 @@
       };
       orderRef.set(orderData).then(() => {
         sendTelegramMessage(TELEGRAM_ADMIN_CHAT_ID, buildNewOrderMessage(orderData)); 
+        sendUserTelegramMessage(orderData, buildUserOrderSubmittedMessage(orderData));
         hideConfirm(); closeOrderModal(); showToast('✓ Order Submitted!','success'); userSwitchTab('history-scr');
       }).catch(err => { showToast('Submit failed','error'); }).finally(() => { submitting = false; btn.textContent = '✓ Submit'; btn.disabled = false; });
     }
@@ -1361,6 +1399,7 @@
       };
       orderRef.set(orderData).then(() => {
         sendTelegramMessage(TELEGRAM_ADMIN_CHAT_ID, buildNewOrderMessage(orderData)); 
+        sendUserTelegramMessage(orderData, buildUserOrderSubmittedMessage(orderData));
         $('vpn-checkout-modal').classList.remove('active'); showToast('✓ VPN Order Submitted!','success'); userSwitchTab('history-scr');
       }).catch(err => { showToast('Submit failed','error'); }).finally(() => { submitting = false; btn.textContent = 'CONFIRM VPN ORDER →'; btn.disabled = false; });
     }
@@ -1371,14 +1410,29 @@
       try{ tg.HapticFeedback.impactOccurred('light'); }catch(e){}
     }
     function openSafeLink(url){ const s = normalizeLink(url); if(!s){ showToast('Link not set.','error'); return; } window.open(s,'_blank','noopener,noreferrer'); }
+    
+    // Robust Copy Method (from Update 0.2)
     function fallbackCopyText(txt){
-      const ta = document.createElement('textarea'); ta.value = txt; ta.setAttribute('readonly',''); ta.style.position = 'fixed'; ta.style.left = '-9999px'; document.body.appendChild(ta); ta.focus(); ta.select(); const ok = document.execCommand('copy'); ta.remove(); if(!ok) throw new Error('copy-failed');
+      const ta = document.createElement('textarea'); 
+      ta.value = txt; ta.setAttribute('readonly',''); 
+      ta.style.position = 'fixed'; ta.style.left = '-9999px'; ta.style.top = '0'; 
+      document.body.appendChild(ta); ta.focus(); ta.select(); 
+      const ok = document.execCommand('copy'); ta.remove(); 
+      if(!ok) throw new Error('copy-failed');
     }
     async function copyTextValue(txt,label='Data'){
-      const value = String(txt || '').trim(); if(!value || value === '—') return;
-      try{ if(navigator.clipboard && navigator.clipboard.writeText) await navigator.clipboard.writeText(value); else fallbackCopyText(value); try{ tg.HapticFeedback.notificationOccurred('success'); }catch(e){} showToast(`${label} copied`,'success'); }catch(e){ try{ fallbackCopyText(value); showToast(`${label} copied`,'success'); }catch(err){ showToast('Copy failed','error'); } }
+      const value = String(txt || '').trim(); if(!value || value === '—'){ showToast('No data to copy','warning'); return; }
+      try{ 
+          if(navigator.clipboard && navigator.clipboard.writeText) await navigator.clipboard.writeText(value); 
+          else fallbackCopyText(value); 
+          try{ tg.HapticFeedback.notificationOccurred('success'); }catch(e){} 
+          showToast(`${label} copied`,'success'); 
+      }catch(e){ 
+          try{ fallbackCopyText(value); showToast(`${label} copied`,'success'); }
+          catch(err){ showToast('Copy failed','error'); } 
+      }
     }
-    function copyID(){ copyTextValue($('admin-id').textContent, 'Transfer ID'); }
+    function copyID(){ copyTextValue(currentTID || $('admin-id').textContent, 'Transfer ID'); }
 
     function cleanAdminRouteFromUrl() {
       try { const url = new URL(location.href); url.searchParams.delete('admin'); return url.pathname + url.search + url.hash; } catch(e) { return location.pathname; }
@@ -1402,7 +1456,13 @@
       if(!requireFirebase()) return;
       db.ref('orders').on('value', snap => {
         globalOrders = snap.val() || {}; const cnt = {pending:0,approved:0,rejected:0,payment:0,paid:0};
-        Object.values(globalOrders).forEach(o => { const os = getOrderStatus(o), ps = getPaymentStatus(o); if(cnt[os] !== undefined) cnt[os]++; if(os === 'approved' && ps === 'pending') cnt.payment++; if(os === 'approved' && ps === 'paid') cnt.paid++; });
+        Object.values(globalOrders).forEach(o => { 
+          if (o.hidden_for_admin) return; // Ignore deleted records
+          const os = getOrderStatus(o), ps = getPaymentStatus(o); 
+          if(cnt[os] !== undefined) cnt[os]++; 
+          if(os === 'approved' && ps === 'pending') cnt.payment++; 
+          if(os === 'approved' && ps === 'paid') cnt.paid++; 
+        });
         $('stat-pending').textContent = cnt.pending; $('cnt-pending').textContent = cnt.pending; $('cnt-completed').textContent = cnt.approved; $('cnt-rejected').textContent = cnt.rejected; if($('cnt-payment')) $('cnt-payment').textContent = cnt.payment;
         if(currentAdminTab !== 'settings') renderAdminOrders(); renderUserTrackingSystem();
       });
@@ -1433,6 +1493,7 @@
       const q = currentAdminTab === 'payment' && $('payment-search') ? $('payment-search').value.trim().toLowerCase() : '';
       const payFilter = currentAdminTab === 'payment' && $('payment-filter') ? $('payment-filter').value : 'pending';
       let arr = Object.values(globalOrders || {}).filter(o => {
+        if(o.hidden_for_admin) return false; // Filter out orders hidden by admin
         const os = getOrderStatus(o), ps = getPaymentStatus(o);
         if(currentAdminTab === 'pending') return os === 'pending';
         if(currentAdminTab === 'approved') return os === 'approved';
@@ -1478,11 +1539,18 @@
       const order = globalOrders[id]; if(!order) return;
       const patch = { order_status:status, status:status==='approved'?'completed':status, updated_at:firebase.database.ServerValue.TIMESTAMP };
       if(status === 'approved'){ patch.payment_status = 'pending'; patch.approved_at = firebase.database.ServerValue.TIMESTAMP; }
+      Object.assign(order, patch); // local update for telegram message
       db.ref('orders/' + id).update(patch).then(() => {
+        sendUserTelegramMessage(order, buildOrderStatusMessage(order, status));
         renderAdminOrders(); showToast('Order updated','success'); if(status==='approved') adminSwitchTab('payment');
       });
     }
-    function deleteOrder(id){ adminConfirm('Delete Order?','Cannot be undone.','🗑️', () => { db.ref('orders/'+id).remove().then(()=>showToast('Deleted','warning')); }); }
+    
+    function deleteOrder(id){ 
+      adminConfirm('Hide Order?','This order will be removed from your panel, but users can still see their history.','🗑️', () => { 
+        db.ref('orders/'+id).update({hidden_for_admin: true}).then(()=>showToast('Removed from panel','warning')); 
+      }); 
+    }
 
     function openStockDeliveryModal(orderId, brandKey){
        deliveryTargetOrderId = orderId; deliveryTargetVpnBrand = brandKey;
@@ -1499,10 +1567,12 @@
           order_status: 'approved', status: 'completed', payment_status: 'pending', approved_at: firebase.database.ServerValue.TIMESTAMP,
           delivered_email: stockItem.email, delivered_pass: stockItem.pass
        };
+       Object.assign(order, patch); // update local order object for telegram
        db.ref('orders/'+orderId).update(patch).then(() => {
           db.ref(`vpnConfig/${brandKey}/stock/${stockKey}`).remove();
           $('admin-stock-modal').classList.remove('active');
-          renderAdminOrders(); showToast('VPN Delivered!','success'); adminSwitchTab('payment');
+          sendUserTelegramMessage(order, buildOrderStatusMessage(order, 'approved'));
+          renderAdminOrders(); showToast('VPN Delivered!','success'); adminSwitchTab('approved');
        });
     }
 
@@ -1523,7 +1593,12 @@
       const id = paymentTargetOrderId, refVal = $('payment-ref-input').value.trim(), o = globalOrders[id];
       if(!refVal) return showToast('Enter Reference ID','error');
       const patch = { order_status:'approved', payment_status:'paid', paid_at:firebase.database.ServerValue.TIMESTAMP, payment_reference_id:refVal };
-      db.ref('orders/'+id).update(patch).then(()=>{ closePaymentModal(); renderAdminOrders(); showToast('Marked as Paid','success'); });
+      Object.assign(o, patch);
+      db.ref('orders/'+id).update(patch).then(()=>{ 
+        sendUserTelegramMessage(o, buildPaymentPaidMessage(o));
+        sendUserPaymentProofPhoto(o);
+        closePaymentModal(); renderAdminOrders(); showToast('Marked as Paid','success'); 
+      });
     }
 
     async function handlePaymentProofFileChange(e){
@@ -1733,6 +1808,7 @@
       $('submit-btn').addEventListener('click', submitOrder);
       $('payment-paid-btn').addEventListener('click', confirmMarkPaid);
       $('save-coin-edit-btn').addEventListener('click', saveCoinEdit);
+      $('copy-id-btn').addEventListener('click', copyID);
       
       // Admin Tools
       document.querySelectorAll('[data-admin-tab]').forEach(tab => tab.addEventListener('click', () => adminSwitchTab(tab.dataset.adminTab)));
