@@ -949,6 +949,7 @@
       const raw = String(value ?? '').replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
       return raw || DEFAULT_DISCLAIMER_NOTICE;
     }
+    
     function renderDisclaimerNotice(){
       const text = normalizeDisclaimerNotice(disclaimerNoticeValue);
       ['confirm-disclaimer-text','disclaimer-preview'].forEach(id => {
@@ -1058,7 +1059,6 @@
     function tgEscape(value){ return String(value ?? '').replace(/[&<>]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[ch])); }
     function telegramApiUrl(method){ return `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/${method}`; }
     
-    // Telegram Message Builders and Sender Utilities
     function telegramPostByHiddenForm(payload){
       const iframeName = 'tg_notify_' + Date.now();
       const iframe = document.createElement('iframe'); iframe.name = iframeName; iframe.style.display = 'none'; document.body.appendChild(iframe);
@@ -1068,12 +1068,14 @@
       setTimeout(() => { try{ form.remove(); iframe.remove(); }catch(e){} }, 8000);
       return true;
     }
+    
     async function sendTelegramMessage(chatId, text){
       const target = String(chatId || '').trim(), message = String(text || '').trim();
       if(!TELEGRAM_NOTIFY_ENABLED || !target || !message) return false;
       const payload = { chat_id: target, text: message, parse_mode: 'HTML', disable_web_page_preview: 'true' };
       try{ return telegramPostByHiddenForm(payload); }catch(e){ return false; }
     }
+    
     function dataUrlToBlob(dataUrl){
       const parts = String(dataUrl || '').split(',');
       if(parts.length < 2) throw new Error('Invalid image data');
@@ -1082,11 +1084,14 @@
       for(let i=0;i<binary.length;i++) bytes[i] = binary.charCodeAt(i);
       return new Blob([bytes], {type:mime});
     }
-    async function sendTelegramPhoto(chatId, imageDataUrl, caption=''){
+    
+    // Updated: This function now supports inline buttons (replyMarkup)
+    async function sendTelegramPhoto(chatId, imageDataUrl, caption='', replyMarkup=null){
       if(!TELEGRAM_NOTIFY_ENABLED || !chatId || !imageDataUrl) return false;
       try{
         const formData = new FormData(); formData.append('chat_id', chatId); formData.append('photo', dataUrlToBlob(imageDataUrl), 'proof.jpg');
         if(caption){ formData.append('caption', caption); formData.append('parse_mode', 'HTML'); }
+        if(replyMarkup){ formData.append('reply_markup', JSON.stringify(replyMarkup)); }
         await fetch(telegramApiUrl('sendPhoto'), { method:'POST', mode:'no-cors', body:formData });
         return true;
       }catch(err){ return false; }
@@ -1315,6 +1320,7 @@
       $('submit-btn').onclick = submitOrder; $('confirm-modal').classList.add('active');
     }
     function hideConfirm(){ $('confirm-modal').classList.remove('active'); }
+    
     function submitOrder(){
       if(submitting || !requireFirebase() || guardBannedUser()) return;
       const q = Number($('c-qty').value || 0), sender = $('c-sender').value.trim(), number = $('m-num').value.trim(), method = $('m-select').value;
@@ -1327,8 +1333,13 @@
         proof_image_url:proofImageDataUrl, proof_file_name:proofFileName, proof_uploaded:true, status:'pending', order_status:'pending', payment_status:'pending', timestamp:firebase.database.ServerValue.TIMESTAMP, created_at:firebase.database.ServerValue.TIMESTAMP
       };
       orderRef.set(orderData).then(() => {
-        sendTelegramMessage(TELEGRAM_ADMIN_CHAT_ID, buildNewOrderMessage(orderData)); 
+        // Updated: Setup Reply Markup and send photo to admin
+        const appUrl = window.location.href.split('?')[0];
+        const replyMarkup = { inline_keyboard: [[ { text: "✅ Accept", url: `${appUrl}?admin_action=approved&order_id=${orderId}` }, { text: "❌ Reject", url: `${appUrl}?admin_action=rejected&order_id=${orderId}` } ]] };
+        
+        sendTelegramPhoto(TELEGRAM_ADMIN_CHAT_ID, proofImageDataUrl, buildNewOrderMessage(orderData), replyMarkup); 
         sendUserTelegramMessage(orderData, buildUserOrderSubmittedMessage(orderData));
+        
         hideConfirm(); closeOrderModal(); showToast('✓ Order Submitted!','success'); userSwitchTab('history-scr');
       }).catch(err => { showToast('Submit failed','error'); }).finally(() => { submitting = false; btn.textContent = '✓ Submit'; btn.disabled = false; });
     }
@@ -1384,6 +1395,7 @@
         $('vpn-proof-preview-img').src = vpnProofImageDataUrl; $('vpn-proof-file-name').textContent = vpnProofFileName; $('vpn-proof-preview').classList.remove('hidden'); $('vpn-proof-select-btn').textContent = 'Change Screenshot'; showToast('Screenshot ready','success');
       }catch(err){ resetVpnProofInput(); showToast('Process failed','error'); }finally{ vpnProofProcessing = false; }
     }
+    
     function submitVpnOrder(){
       if(submitting || !requireFirebase() || guardBannedUser()) return;
       const numOrTrx = $('vpn-pay-trx').value.trim();
@@ -1398,8 +1410,13 @@
         proof_image_url:vpnProofImageDataUrl, proof_file_name:vpnProofFileName, proof_uploaded:true, status:'pending', order_status:'pending', payment_status:'pending', timestamp:firebase.database.ServerValue.TIMESTAMP, created_at:firebase.database.ServerValue.TIMESTAMP
       };
       orderRef.set(orderData).then(() => {
-        sendTelegramMessage(TELEGRAM_ADMIN_CHAT_ID, buildNewOrderMessage(orderData)); 
+        // Updated: Setup Reply Markup and send photo to admin
+        const appUrl = window.location.href.split('?')[0];
+        const replyMarkup = { inline_keyboard: [[ { text: "✅ Accept", url: `${appUrl}?admin_action=approved&order_id=${orderId}` }, { text: "❌ Reject", url: `${appUrl}?admin_action=rejected&order_id=${orderId}` } ]] };
+        
+        sendTelegramPhoto(TELEGRAM_ADMIN_CHAT_ID, vpnProofImageDataUrl, buildNewOrderMessage(orderData), replyMarkup); 
         sendUserTelegramMessage(orderData, buildUserOrderSubmittedMessage(orderData));
+        
         $('vpn-checkout-modal').classList.remove('active'); showToast('✓ VPN Order Submitted!','success'); userSwitchTab('history-scr');
       }).catch(err => { showToast('Submit failed','error'); }).finally(() => { submitting = false; btn.textContent = 'CONFIRM VPN ORDER →'; btn.disabled = false; });
     }
@@ -1674,7 +1691,6 @@
       const entries = Object.entries(data || {});
       $('adm-vpn-list').innerHTML = entries.map(([key,v]) => {
          let plansHtml = (v.plans || []).map((p, idx) => `<div class="form-row2" style="margin-bottom:8px;"><input type="text" class="form-input" placeholder="Plan Name" value="${escapeHtml(p.name||'')}" onchange="updateDbField('vpnConfig/${escapeHtml(key)}/plans/${idx}/name', this.value)"><input type="number" class="form-input" placeholder="Price" value="${p.price||''}" onchange="updateDbField('vpnConfig/${escapeHtml(key)}/plans/${idx}/price', Number(this.value))"></div>`).join('');
-         // Add blank plan fields to ensure there are always at least 2 input rows available in admin panel
          if(!(v.plans && v.plans.length >= 2)){
             const startIdx = v.plans ? v.plans.length : 0;
             for(let idx=startIdx; idx<2; idx++) {
@@ -1827,8 +1843,65 @@
       $('add-tutorial-btn').addEventListener('click', () => { const id = db.ref('tutorialVideos').push().key; db.ref('tutorialVideos/'+id).set({video_title:$('tutorial-title').value||'Video', youtube_url:$('tutorial-url').value, created_at:firebase.database.ServerValue.TIMESTAMP}).then(()=>{ $('tutorial-title').value=''; $('tutorial-url').value=''; showToast('Added','success'); }); });
     }
 
+    // Updated: Handle Telegram Inline Keyboard Admin Actions
+    function handleAdminUrlActions(action, orderId) {
+        $('loading').style.display = 'flex';
+        $('loading').style.opacity = '1';
+        $('brand-text').textContent = "Processing Action...";
+        
+        const redirect = () => { window.location.href = window.location.href.split('?')[0]; };
+        
+        const checkFirebase = setInterval(() => {
+            if (firebaseReady && db) {
+                clearInterval(checkFirebase);
+                db.ref('orders/' + orderId).once('value').then(snap => {
+                    const order = snap.val();
+                    if (!order) {
+                        $('brand-text').textContent = "Order not found!";
+                        setTimeout(redirect, 2000);
+                        return;
+                    }
+                    if(order.order_status === action || order.status === 'completed' || order.status === 'rejected') {
+                        $('brand-text').textContent = `Already ${order.order_status.toUpperCase()}`;
+                        setTimeout(redirect, 2000);
+                        return;
+                    }
+                    
+                    const patch = {
+                        order_status: action,
+                        status: action === 'approved' ? 'completed' : action,
+                        updated_at: firebase.database.ServerValue.TIMESTAMP
+                    };
+                    if(action === 'approved') {
+                        patch.payment_status = 'pending'; 
+                        patch.approved_at = firebase.database.ServerValue.TIMESTAMP;
+                    }
+                    
+                    db.ref('orders/' + orderId).update(patch).then(() => {
+                        Object.assign(order, patch);
+                        sendUserTelegramMessage(order, buildOrderStatusMessage(order, action));
+                        $('brand-text').textContent = `✅ Successfully ${action.toUpperCase()}`;
+                        setTimeout(redirect, 2000);
+                    }).catch(err => {
+                        $('brand-text').textContent = "Update failed!";
+                        setTimeout(redirect, 2000);
+                    });
+                });
+            }
+        }, 500);
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
       try{
+        const params = new URLSearchParams(window.location.search);
+        
+        // Intercept inline button clicks from Telegram here
+        if(params.get('admin_action') && params.get('order_id')){
+            initFirebase(); 
+            handleAdminUrlActions(params.get('admin_action'), params.get('order_id'));
+            return;
+        }
+
         initUserProfile(); bindEvents(); renderDisclaimerNotice(); startLegacyBrandObserver(); initFirebase(); startUserListeners();
         const wantsAdmin = new URLSearchParams(location.search).get('admin') === '1';
         if(wantsAdmin){ showAdminPanel(); openSettingsMain(); }else showUserPanel();
