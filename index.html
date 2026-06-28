@@ -418,6 +418,52 @@
     /* Performance hints */
     .coin-card,.coin-box,.order-card,.hist-card{will-change:transform;contain:layout style;}
     .coin-detail-mask{will-change:opacity;}
+
+    /* ===== GREEN GLOW PAYMENT BANNER ===== */
+    @keyframes greenGlow{0%,100%{box-shadow:0 0 10px rgba(52,211,153,.4),0 0 20px rgba(52,211,153,.2)}50%{box-shadow:0 0 20px rgba(52,211,153,.7),0 0 40px rgba(52,211,153,.35),0 0 60px rgba(52,211,153,.15)}}
+    @keyframes glowText{0%,100%{text-shadow:0 0 8px rgba(52,211,153,.6)}50%{text-shadow:0 0 16px rgba(52,211,153,1),0 0 30px rgba(52,211,153,.5)}}
+    .pay-save-banner{background:linear-gradient(135deg,rgba(52,211,153,.12),rgba(16,185,129,.06));border:1px solid rgba(52,211,153,.45);border-radius:var(--radius-xl);padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px;cursor:pointer;animation:riseUp .4s ease both,greenGlow 2.5s ease-in-out infinite;transition:all .2s ease;}
+    .pay-save-banner:active{transform:scale(.98);background:rgba(52,211,153,.2);}
+    .pay-save-icon{width:42px;height:42px;border-radius:12px;background:rgba(52,211,153,.2);border:1px solid rgba(52,211,153,.4);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+    .pay-save-title{font-size:14px;font-weight:900;color:var(--emerald);letter-spacing:.3px;animation:glowText 2.5s ease-in-out infinite;}
+    .pay-save-sub{font-size:10px;font-weight:600;color:rgba(52,211,153,.7);margin-top:2px;}
+    .pay-save-arrow{margin-left:auto;font-size:18px;color:var(--emerald);flex-shrink:0;}
+
+    /* ===== PAYMENT SETTINGS SCREEN ===== */
+    .pay-settings-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+    .pay-settings-method-card{background:var(--panel2);border:1px solid var(--border);border-radius:var(--radius-xl);padding:16px;margin-bottom:12px;animation:riseUp .35s ease both;}
+    .pay-settings-method-head{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+    .pay-settings-method-icon{width:44px;height:44px;border-radius:12px;background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.3);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;overflow:hidden;}
+    .pay-settings-method-icon img{width:100%;height:100%;object-fit:cover;border-radius:10px;}
+    .pay-settings-method-name{font-size:16px;font-weight:900;color:var(--text);}
+    .pay-settings-method-saved{font-size:10px;font-weight:700;color:var(--emerald);margin-top:2px;}
+    .pay-settings-save-btn{width:100%;background:linear-gradient(135deg,var(--emerald),rgba(16,185,129,.75));border:none;padding:13px;border-radius:12px;font-size:13px;font-weight:900;color:#000;transition:all .2s;letter-spacing:.3px;}
+    .pay-settings-save-btn:active{transform:scale(.98);}
+    .pay-settings-empty{text-align:center;padding:40px 20px;color:var(--subtext);font-size:13px;font-weight:600;}
+
+    /* ===== SELL FORM PAYMENT CARDS ===== */
+    .sell-pay-section{margin-bottom:9px;}
+    .sell-pay-section-title{font-size:9px;font-weight:900;letter-spacing:1.5px;color:var(--emerald);display:flex;align-items:center;gap:7px;padding:4px 0 9px 2px;}
+    .sell-pay-section-title::before{content:'';display:block;width:3px;height:12px;border-radius:2px;background:var(--emerald);flex-shrink:0;}
+    .sell-pay-card{background:var(--gray-light);border:2px solid var(--border);border-radius:var(--radius-md);padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .18s ease;margin-bottom:7px;}
+    .sell-pay-card:active{transform:scale(.98);}
+    .sell-pay-card.active{border-color:var(--emerald);background:rgba(52,211,153,.08);box-shadow:0 0 0 1px rgba(52,211,153,.3);}
+    .sell-pay-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#000;flex-shrink:0;transition:all .18s;}
+    .sell-pay-card.active .sell-pay-check{background:var(--emerald);border-color:var(--emerald);color:#000;}
+    .sell-pay-icon{width:36px;height:36px;border-radius:9px;background:rgba(255,255,255,.06);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;overflow:hidden;}
+    .sell-pay-icon img{width:100%;height:100%;object-fit:cover;border-radius:7px;}
+    .sell-pay-name{font-size:13px;font-weight:800;color:var(--text);}
+    .sell-pay-num{font-size:11px;font-weight:600;color:var(--subtext);margin-top:1px;}
+    .sell-pay-num.nosaved{color:var(--warning);}
+    .sell-pay-go{font-size:9px;font-weight:900;color:var(--sky-dark);margin-left:auto;white-space:nowrap;flex-shrink:0;background:var(--sky-light);border:1px solid rgba(56,189,248,.3);padding:4px 9px;border-radius:8px;}
+    .manage-pay-link{font-size:10px;color:var(--sky-dark);text-align:right;font-weight:800;cursor:pointer;padding:3px 0 7px;display:flex;align-items:center;justify-content:flex-end;gap:4px;transition:opacity .15s;}
+    .manage-pay-link:active{opacity:.7;}
+
+    /* ===== COIN AMOUNT K LABEL ===== */
+    .coin-k-label{font-size:9px;font-weight:900;letter-spacing:1.5px;color:var(--subtext);margin-bottom:6px;padding:0 2px;}
+    .coin-k-hint{font-size:10px;color:var(--subtext);margin-top:-6px;margin-bottom:10px;font-weight:600;padding:0 2px;}
+    .coin-k-hint b{color:var(--sky-dark);}
+    .coin-k-display{font-size:11px;font-weight:800;color:var(--emerald);}
   </style>
 </head>
 <body>
@@ -453,9 +499,35 @@
       <button class="qa-btn qa-admin hidden" type="button" id="admin-btn" style="grid-column:1/-1;"><div class="qa-icon" style="background:var(--sky-light);color:var(--sky-dark);">🛡️</div><div><div class="qa-main-text">Admin Panel</div><div class="qa-sub-text" style="color:var(--sky-dark);">RESTRICTED ACCESS</div></div></button>
     </div>
 
+    <!-- GREEN GLOW PAYMENT BANNER -->
+    <div class="pay-save-banner" onclick="userSwitchTab('payment-settings-scr')">
+      <div class="pay-save-icon">💳</div>
+      <div style="flex:1;min-width:0;">
+        <div class="pay-save-title">SAVE YOUR PAYMENT METHOD</div>
+        <div class="pay-save-sub">Tap to save your payment numbers for faster selling</div>
+      </div>
+      <div class="pay-save-arrow">›</div>
+    </div>
+
     <div id="home-scr">
       <div class="sec-title" style="margin-top:18px;">LIVE MARKET <div class="s-dot on" style="margin-left:4px;width:7px;height:7px;"></div></div>
       <div id="market-list"></div>
+    </div>
+
+    <!-- PAYMENT SETTINGS SCREEN -->
+    <div id="payment-settings-scr" style="display:none;padding-top:6px;">
+      <div class="pay-settings-header">
+        <button class="cd-back-btn" type="button" onclick="userSwitchTab('home-scr')">←</button>
+        <div>
+          <div style="font-size:18px;font-weight:900;color:var(--text);">Payment Settings</div>
+          <div style="font-size:10px;font-weight:700;color:var(--subtext);margin-top:2px;">Save your payment numbers</div>
+        </div>
+      </div>
+      <div class="notice-box" style="margin-bottom:14px;">
+        <div class="notice-title">💡 How it works</div>
+        <div class="notice-text">Save your payment number for each method below. When you sell coins, your saved numbers will auto-fill in the form.</div>
+      </div>
+      <div id="payment-settings-list"></div>
     </div>
 
     <div id="vpn-scr" style="display:none;padding-top:6px;">
@@ -485,10 +557,21 @@
       <div class="sheet-handle"></div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><div class="sheet-title" id="m-title">Sell COIN</div><button class="x-btn" type="button" id="close-order-btn">✕</button></div>
       <div class="transfer-id-box"><small>⚡ SEND COIN TO THIS TRANSFER ID</small><div class="tid-value" id="admin-id">—</div><button class="copy-btn" type="button" id="copy-id-btn">⧉ COPY ID</button></div>
-      <input type="number" id="c-qty" class="form-input" placeholder="Enter Amount (Min: 5000)" inputmode="numeric" min="0" step="any">
+      <!-- COIN AMOUNT (K-based) -->
+      <div class="coin-k-label">💰 HOW MANY K (THOUSANDS) OF COINS?</div>
+      <input type="number" id="c-qty" class="form-input" placeholder="e.g. 5.5" inputmode="decimal" min="0" step="0.1">
+      <div class="coin-k-hint">1 K = 1000 coins. Example: <b>5.5 = 5,500 coins</b> | 1000 = <b>1M coins</b></div>
       <input type="text" id="c-sender" class="form-input" placeholder="Sender Username / Transfer Code">
-      <div class="form-row" style="margin-bottom:9px;"><select id="m-select" class="form-input" style="margin-bottom:0;"></select><input type="text" id="m-num" class="form-input" style="margin-bottom:0;" placeholder="Payment Number"></div>
-      <div class="calc-box"><div class="calc-row"><span style="color:var(--subtext);">Coin Unit</span><span id="coin-unit-val" style="font-weight:800;">0.00</span></div><div class="calc-row"><span style="color:var(--subtext);">Base Amount</span><span id="base-val" style="font-weight:800;">0.00 ৳</span></div><div class="calc-row"><span style="color:var(--danger);">Send Fee</span><span id="fee-val" style="color:var(--danger);font-weight:800;">- 5.00 ৳</span></div><div class="calc-divider"></div><div class="calc-row"><span style="color:var(--subtext);">Net Payable</span><span id="c-res" style="color:var(--sky-dark);">0.00 ৳</span></div></div>
+      <!-- Hidden fields (used by submit logic) -->
+      <select id="m-select" class="hidden"></select>
+      <input type="text" id="m-num" class="hidden">
+      <!-- PAYMENT METHOD CARDS -->
+      <div class="sell-pay-section">
+        <div class="sell-pay-section-title">💳 PAYMENT METHOD</div>
+        <div id="sell-pay-cards"></div>
+        <div class="manage-pay-link" onclick="closeOrderModal();userSwitchTab('payment-settings-scr');">⚙ Manage Payment Numbers →</div>
+      </div>
+      <div class="calc-box"><div class="calc-row"><span style="color:var(--subtext);">Coin Unit</span><span id="coin-unit-val" style="font-weight:800;" class="coin-k-display">—</span></div><div class="calc-row"><span style="color:var(--subtext);">Base Amount</span><span id="base-val" style="font-weight:800;">0.00 ৳</span></div><div class="calc-row"><span style="color:var(--danger);">Send Fee</span><span id="fee-val" style="color:var(--danger);font-weight:800;">- 5.00 ৳</span></div><div class="calc-divider"></div><div class="calc-row"><span style="color:var(--subtext);">Net Payable</span><span id="c-res" style="color:var(--sky-dark);">0.00 ৳</span></div></div>
       <div class="proof-upload" id="proof-upload-box">
         <input type="file" id="proof-file" accept="image/*" class="hidden">
         <div class="proof-head"><span>📸 Proof / Screenshot</span><small>Required</small></div>
@@ -962,6 +1045,7 @@
     let selPricingTiers = [], selMinSubmitLimit = DEFAULT_MIN_SUBMIT_LIMIT, selInputType = 'username';
     let channelLinkValue = '', helpLinkValue = '', disclaimerNoticeValue = DEFAULT_DISCLAIMER_NOTICE, submitting = false;
     let proofFileName = '', proofImageDataUrl = '', proofProcessing = false;
+    let currentSellPayMethod = '', currentSellPayNumber = '';
     
     // Config Caches
     let marketCache = {}, vpnConfigCache = {}, paymentMethodsCache = {}, vpnPaymentMethodsCache = {}, tutorialCache = {}, userRegistryCache = {}, globalOrders = {};
@@ -1360,7 +1444,130 @@
 
     function renderUserCoinPayments(data){
       const entries = Object.entries(data || {}).filter(([,v]) => v && v.status !== false);
-      $('m-select').innerHTML = '<option value="">Payment Method</option>' + entries.map(([key]) => `<option value="${escapeHtml(key)}">${escapeHtml(key)}</option>`).join('');
+      // Populate hidden select (keeps existing submit logic working)
+      if($('m-select')) $('m-select').innerHTML = '<option value="">Select Method</option>' + entries.map(([key]) => `<option value="${escapeHtml(key)}">${escapeHtml(key)}</option>`).join('');
+      // Also render the visual payment cards in the sell form
+      renderSellFormPaymentCards();
+    }
+
+    // ===== PAYMENT SETTINGS - localStorage helpers =====
+    function getUserSavedPayments(){
+      try{
+        const key = 'paySettings_' + (currentUserId || 'guest');
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : {};
+      }catch(e){ return {}; }
+    }
+    function saveUserPaymentSetting(method, number){
+      try{
+        const key = 'paySettings_' + (currentUserId || 'guest');
+        const existing = getUserSavedPayments();
+        existing[method] = number;
+        localStorage.setItem(key, JSON.stringify(existing));
+        return true;
+      }catch(e){ return false; }
+    }
+
+    // Render the Payment Settings page
+    function renderPaymentSettingsPage(){
+      const container = $('payment-settings-list');
+      if(!container) return;
+      const methods = Object.entries(paymentMethodsCache || {}).filter(([,v]) => v && v.status !== false);
+      if(!methods.length){
+        container.innerHTML = '<div class="pay-settings-empty">⚠️ No payment methods available.<br>Admin hasn\'t added any payment methods yet.</div>';
+        return;
+      }
+      const saved = getUserSavedPayments();
+      container.innerHTML = methods.map(([key, v], i) => {
+        const savedNum = saved[key] || '';
+        const logoHtml = v.logo
+          ? `<img src="${escapeHtml(v.logo)}" alt="${escapeHtml(key)}">`
+          : '💳';
+        return `<div class="pay-settings-method-card" style="animation-delay:${i*.06}s;">
+          <div class="pay-settings-method-head">
+            <div class="pay-settings-method-icon">${logoHtml}</div>
+            <div>
+              <div class="pay-settings-method-name">${escapeHtml(key)}</div>
+              <div class="pay-settings-method-saved">${savedNum ? '✓ Saved: ' + escapeHtml(savedNum) : 'Not saved yet'}</div>
+            </div>
+          </div>
+          <input type="text" id="pay-setting-num-${escapeHtml(key)}" class="form-input" placeholder="Enter your ${escapeHtml(key)} number" value="${escapeHtml(savedNum)}" inputmode="tel" style="margin-bottom:10px;">
+          <button class="pay-settings-save-btn" type="button" onclick="savePaymentSettingBtn('${escapeHtml(key)}')">
+            💾 Save ${escapeHtml(key)} Number
+          </button>
+        </div>`;
+      }).join('');
+    }
+
+    function savePaymentSettingBtn(method){
+      const input = $('pay-setting-num-' + method);
+      if(!input) return;
+      const number = input.value.trim();
+      if(!number){ showToast('Enter your payment number', 'error'); return; }
+      if(saveUserPaymentSetting(method, number)){
+        showToast('✓ ' + method + ' number saved!', 'success');
+        renderPaymentSettingsPage(); // re-render to update saved display
+        renderSellFormPaymentCards(); // update sell form too
+      }else{ showToast('Could not save. Try again.', 'error'); }
+    }
+
+    // Render sell-form payment method cards
+    function renderSellFormPaymentCards(){
+      const container = $('sell-pay-cards');
+      if(!container) return;
+      const methods = Object.entries(paymentMethodsCache || {}).filter(([,v]) => v && v.status !== false);
+      if(!methods.length){
+        container.innerHTML = '<div style="font-size:11px;color:var(--subtext);text-align:center;padding:12px 0;">No payment methods available.</div>';
+        return;
+      }
+      const saved = getUserSavedPayments();
+      container.innerHTML = methods.map(([key, v]) => {
+        const savedNum = saved[key] || '';
+        const logoHtml = v.logo
+          ? `<img src="${escapeHtml(v.logo)}" alt="${escapeHtml(key)}">`
+          : '💳';
+        const numHtml = savedNum
+          ? `<div class="sell-pay-num">${escapeHtml(savedNum)}</div>`
+          : `<div class="sell-pay-num nosaved">⚠ Number not saved</div>`;
+        const goBtn = !savedNum ? `<div class="sell-pay-go">SET</div>` : '';
+        return `<div class="sell-pay-card" id="sell-pay-card-${escapeHtml(key)}" onclick="selectSellPayMethod('${escapeHtml(key)}','${escapeHtml(savedNum)}')">
+          <div class="sell-pay-check" id="sell-pay-check-${escapeHtml(key)}"></div>
+          <div class="sell-pay-icon">${logoHtml}</div>
+          <div style="flex:1;min-width:0;">
+            <div class="sell-pay-name">${escapeHtml(key)}</div>
+            ${numHtml}
+          </div>
+          ${goBtn}
+        </div>`;
+      }).join('');
+      // Re-select previous if still valid
+      if(currentSellPayMethod) selectSellPayMethod(currentSellPayMethod, saved[currentSellPayMethod] || '');
+    }
+
+    function selectSellPayMethod(method, number){
+      currentSellPayMethod = method;
+      currentSellPayNumber = number;
+      // Update hidden fields for submit logic
+      if($('m-select')) $('m-select').value = method;
+      if($('m-num')) $('m-num').value = number;
+      // Update visual state
+      document.querySelectorAll('.sell-pay-card').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.sell-pay-check').forEach(c => { c.innerHTML = ''; });
+      const card = $('sell-pay-card-' + method);
+      const check = $('sell-pay-check-' + method);
+      if(card) card.classList.add('active');
+      if(check) check.innerHTML = '✓';
+      if(!number){ showToast('No number saved for ' + method + '. Tap "Manage Payment Numbers" to set it.', 'warning'); }
+    }
+
+    // Format K/M display
+    function formatKDisplay(kVal){
+      if(!kVal) return '—';
+      if(kVal >= 1000){
+        const m = kVal / 1000;
+        return (m === Math.floor(m) ? m.toFixed(0) : m.toFixed(2)) + 'M';
+      }
+      return (kVal === Math.floor(kVal) ? kVal.toFixed(0) : kVal.toFixed(2)) + 'K';
     }
 
     function renderUserVpnPayments(data){
@@ -1418,19 +1625,36 @@
         if(Number(v.adminRate)>0 && Number(v.adminRateMinCoins)>0) tiers.push({from:Number(v.adminRateMinCoins), to:999999999, rate:Number(v.adminRate)});
       }
       selPricingTiers = tiers; selR = tiers.length ? tiers[0].rate : 0;
-      $('m-title').textContent = '⚡ Sell ' + key; $('admin-id').textContent = currentTID || '—'; $('c-qty').placeholder = `Enter Amount (Min: ${selMinSubmitLimit.toLocaleString()})`; $('c-sender').placeholder = selInputType === 'code' ? 'Enter Transfer Code' : 'Sender Username';
-      ['c-qty','c-sender','m-num'].forEach(id => $(id).value = ''); $('m-select').value = ''; $('coin-unit-val').textContent = '0.00'; $('base-val').textContent = '0.00 ৳'; $('c-res').textContent = '0.00 ৳'; resetProofInput(); finalP = 0;
+      $('m-title').textContent = '⚡ Sell ' + key;
+      $('admin-id').textContent = currentTID || '—';
+      // Placeholder using K-based min
+      const minK = selMinSubmitLimit / 1000;
+      $('c-qty').placeholder = `e.g. ${minK} (Min: ${formatKDisplay(minK)})`;
+      $('c-sender').placeholder = selInputType === 'code' ? 'Enter Transfer Code' : 'Sender Username';
+      ['c-qty','c-sender'].forEach(id => $(id).value = '');
+      $('coin-unit-val').textContent = '—'; $('base-val').textContent = '0.00 ৳'; $('c-res').textContent = '0.00 ৳';
+      resetProofInput(); finalP = 0;
+      // Reset payment method selection and render cards
+      currentSellPayMethod = ''; currentSellPayNumber = '';
+      if($('m-select')) $('m-select').value = '';
+      if($('m-num')) $('m-num').value = '';
+      renderSellFormPaymentCards();
       $('order-modal').classList.add('active'); try{ tg.HapticFeedback.impactOccurred('light'); }catch(e){}
     }
     function closeOrderModal(){ $('order-modal').classList.remove('active'); }
     function calc(){
-      const q = Number($('c-qty').value || 0);
+      const qK = Number($('c-qty').value || 0); // K amount entered by user
+      const q = qK * 1000; // actual coins
       let activeRate = selR;
       for(const tier of selPricingTiers){
         if(q >= Number(tier.from) && (Number(tier.to) === 0 || q <= Number(tier.to))){ activeRate = Number(tier.rate); break; }
       }
-      const coinUnit = q / 1000, base = coinUnit * activeRate; finalP = Math.max(0, base - SEND_FEE);
-      $('coin-unit-val').textContent = coinUnit.toFixed(2); $('base-val').textContent = money(base); $('c-res').textContent = money(finalP);
+      const coinUnit = qK; // coinUnit is K value
+      const base = coinUnit * activeRate;
+      finalP = Math.max(0, base - SEND_FEE);
+      $('coin-unit-val').textContent = qK ? formatKDisplay(qK) : '—';
+      $('base-val').textContent = money(base);
+      $('c-res').textContent = money(finalP);
     }
     function resetProofInput(){
       proofFileName = ''; proofImageDataUrl = ''; proofProcessing = false;
@@ -1450,19 +1674,25 @@
     }
     function showConfirm(){
       if(!requireFirebase()) return;
-      const q = Number($('c-qty').value || 0), sender = $('c-sender').value.trim(), number = $('m-num').value.trim(), method = $('m-select').value;
-      if(!selC || !q || q < selMinSubmitLimit || !sender || !method || !number){ showToast('Fill all fields correctly','error'); return; }
+      const qK = Number($('c-qty').value || 0);
+      const q = qK * 1000; // actual coins
+      const sender = $('c-sender').value.trim(), number = $('m-num').value.trim(), method = $('m-select').value;
+      if(!selC || !qK || q < selMinSubmitLimit || !sender || !method || !number){ showToast('Fill all fields correctly','error'); return; }
       if(!proofImageDataUrl){ showToast('Upload proof screenshot','error'); return; }
-      calc(); $('sum-amt').textContent = `${q} ${selC}`; $('sum-method').textContent = method; $('sum-number').textContent = number; $('sum-sender').textContent = sender; $('sum-total').textContent = money(finalP);
+      calc();
+      const displayAmt = formatKDisplay(qK) + ' ' + selC;
+      $('sum-amt').textContent = displayAmt; $('sum-method').textContent = method; $('sum-number').textContent = number; $('sum-sender').textContent = sender; $('sum-total').textContent = money(finalP);
       $('submit-btn').onclick = submitOrder; $('confirm-modal').classList.add('active');
     }
     function hideConfirm(){ $('confirm-modal').classList.remove('active'); }
     function submitOrder(){
       if(submitting || !requireFirebase() || guardBannedUser()) return;
-      const q = Number($('c-qty').value || 0), sender = $('c-sender').value.trim(), number = $('m-num').value.trim(), method = $('m-select').value;
+      const qK = Number($('c-qty').value || 0);
+      const q = qK * 1000; // actual coins
+      const sender = $('c-sender').value.trim(), number = $('m-num').value.trim(), method = $('m-select').value;
       let activeRate = selR;
       for(const tier of selPricingTiers){ if(q >= Number(tier.from) && (Number(tier.to)===0||q<=Number(tier.to))){ activeRate=Number(tier.rate); break; } }
-      const coinUnit = q / 1000;
+      const coinUnit = qK; // K unit
       submitting = true; const btn = $('submit-btn'); btn.textContent = '⏳ Submitting...'; btn.disabled = true;
       const orderRef = db.ref('orders').push(); const orderId = orderRef.key;
       const orderData = {
@@ -1549,8 +1779,14 @@
     }
 
     function userSwitchTab(screenId){
-      ['home-scr','vpn-scr','history-scr','tutorial-scr'].forEach(s => $(s).style.display = s === screenId ? 'block' : 'none');
+      ['home-scr','vpn-scr','history-scr','tutorial-scr','payment-settings-scr'].forEach(s => {
+        const el = $(s); if(el) el.style.display = s === screenId ? 'block' : 'none';
+      });
       document.querySelectorAll('#user-nav .nav-tab').forEach(tab => tab.classList.toggle('active', tab.dataset.screen === screenId));
+      // Render payment settings page when switching to it
+      if(screenId === 'payment-settings-scr') renderPaymentSettingsPage();
+      // Refresh sell form cards when returning home (in case settings changed)
+      if(screenId === 'home-scr') renderSellFormPaymentCards();
       try{ tg.HapticFeedback.impactOccurred('light'); }catch(e){}
     }
     function openSafeLink(url){ const s = normalizeLink(url); if(!s){ showToast('Link not set.','error'); return; } window.open(s,'_blank','noopener,noreferrer'); }
