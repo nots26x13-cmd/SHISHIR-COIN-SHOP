@@ -557,10 +557,10 @@
       <div class="sheet-handle"></div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><div class="sheet-title" id="m-title">Sell COIN</div><button class="x-btn" type="button" id="close-order-btn">✕</button></div>
       <div class="transfer-id-box"><small>⚡ SEND COIN TO THIS TRANSFER ID</small><div class="tid-value" id="admin-id">—</div><button class="copy-btn" type="button" id="copy-id-btn">⧉ COPY ID</button></div>
-      <!-- COIN AMOUNT (K-based) -->
-      <div class="coin-k-label">💰 HOW MANY K (THOUSANDS) OF COINS?</div>
-      <input type="number" id="c-qty" class="form-input" placeholder="e.g. 5.5" inputmode="decimal" min="0" step="0.1">
-      <div class="coin-k-hint">1 K = 1000 coins. Example: <b>5.5 = 5,500 coins</b> | 1000 = <b>1M coins</b></div>
+      <!-- COIN AMOUNT (full coin count entered directly) -->
+      <div class="coin-k-label">💰 HOW MANY COINS DO YOU WANT TO SELL?</div>
+      <input type="number" id="c-qty" class="form-input" placeholder="e.g. 5500" inputmode="decimal" min="0" step="1">
+      <div class="coin-k-hint">Enter your full coin amount. Example: <b>5500 = 5,500 coins</b> | <b>1000000 = 1M coins</b></div>
       <input type="text" id="c-sender" class="form-input" placeholder="Sender Username / Transfer Code">
       <!-- Hidden fields (used by submit logic) -->
       <select id="m-select" class="hidden"></select>
@@ -1400,7 +1400,10 @@
 
     function formatCoinNum(n){
       const num = Number(n||0);
-      if(num>=1000000) return (num/1000).toLocaleString()+'K';
+      if(num>=1000000){
+        const m = num/1000000;
+        return (m === Math.floor(m) ? m.toFixed(0) : m.toFixed(2)) + 'M';
+      }
       if(num>=1000) return (num/1000).toLocaleString()+'K';
       return num.toLocaleString();
     }
@@ -1627,9 +1630,8 @@
       selPricingTiers = tiers; selR = tiers.length ? tiers[0].rate : 0;
       $('m-title').textContent = '⚡ Sell ' + key;
       $('admin-id').textContent = currentTID || '—';
-      // Placeholder using K-based min
-      const minK = selMinSubmitLimit / 1000;
-      $('c-qty').placeholder = `e.g. ${minK} (Min: ${formatKDisplay(minK)})`;
+      // Placeholder using full coin min
+      $('c-qty').placeholder = `e.g. ${selMinSubmitLimit} (Min: ${formatKDisplay(selMinSubmitLimit/1000)})`;
       $('c-sender').placeholder = selInputType === 'code' ? 'Enter Transfer Code' : 'Sender Username';
       ['c-qty','c-sender'].forEach(id => $(id).value = '');
       $('coin-unit-val').textContent = '—'; $('base-val').textContent = '0.00 ৳'; $('c-res').textContent = '0.00 ৳';
@@ -1643,16 +1645,16 @@
     }
     function closeOrderModal(){ $('order-modal').classList.remove('active'); }
     function calc(){
-      const qK = Number($('c-qty').value || 0); // K amount entered by user
-      const q = qK * 1000; // actual coins
+      const q = Number($('c-qty').value || 0); // full coin amount entered by user
+      const qK = q / 1000; // K equivalent, used for rate math/display only
       let activeRate = selR;
       for(const tier of selPricingTiers){
         if(q >= Number(tier.from) && (Number(tier.to) === 0 || q <= Number(tier.to))){ activeRate = Number(tier.rate); break; }
       }
-      const coinUnit = qK; // coinUnit is K value
+      const coinUnit = qK; // rate is applied per 1,000 coins
       const base = coinUnit * activeRate;
       finalP = Math.max(0, base - SEND_FEE);
-      $('coin-unit-val').textContent = qK ? formatKDisplay(qK) : '—';
+      $('coin-unit-val').textContent = q ? formatKDisplay(qK) : '—';
       $('base-val').textContent = money(base);
       $('c-res').textContent = money(finalP);
     }
@@ -1674,25 +1676,25 @@
     }
     function showConfirm(){
       if(!requireFirebase()) return;
-      const qK = Number($('c-qty').value || 0);
-      const q = qK * 1000; // actual coins
+      const q = Number($('c-qty').value || 0); // full coin amount entered by user
+      const qK = q / 1000;
       const sender = $('c-sender').value.trim(), number = $('m-num').value.trim(), method = $('m-select').value;
-      if(!selC || !qK || q < selMinSubmitLimit || !sender || !method || !number){ showToast('Fill all fields correctly','error'); return; }
+      if(!selC || !q || q < selMinSubmitLimit || !sender || !method || !number){ showToast('Fill all fields correctly','error'); return; }
       if(!proofImageDataUrl){ showToast('Upload proof screenshot','error'); return; }
       calc();
-      const displayAmt = formatKDisplay(qK) + ' ' + selC;
+      const displayAmt = q.toLocaleString() + ' ' + selC;
       $('sum-amt').textContent = displayAmt; $('sum-method').textContent = method; $('sum-number').textContent = number; $('sum-sender').textContent = sender; $('sum-total').textContent = money(finalP);
       $('submit-btn').onclick = submitOrder; $('confirm-modal').classList.add('active');
     }
     function hideConfirm(){ $('confirm-modal').classList.remove('active'); }
     function submitOrder(){
       if(submitting || !requireFirebase() || guardBannedUser()) return;
-      const qK = Number($('c-qty').value || 0);
-      const q = qK * 1000; // actual coins
+      const q = Number($('c-qty').value || 0); // full coin amount entered by user
+      const qK = q / 1000;
       const sender = $('c-sender').value.trim(), number = $('m-num').value.trim(), method = $('m-select').value;
       let activeRate = selR;
       for(const tier of selPricingTiers){ if(q >= Number(tier.from) && (Number(tier.to)===0||q<=Number(tier.to))){ activeRate=Number(tier.rate); break; } }
-      const coinUnit = qK; // K unit
+      const coinUnit = qK; // rate applied per 1,000 coins
       submitting = true; const btn = $('submit-btn'); btn.textContent = '⏳ Submitting...'; btn.disabled = true;
       const orderRef = db.ref('orders').push(); const orderId = orderRef.key;
       const orderData = {
